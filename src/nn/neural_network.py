@@ -29,7 +29,7 @@ class NeuralNetwork:
         return x * 2
 
     def feedforward(self, inputs: List[float]) -> float:
-        input_matrix = Matrix.column_from_array(np.array(inputs))
+        input_matrix = Matrix.from_matrix_array(np.array(inputs))
 
         hidden = Matrix.multiply(self._weights_ih, input_matrix)
         hidden = Matrix.add(hidden, self._bias_h)
