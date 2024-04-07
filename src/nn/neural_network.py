@@ -6,10 +6,23 @@ from src.math.matrix import Matrix
 
 
 class NeuralNetwork:
+    """
+    This class can be used to create a NeuralNetwork with specified layer sizes. This neural network can feedforward a
+    list of inputs, and be trained through backpropagation of errors.
+    """
+
     WEIGHTS_RANGE = [-1, 1]
     BIAS_RANGE = [-1, 1]
 
     def __init__(self, input_nodes: int, hidden_nodes: int, output_nodes: int) -> None:
+        """
+        Initialise NeuralNetwork object with specified layer sizes.
+
+        Parameters:
+            input_nodes (int): Number of inputs
+            hidden_nodes (int): Number of hidden nodes
+            output_nodes (int): Number of outputs
+        """
         self._input_nodes = input_nodes
         self._hidden_nodes = hidden_nodes
         self._output_nodes = output_nodes
@@ -29,6 +42,15 @@ class NeuralNetwork:
         return x * 2
 
     def feedforward(self, inputs: List[float]) -> List[float]:
+        """
+        Feedforward a list of inputs.
+
+        Parameters:
+            inputs (List[float]): List of input values
+
+        Returns:
+            output (List[float]): List of outputs
+        """
         input_matrix = Matrix.from_matrix_array(np.array(inputs))
 
         hidden = Matrix.multiply(self._weights_ih, input_matrix)
@@ -41,5 +63,12 @@ class NeuralNetwork:
         output = Matrix.transpose(output)
         return cast(List[float], output.data[0])
 
-    def train(self, inputs: List[float], expected_output: float) -> None:
+    def train(self, inputs: List[float], expected_outputs: List[float]) -> None:
+        """
+        Train NeuralNetwork using a list of input values and expected  output values.
+
+        Parameters:
+            inputs (List[float]): List of input values
+            expected_outputs (List[float]): List of output values
+        """
         pass
