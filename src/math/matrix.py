@@ -7,7 +7,19 @@ from numpy.typing import NDArray
 
 
 class Matrix:
+    """
+    This class handles the matrix mathematics required to pass data through neural networks.
+    """
+
     def __init__(self, rows: int, cols: int, data: Optional[NDArray] = None) -> None:
+        """
+        Initialise Matrix with number of rows and columns, and optionally the matrix values.
+
+        Parameters:
+            rows (int): Number of rows in matrix
+            cols (int): Number of columns in matrix
+            data (Optional[NDArray]): Matrix values if specified
+        """
         self._rows = rows
         self._cols = cols
         self._data = data
@@ -27,37 +39,85 @@ class Matrix:
 
     @classmethod
     def from_matrix_array(cls, matrix_array: NDArray) -> Matrix:
-        rows, cols = matrix_array.shape
-        _matrix = cls(rows, cols, matrix_array)
-        return _matrix
+        """
+        Create a Matrix from an array.
 
-    @classmethod
-    def column_from_array(cls, matrix_array: NDArray) -> Matrix:
-        matrix_array = np.expand_dims(matrix_array, axis=1)
-        _matrix = cls.from_matrix_array(matrix_array)
-        return _matrix
+        Parameters:
+            matrix_array (NDArray): Array of matrix values
+
+        Returns:
+            matrix (Matrix): Matrix with assigned values
+        """
+        try:
+            _rows, _cols = matrix_array.shape
+        except ValueError:
+            matrix_array = np.expand_dims(matrix_array, axis=1)
+            _rows, _cols = matrix_array.shape
+
+        matrix = cls(_rows, _cols, matrix_array)
+        return matrix
 
     @classmethod
     def random_matrix(cls, rows: int, cols: int, low: float, high: float) -> Matrix:
+        """
+        Create Matrix of specified shape with random values in specified range.
+
+        Parameters:
+            rows (int): Number of rows in matrix
+            cols (int): Number of columns in matrix
+            low (float): Lower boundary for random number
+            high (float): Upper boundary for random number
+
+        Returns:
+            matrix (Matrix): Matrix with random values
+        """
         _data = np.random.uniform(low=low, high=high, size=(rows, cols))
-        _matrix = cls(rows, cols, _data)
-        return _matrix
+        matrix = cls.from_matrix_array(_data)
+        return matrix
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
-        _matrix = cls.random_matrix(rows=rows, cols=1, low=low, high=high)
-        return _matrix
+        """
+        Create column Matrix with random values in specified range.
+
+        Parameters:
+            rows (int): Number of rows in matrix
+            low (float): Lower boundary for random number
+            high (float): Upper boundary for random number
+
+        Returns:
+            matrix (Matrix): Column Matrix with random values
+        """
+        matrix = cls.random_matrix(rows=rows, cols=1, low=low, high=high)
+        return matrix
 
     @staticmethod
-    def add(matrix: Matrix, val: Matrix | float) -> Matrix:
-        if isinstance(val, Matrix):
-            val = val.data
+    def add(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+        """
+        Add two Matrix objects.
 
-        new_matrix = matrix.data + val
+        Parameters:
+            matrix (Matrix): Matrix to use in sum
+            other_matrix (Matrix): Other Matrix to use in sum
+
+        Returns:
+            new_matrix (Matrix): Sum of both matrices
+        """
+        new_matrix = matrix.data + other_matrix.data
         return Matrix.from_matrix_array(new_matrix)
 
     @staticmethod
     def multiply(matrix: Matrix, val: Matrix | float) -> Matrix:
+        """
+        Multiply Matrix with scalar or Matrix.
+
+        Parameters:
+            matrix (Matrix): Matrix to multiply
+            val (Matrix | float): Matrix or scalar to use for multiplication
+
+        Returns:
+            new_matrix (Matrix): Multiplied Matrix
+        """
         if isinstance(val, Matrix):
             val = val.data
         new_matrix = matrix.data.dot(val)
@@ -65,10 +125,28 @@ class Matrix:
 
     @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
+        """
+        Return transpose of Matrix.
+
+        Parameters:
+            matrix (Matrix): Matrix to transpose
+
+        Returns:
+            new_matrix (Matrix): Transposed Matrix
+        """
         new_matrix = matrix.data.transpose()
         return Matrix.from_matrix_array(new_matrix)
 
     @staticmethod
     def map(matrix: Matrix, func: Callable) -> Matrix:
+        """
+        Map all values of Matrix through specified function.
+
+        Parameters:
+            matrix (Matrix): Matrix to map
+
+        Returns:
+            new_matrix (Matrix): Matrix with mapped values
+        """
         new_matrix = np.vectorize(func)(matrix.data)
         return Matrix.from_matrix_array(new_matrix)
