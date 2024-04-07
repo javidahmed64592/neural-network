@@ -28,7 +28,7 @@ class NeuralNetwork:
     def _activation(x):
         return x * 2
 
-    def feedforward(self, inputs: List[float]) -> float:
+    def feedforward(self, inputs: List[float]) -> List[float]:
         input_matrix = Matrix.from_matrix_array(np.array(inputs))
 
         hidden = Matrix.multiply(self._weights_ih, input_matrix)
@@ -39,7 +39,7 @@ class NeuralNetwork:
         output = Matrix.add(output, self._bias_o)
         output = Matrix.map(output, NeuralNetwork._activation)
         output = Matrix.transpose(output)
-        return cast(float, output.data[0])
+        return cast(List[float], output.data[0])
 
     def train(self, inputs: List[float], expected_output: float) -> None:
         pass
