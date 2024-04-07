@@ -62,7 +62,7 @@ class Node:
         Returns:
             error (float): Difference between predicted and expected output
         """
-        error = predicted_output - expected_output
+        error = expected_output - predicted_output
         return error
 
     def _calculate_delta_w(self, inputs: NDArray, error: float) -> NDArray:
