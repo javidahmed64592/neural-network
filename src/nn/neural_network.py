@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, cast
 
 import numpy as np
 
@@ -39,7 +39,7 @@ class NeuralNetwork:
         output = Matrix.add(output, self._bias_o)
         output = Matrix.map(output, NeuralNetwork._activation)
         output = Matrix.transpose(output)
-        return output.data[0]
+        return cast(float, output.data[0])
 
     def train(self, inputs: List[float], expected_output: float) -> None:
         pass

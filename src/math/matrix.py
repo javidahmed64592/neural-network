@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 from numpy.typing import NDArray
 
 
 class Matrix:
-    def __init__(self, rows: int, cols: int, data: NDArray = Optional[None]) -> None:
+    def __init__(self, rows: int, cols: int, data: Optional[NDArray] = None) -> None:
         self._rows = rows
         self._cols = cols
         self._data = data
@@ -17,7 +17,7 @@ class Matrix:
 
     @property
     def data(self):
-        if not self._data.any():
+        if self._data is None:
             self._data = np.zeros(shape=self.shape)
         return self._data
 
@@ -33,10 +33,8 @@ class Matrix:
 
     @classmethod
     def column_from_array(cls, matrix_array: NDArray) -> Matrix:
-        rows = matrix_array.shape[0]
-        cols = 1
         matrix_array = np.expand_dims(matrix_array, axis=1)
-        _matrix = cls(rows, cols, matrix_array)
+        _matrix = cls.from_matrix_array(matrix_array)
         return _matrix
 
     @classmethod
@@ -47,8 +45,7 @@ class Matrix:
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
-        _data = np.random.uniform(low=low, high=high, size=(rows, 1))
-        _matrix = cls(rows, 1, _data)
+        _matrix = cls.random_matrix(rows=rows, cols=1, low=low, high=high)
         return _matrix
 
     @staticmethod
@@ -72,6 +69,6 @@ class Matrix:
         return Matrix.from_matrix_array(new_matrix)
 
     @staticmethod
-    def map(matrix: Matrix, func: function) -> Matrix:
+    def map(matrix: Matrix, func: Callable) -> Matrix:
         new_matrix = np.vectorize(func)(matrix.data)
         return Matrix.from_matrix_array(new_matrix)
