@@ -12,6 +12,7 @@ class Node:
     """
 
     WEIGHTS_RANGE = [-1, 1]
+    BIAS_RANGE = [-1, 1]
     LR = 0.00001
 
     def __init__(self, num_weights: int) -> None:
@@ -21,7 +22,8 @@ class Node:
         Parameters:
             num_weights (int): Number of weights for node
         """
-        self._weights = np.random.uniform(low=self.WEIGHTS_RANGE[0], high=self.WEIGHTS_RANGE[1], size=(num_weights + 1))
+        self._weights = np.random.uniform(low=self.WEIGHTS_RANGE[0], high=self.WEIGHTS_RANGE[1], size=(num_weights))
+        self._bias = np.random.uniform(low=self.BIAS_RANGE[0], high=self.BIAS_RANGE[1])
 
     def _activation(self, x: float) -> float:
         """
@@ -46,7 +48,7 @@ class Node:
         Returns:
             output (float): Inputs multiplied by weight
         """
-        output = np.sum(self._weights[:-1] * np.array(inputs)) + self._weights[-1]
+        output = np.sum(self._weights * np.array(inputs)) + self._bias
         return cast(float, output)
 
     def _calculate_error(self, predicted_output: float, expected_output: float) -> float:
@@ -75,9 +77,21 @@ class Node:
             delta_w (NDArray): Array to add to weights
         """
         delta_factor = error * self.LR
-        inputs.append(self._weights[-1])
         delta_w = np.array(inputs) * delta_factor
         return delta_w
+
+    def _calculate_delta_b(self, error: float) -> float:
+        """
+        Calculate delta_b to modify bias through backpropagation.
+
+        Paremeters:
+            error (float): Error from node output
+
+        Returns:
+            delta_b (float): Number to add to bias
+        """
+        delta_b = error * self.LR
+        return delta_b
 
     def _backpropagate(self, inputs: List[float], error: float) -> None:
         """
@@ -88,6 +102,7 @@ class Node:
             error (float): Error from node output
         """
         self._weights += self._calculate_delta_w(inputs, error)
+        self._bias += self._calculate_delta_b(error)
 
     def feedforward(self, inputs: List[float]) -> float:
         """

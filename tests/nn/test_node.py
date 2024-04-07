@@ -10,7 +10,7 @@ class TestNode:
     def test_given_inputs_when_calculating_output_then_check_output_correctly_calculated(self):
         expected_output = (
             sum([(self.test_inputs[i] * self.test_node._weights[i]) for i in range(self.test_num_inputs)])
-            + self.test_node._weights[-1]
+            + self.test_node._bias
         )
         actual_output = self.test_node._calculate_output(self.test_inputs)
         assert actual_output == expected_output
@@ -28,3 +28,10 @@ class TestNode:
         actual_delta_w = self.test_node._calculate_delta_w(self.test_inputs, error)
         for actual, expected in zip(actual_delta_w, expected_delta_w):
             assert actual == expected
+
+    def test_given_inputs_and_error_when_calculating_delta_b_then_check_delta_b_correctly_calculated(self):
+        output = self.test_node._calculate_output(self.test_inputs)
+        error = self.test_node._calculate_error(output, self.test_expected_output)
+        expected_delta_b = error * self.test_node.LR
+        actual_delta_b = self.test_node._calculate_delta_b(error)
+        assert actual_delta_b == expected_delta_b
