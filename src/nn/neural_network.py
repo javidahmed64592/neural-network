@@ -71,4 +71,12 @@ class NeuralNetwork:
             inputs (List[float]): List of input values
             expected_outputs (List[float]): List of output values
         """
-        pass
+        outputs = self.feedforward(inputs)
+        outputs_matrix = Matrix.from_matrix_array(outputs)
+        expected_matrix = Matrix.from_matrix_array(expected_outputs)
+        output_errors = Matrix.subtract(expected_matrix, outputs_matrix)
+
+        weights_ho_t = Matrix.transpose(self._weights_ho)
+
+        hidden_errors = Matrix.multiply(weights_ho_t, output_errors)
+        print(hidden_errors)
