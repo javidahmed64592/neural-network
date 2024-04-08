@@ -48,6 +48,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with assigned values
         """
+        matrix_array = np.array(matrix_array)
         try:
             _rows, _cols = matrix_array.shape
         except ValueError:
@@ -104,6 +105,21 @@ class Matrix:
             new_matrix (Matrix): Sum of both matrices
         """
         new_matrix = matrix.data + other_matrix.data
+        return Matrix.from_matrix_array(new_matrix)
+
+    @staticmethod
+    def subtract(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+        """
+        Subtract two Matrix objects.
+
+        Parameters:
+            matrix (Matrix): Matrix to use in subtraction
+            other_matrix (Matrix): Other Matrix to use in subtraction
+
+        Returns:
+            new_matrix (Matrix): Difference between both matrices
+        """
+        new_matrix = matrix.data - other_matrix.data
         return Matrix.from_matrix_array(new_matrix)
 
     @staticmethod
