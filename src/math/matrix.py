@@ -128,7 +128,7 @@ class Matrix:
         Multiply Matrix with scalar or Matrix.
 
         Parameters:
-            matrix (Matrix): Matrix to multiply
+            matrix (Matrix): Matrix to to use for multiplication
             val (Matrix | float): Matrix or scalar to use for multiplication
 
         Returns:
@@ -137,6 +137,21 @@ class Matrix:
         if isinstance(val, Matrix):
             val = val.data
         new_matrix = matrix.data.dot(val)
+        return Matrix.from_matrix_array(new_matrix)
+
+    @staticmethod
+    def multiply_element_wise(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+        """
+        Multiply Matrix element wise with Matrix.
+
+        Parameters:
+            matrix (Matrix): Matrix to use for multiplication
+            other_matrix (Matrix): Other Matrix to use for multiplication
+
+        Returns:
+            new_matrix (Matrix): Multiplied Matrix
+        """
+        new_matrix = matrix.data * other_matrix.data
         return Matrix.from_matrix_array(new_matrix)
 
     @staticmethod
