@@ -4,13 +4,7 @@ import numpy as np
 
 from src.math.activation_functions import ActivationFunctions
 from src.math.matrix import Matrix
-from src.math.nn_math import (
-    calculate_delta,
-    calculate_error_from_expected,
-    calculate_gradient,
-    calculate_next_errors,
-    feedforward_through_layer,
-)
+from src.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from src.nn.layer import Layer
 
 
