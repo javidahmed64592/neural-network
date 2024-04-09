@@ -1,36 +1,27 @@
-from typing import List
+import numpy as np
 
-from src.models.point import Point
-from src.nn.node import Node
-
-
-def generate_training_set(num_points: int) -> List[Point]:
-    return Point.training_set(num_points)
+from src.nn.neural_network import NeuralNetwork
 
 
-def main(num_inputs, num_points):
-    node = Node(num_inputs)
+def main():
+    num_inputs = 2
+    num_hidden = 4
+    num_outputs = 1
 
-    num_iters = 100
-    for i in range(num_iters):
-        m = -node._weights[0] / node._weights[1]
-        c = -node._weights[2] / node._weights[1]
-        print(f"\rGeneration {i+1} / {num_iters}: {m:.2f} x + {c:.2f}", end="", flush=True)
-        points = generate_training_set(num_points)
-        point_inputs = [[point.x, point.y] for point in points]
-        point_targets = [point.label for point in points]
-        for input, target in zip(point_inputs, point_targets):
-            node.train(input, target)
+    inputs = [[0, 1], [1, 0], [1, 1], [0, 0]]
+    outputs = [[1], [1], [0], [0]]
 
-    print("\nTraining complete!")
-    print(f"Guess: {node.feedforward([0.3, 0.6])} Expected: -1")
-    print(f"Guess: {node.feedforward([0.9, 0.1])} Expected: 1")
-    print(f"Guess: {node.feedforward([0.4, -1])} Expected: 1")
-    print(f"Guess: {node.feedforward([-0.4, 0.5])} Expected: -1")
+    nn = NeuralNetwork(num_inputs, num_hidden, num_outputs)
+
+    for _ in range(20000):
+        random_choice = np.random.randint(low=0, high=len(inputs))
+        nn.train(inputs[random_choice], outputs[random_choice])
+
+    print(f"Guessing inputs {inputs[0]}: Calculated outputs {nn.feedforward(inputs[0])} \t| Expected: {outputs[0]}")
+    print(f"Guessing inputs {inputs[1]}: Calculated outputs {nn.feedforward(inputs[1])} \t| Expected: {outputs[1]}")
+    print(f"Guessing inputs {inputs[2]}: Calculated outputs {nn.feedforward(inputs[2])} \t| Expected: {outputs[2]}")
+    print(f"Guessing inputs {inputs[3]}: Calculated outputs {nn.feedforward(inputs[3])} \t| Expected: {outputs[3]}")
 
 
 if __name__ == "__main__":
-    num_points = 2000
-    num_inputs = 2
-
-    main(num_inputs, num_points)
+    main()
