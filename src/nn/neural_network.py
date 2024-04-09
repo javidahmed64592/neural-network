@@ -6,9 +6,9 @@ from src.math.activation_functions import ActivationFunctions
 from src.math.matrix import Matrix
 from src.math.nn_math import (
     calculate_delta,
-    calculate_error_from_errors,
     calculate_error_from_expected,
     calculate_gradient,
+    calculate_next_errors,
     feedforward_through_layer,
 )
 
@@ -88,7 +88,7 @@ class NeuralNetwork:
         self._bias_o = Matrix.add(self._bias_o, gradient_ho)
 
         # Calculate errors
-        hidden_errors = calculate_error_from_errors(self._weights_ho, output_errors)
+        hidden_errors = calculate_next_errors(self._weights_ho, output_errors)
 
         # Calculate gradient
         gradient_ih = calculate_gradient(hidden, hidden_errors, self.LR)
