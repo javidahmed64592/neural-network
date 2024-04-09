@@ -1,8 +1,9 @@
-import numpy as np
-
 from src.math import nn_math
-from src.math.activation_functions import ActivationFunctions
 from src.math.matrix import Matrix
+
+
+def activation(x):
+    return x
 
 
 class TestNNMath:
@@ -14,7 +15,9 @@ class TestNNMath:
         weights_ih = Matrix.random_matrix(rows=num_hidden_nodes, cols=len(self.test_inputs), low=-1, high=1)
         bias_h = Matrix.random_column(rows=num_hidden_nodes, low=-1, high=1)
 
-        output = nn_math.feedforward_through_layer(self.input_matrix, weights_ih, bias_h, ActivationFunctions.sigmoid)
+        output = nn_math.feedforward_through_layer(
+            input_vals=self.input_matrix, weights=weights_ih, bias=bias_h, activation=activation
+        )
 
         expected_shape = (5, 1)
         actual_shape = output.shape
