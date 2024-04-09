@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -38,12 +38,12 @@ class Matrix:
         return (self._rows, self._cols)
 
     @classmethod
-    def from_matrix_array(cls, matrix_array: NDArray) -> Matrix:
+    def from_matrix_array(cls, matrix_array: NDArray | List[List[float]] | List[float]) -> Matrix:
         """
         Create a Matrix from an array.
 
         Parameters:
-            matrix_array (NDArray): Array of matrix values
+            matrix_array (NDArray | List[List[float]] | List[float]): Array of matrix values
 
         Returns:
             matrix (Matrix): Matrix with assigned values
