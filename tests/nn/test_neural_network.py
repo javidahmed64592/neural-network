@@ -19,7 +19,7 @@ class TestNeuralNetwork:
         test_inputs = [1.0, 0.0, 1.0]
         num_inputs = len(test_inputs)
 
-        expected_outputs = [2, 3]
+        expected_outputs = [2.0, 3.0]
         num_outputs = len(expected_outputs)
         test_nn = NeuralNetwork(num_inputs, 5, num_outputs)
 
