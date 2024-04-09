@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 
 
@@ -16,4 +18,4 @@ class ActivationFunctions:
 
     @staticmethod
     def sigmoid(x: float) -> float:
-        return 1 / (1 + np.exp(-x))
+        return cast(float, 1 / (1 + np.exp(-x)))
