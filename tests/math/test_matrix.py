@@ -71,6 +71,20 @@ class TestMatrix:
 
         assert np.all(actual_vals == expected_vals)
 
+    def test_given_two_matrices_when_subtracting_then_check_new_matrix_correctly_calculated(self):
+        test_array_1 = np.array([[1, 2], [4, 3]])
+        test_array_2 = np.array([[-1, 1], [2, -5]])
+
+        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
+        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+
+        new_matrix = Matrix.subtract(test_matrix_1, test_matrix_2)
+
+        expected_vals = np.array([[2, 1], [2, 8]])
+        actual_vals = new_matrix.data
+
+        assert np.all(actual_vals == expected_vals)
+
     def test_given_two_matrices_when_multiplying_then_check_new_matrix_correctly_calculated(self):
         test_array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         test_array_2 = np.array([[-1, 1], [2, -5]])
@@ -81,6 +95,20 @@ class TestMatrix:
         new_matrix = Matrix.multiply(test_matrix_1, test_matrix_2)
 
         expected_vals = np.array([[3, -9], [2, -11], [6, -18]])
+        actual_vals = new_matrix.data
+
+        assert np.all(actual_vals == expected_vals)
+
+    def test_given_two_matrices_when_multiplying_element_wise_then_check_new_matrix_correctly_calculated(self):
+        test_array_1 = np.array([[1, 2], [4, 3], [2, 4]])
+        test_array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
+
+        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
+        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+
+        new_matrix = Matrix.multiply_element_wise(test_matrix_1, test_matrix_2)
+
+        expected_vals = np.array([[-1, 2], [8, -15], [6, 8]])
         actual_vals = new_matrix.data
 
         assert np.all(actual_vals == expected_vals)
