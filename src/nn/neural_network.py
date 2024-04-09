@@ -4,6 +4,13 @@ import numpy as np
 
 from src.math.activation_functions import ActivationFunctions
 from src.math.matrix import Matrix
+from src.math.nn_math import (
+    calculate_delta,
+    calculate_error_from_errors,
+    calculate_error_from_expected,
+    calculate_gradient,
+    feedforward_through_layer,
+)
 
 
 class NeuralNetwork:
@@ -50,14 +57,8 @@ class NeuralNetwork:
             output (List[float]): List of outputs
         """
         input_matrix = Matrix.from_matrix_array(np.array(inputs))
-
-        hidden = Matrix.multiply(self._weights_ih, input_matrix)
-        hidden = Matrix.add(hidden, self._bias_h)
-        hidden = Matrix.map(hidden, ActivationFunctions.sigmoid)
-
-        output = Matrix.multiply(self._weights_ho, hidden)
-        output = Matrix.add(output, self._bias_o)
-        output = Matrix.map(output, ActivationFunctions.sigmoid)
+        hidden = feedforward_through_layer(input_matrix, self._weights_ih, self._bias_h, ActivationFunctions.sigmoid)
+        output = feedforward_through_layer(hidden, self._weights_ho, self._bias_o, ActivationFunctions.sigmoid)
         output = Matrix.transpose(output)
         return cast(List[float], output.data[0])
 
@@ -71,41 +72,28 @@ class NeuralNetwork:
         """
         # Feedforward
         input_matrix = Matrix.from_matrix_array(np.array(inputs))
-
-        hidden = Matrix.multiply(self._weights_ih, input_matrix)
-        hidden = Matrix.add(hidden, self._bias_h)
-        hidden = Matrix.map(hidden, ActivationFunctions.sigmoid)
-
-        output = Matrix.multiply(self._weights_ho, hidden)
-        output = Matrix.add(output, self._bias_o)
-        output = Matrix.map(output, ActivationFunctions.sigmoid)
+        hidden = feedforward_through_layer(input_matrix, self._weights_ih, self._bias_h, ActivationFunctions.sigmoid)
+        output = feedforward_through_layer(hidden, self._weights_ho, self._bias_o, ActivationFunctions.sigmoid)
 
         # Calculate errors
         expected_output_matrix = Matrix.from_matrix_array(expected_outputs)
-        output_errors = Matrix.subtract(expected_output_matrix, output)
+        output_errors = calculate_error_from_expected(expected_output_matrix, output)
 
         # Calculate gradient
-        gradient_ho = Matrix.from_matrix_array(output.data * (1 - output.data))
-        gradient_ho = Matrix.multiply_element_wise(gradient_ho, output_errors)
-        gradient_ho = Matrix.multiply(gradient_ho, self.LR)
+        gradient_ho = calculate_gradient(output, output_errors, self.LR)
 
         # Adjust weights and bias
-        hidden_T = Matrix.transpose(hidden)
-        weights_ho_delta = Matrix.multiply(gradient_ho, hidden_T)
+        weights_ho_delta = calculate_delta(hidden, gradient_ho)
         self._weights_ho = Matrix.add(self._weights_ho, weights_ho_delta)
         self._bias_o = Matrix.add(self._bias_o, gradient_ho)
 
         # Calculate errors
-        weights_ho_t = Matrix.transpose(self._weights_ho)
-        hidden_errors = Matrix.multiply(weights_ho_t, output_errors)
+        hidden_errors = calculate_error_from_errors(self._weights_ho, output_errors)
 
         # Calculate gradient
-        gradient_ih = Matrix.from_matrix_array(hidden.data * (1 - hidden.data))
-        gradient_ih = Matrix.multiply_element_wise(gradient_ih, hidden_errors)
-        gradient_ih = Matrix.multiply(gradient_ih, self.LR)
+        gradient_ih = calculate_gradient(hidden, hidden_errors, self.LR)
 
         # Adjust weights and bias
-        input_T = Matrix.transpose(input_matrix)
-        weights_ih_delta = Matrix.multiply(gradient_ih, input_T)
+        weights_ih_delta = calculate_delta(input_matrix, gradient_ih)
         self._weights_ih = Matrix.add(self._weights_ih, weights_ih_delta)
         self._bias_h = Matrix.add(self._bias_h, gradient_ih)
