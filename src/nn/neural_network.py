@@ -29,11 +29,9 @@ class NeuralNetwork:
         """
         self._input_nodes = input_nodes
 
-        self._hidden_layer = Layer(
-            num_nodes=hidden_nodes, num_inputs=input_nodes, activation=ActivationFunctions.sigmoid
-        )
+        self._hidden_layer = Layer(size=hidden_nodes, num_inputs=input_nodes, activation=ActivationFunctions.sigmoid)
         self._output_layer = Layer(
-            num_nodes=output_nodes,
+            size=output_nodes,
             num_inputs=hidden_nodes,
             activation=ActivationFunctions.sigmoid,
             prev_layer=self._hidden_layer,

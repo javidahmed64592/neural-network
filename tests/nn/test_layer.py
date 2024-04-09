@@ -10,7 +10,7 @@ class TestLayer:
         num_nodes = 5
         num_inputs = 3
 
-        test_layer = Layer(num_nodes=num_nodes, num_inputs=num_inputs, activation=activation)
+        test_layer = Layer(size=num_nodes, num_inputs=num_inputs, activation=activation)
 
         expected_weights_shape = (num_nodes, num_inputs)
         expected_bias_shape = (num_nodes, 1)

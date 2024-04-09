@@ -15,19 +15,17 @@ class Layer:
     BIAS_RANGE = [-1, 1]
     LR = 0.1
 
-    def __init__(
-        self, num_nodes: int, num_inputs: int, activation: Callable, prev_layer: Optional[Layer] = None
-    ) -> None:
+    def __init__(self, size: int, num_inputs: int, activation: Callable, prev_layer: Optional[Layer] = None) -> None:
         """
         Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
 
         Parameters:
-            num_nodes (int): Size of Layer
+            size (int): Size of Layer
             num_inputs (int): Number of inputs into Layer
             activation (Callable): Layer activation function
             prev_layer (Layer): Previous Layer to connect
         """
-        self._size = num_nodes
+        self._size = size
         self._num_inputs = num_inputs
         self._activation = activation
         self._prev_layer = prev_layer
