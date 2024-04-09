@@ -1,4 +1,6 @@
-from typing import List, cast
+from __future__ import annotations
+
+from typing import Callable, List, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -11,32 +13,55 @@ class Node:
     rate. These values affect the node's output and training.
     """
 
-    WEIGHTS_RANGE = [-1, 1]
-    BIAS_RANGE = [-1, 1]
     LR = 0.00001
 
-    def __init__(self, num_weights: int) -> None:
+    def __init__(self, weights: NDArray, bias: float, activation: Callable) -> None:
         """
         Initialise Node object with number of weights, equal to number of inputs.
 
         Parameters:
-            num_weights (int): Number of weights for node
+            weights (NDArray): Node weights
+            bias (float): Node bias
+            activation (Callable): Activation function for node
         """
-        self._weights = np.random.uniform(low=self.WEIGHTS_RANGE[0], high=self.WEIGHTS_RANGE[1], size=(num_weights))
-        self._bias = np.random.uniform(low=self.BIAS_RANGE[0], high=self.BIAS_RANGE[1])
+        self._weights = weights
+        self._bias = bias
+        self._activation = activation
 
-    def _activation(self, x: float) -> float:
+    @classmethod
+    def random_node(cls, size: int, weights_range: List[float], bias_range: List[float], activation: Callable) -> Node:
         """
-        Activation function for node output.
+        Create a Node with random weights and bias.
 
         Parameters:
-            x (float): Output to pass through activation function
+            size (int): Number of Node weights
+            weights_range (List[float]): Lower and upper limits for weights
+            bias_range (List[float]): Lower and upper limits for bias
+            activation (Callable): Node activation function
 
         Returns:
-            output (float): Node output passed through activation function
+            node (Node): Node with random weights and bias
         """
-        output = np.sign(x)
-        return cast(float, output)
+        _weights = np.random.uniform(low=weights_range[0], high=weights_range[1], size=(size))
+        _bias = np.random.uniform(low=bias_range[0], high=bias_range[1])
+        node = cls(_weights, _bias, activation)
+        return node
+
+    @classmethod
+    def with_params(cls, weights: NDArray, bias: float, activation: Callable) -> Node:
+        """
+        Create Node with assigned weights and bias.
+
+        Parameters:
+            weights (List[float]): Node weights
+            bias (float): Node bias
+            activation (Callable): Node activation function
+
+        Returns:
+            node (Node): Node with assigned weights and bias
+        """
+        node = cls(weights, bias, activation)
+        return node
 
     def _calculate_output(self, inputs: List[float]) -> float:
         """
@@ -116,7 +141,7 @@ class Node:
         """
         sum = self._calculate_output(inputs=inputs)
         output = self._activation(sum)
-        return output
+        return cast(float, output)
 
     def train(self, inputs: List[float], target: float) -> None:
         """

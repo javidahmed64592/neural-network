@@ -1,11 +1,17 @@
 from src.nn.node import Node
 
 
+def activation(x):
+    return x
+
+
 class TestNode:
+    test_weights_range = [-1.0, 1.0]
+    test_bias_range = [-1.0, 1.0]
     test_inputs = [1.0, 2.0]
     test_expected_output = 1
     test_num_inputs = len(test_inputs)
-    test_node = Node(test_num_inputs)
+    test_node = Node.random_node(test_num_inputs, test_weights_range, test_bias_range, activation)
 
     def test_given_inputs_when_calculating_output_then_check_output_correctly_calculated(self):
         expected_output = (
