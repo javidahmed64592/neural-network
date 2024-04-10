@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 
 from src.nn.neural_network import NeuralNetwork
@@ -23,5 +25,29 @@ def main():
     print(f"Guessing inputs {inputs[3]}: Calculated outputs {nn.feedforward(inputs[3])} \t| Expected: {outputs[3]}")
 
 
+def time_feedforward():
+    num_inputs = 2
+    num_hidden = 4
+    num_outputs = 1
+
+    inputs = [[0, 1], [1, 0], [1, 1], [0, 0]]
+
+    nn = NeuralNetwork(num_inputs, num_hidden, num_outputs)
+
+    num_iters = 12000 * 100
+
+    begin_time = datetime.datetime.now()
+    print(f"Starting feedfoward: {num_iters} times")
+    for i in range(num_iters):
+        print(f"\rProgress: {i+1} / {num_iters}", flush=True, end="")
+        random_choice = np.random.randint(low=0, high=len(inputs))
+        nn.feedforward(inputs[random_choice])
+
+    dt = datetime.datetime.now() - begin_time
+    dt_m = int(dt.total_seconds() // 60)
+    dt_s = int(dt.total_seconds() - (dt_m * 60))
+    print(f"\nDone! The time it took is {dt_m}m {dt_s}s.")
+
+
 if __name__ == "__main__":
-    main()
+    time_feedforward()
