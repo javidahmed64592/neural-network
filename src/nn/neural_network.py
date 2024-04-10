@@ -1,6 +1,7 @@
 from typing import List, cast
 
 import numpy as np
+from numpy.typing import NDArray
 
 from src.math.activation_functions import ActivationFunctions
 from src.math.matrix import Matrix
@@ -37,12 +38,12 @@ class NeuralNetwork:
             prev_layer=self._hidden_layer,
         )
 
-    def feedforward(self, inputs: List[float]) -> List[float]:
+    def feedforward(self, inputs: NDArray | List[float]) -> List[float]:
         """
         Feedforward a list of inputs.
 
         Parameters:
-            inputs (List[float]): List of input values
+            inputs (NDArray | List[float]): List of input values
 
         Returns:
             output (List[float]): List of outputs
