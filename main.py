@@ -10,8 +10,8 @@ def main():
     num_hidden = 4
     num_outputs = 1
 
-    inputs = [[0, 1], [1, 0], [1, 1], [0, 0]]
-    outputs = [[1], [1], [0], [0]]
+    inputs = [[0.0, 1.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]
+    outputs = [[1.0], [1.0], [0.0], [0.0]]
 
     nn = NeuralNetwork(num_inputs, num_hidden, num_outputs)
 
@@ -26,11 +26,9 @@ def main():
 
 
 def time_feedforward():
-    num_inputs = 2
-    num_hidden = 4
-    num_outputs = 1
-
-    inputs = [[0, 1], [1, 0], [1, 1], [0, 0]]
+    num_inputs = 16
+    num_hidden = 8
+    num_outputs = 4
 
     nn = NeuralNetwork(num_inputs, num_hidden, num_outputs)
 
@@ -40,8 +38,8 @@ def time_feedforward():
     print(f"Starting feedfoward: {num_iters} times")
     for i in range(num_iters):
         print(f"\rProgress: {i+1} / {num_iters}", flush=True, end="")
-        random_choice = np.random.randint(low=0, high=len(inputs))
-        nn.feedforward(inputs[random_choice])
+        inputs = np.random.uniform(low=-1, high=1, size=(num_inputs,))
+        nn.feedforward(inputs)
 
     dt = datetime.datetime.now() - begin_time
     dt_m = int(dt.total_seconds() // 60)
