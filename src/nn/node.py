@@ -47,22 +47,6 @@ class Node:
         node = cls(_weights, _bias, activation)
         return node
 
-    @classmethod
-    def with_params(cls, weights: NDArray, bias: float, activation: Callable) -> Node:
-        """
-        Create Node with assigned weights and bias.
-
-        Parameters:
-            weights (List[float]): Node weights
-            bias (float): Node bias
-            activation (Callable): Node activation function
-
-        Returns:
-            node (Node): Node with assigned weights and bias
-        """
-        node = cls(weights, bias, activation)
-        return node
-
     def _calculate_output(self, inputs: List[float]) -> float:
         """
         Calculate node output from array of inputs.
@@ -101,8 +85,8 @@ class Node:
         Returns:
             delta_w (NDArray): Array to add to weights
         """
-        delta_factor = error * self.LR
-        delta_w = np.array(inputs) * delta_factor
+        _delta_factor = error * self.LR
+        delta_w = np.array(inputs) * _delta_factor
         return delta_w
 
     def _calculate_delta_b(self, error: float) -> float:
@@ -139,8 +123,8 @@ class Node:
         Returns:
             output (float): Node output
         """
-        sum = self._calculate_output(inputs=inputs)
-        output = self._activation(sum)
+        _sum = self._calculate_output(inputs=inputs)
+        output = self._activation(_sum)
         return cast(float, output)
 
     def train(self, inputs: List[float], target: float) -> None:
@@ -151,7 +135,7 @@ class Node:
             inputs (List[float]): Inputs to pass through feedforward
             target (float): Expected output from inputs
         """
-        guess = self.feedforward(inputs)
-        if guess != target:
-            error = self._calculate_error(guess, target)
-            self._backpropagate(inputs, error)
+        _output = self.feedforward(inputs)
+        if _output != target:
+            _error = self._calculate_error(_output, target)
+            self._backpropagate(inputs, _error)
