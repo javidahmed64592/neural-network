@@ -47,7 +47,7 @@ class NeuralNetwork:
         Returns:
             output (List[float]): List of outputs
         """
-        input_matrix = Matrix.from_matrix_array(np.array(inputs))
+        input_matrix = Matrix.from_array(np.array(inputs))
         hidden = self._hidden_layer.feedforward(input_matrix)
         output = self._output_layer.feedforward(hidden)
         output = Matrix.transpose(output)
@@ -65,12 +65,12 @@ class NeuralNetwork:
             output_errors (List[float]): List of output errors
         """
         # Feedforward
-        input_matrix = Matrix.from_matrix_array(np.array(inputs))
+        input_matrix = Matrix.from_array(np.array(inputs))
         hidden = self._hidden_layer.feedforward(input_matrix)
         output = self._output_layer.feedforward(hidden)
 
         # Calculate errors
-        expected_output_matrix = Matrix.from_matrix_array(expected_outputs)
+        expected_output_matrix = Matrix.from_array(expected_outputs)
         output_errors = calculate_error_from_expected(expected_output_matrix, output)
 
         # Calculate gradient and adjust weights and bias

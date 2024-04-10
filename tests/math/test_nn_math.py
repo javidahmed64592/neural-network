@@ -8,7 +8,7 @@ def activation(x):
 
 class TestNNMath:
     test_inputs = [1.0, 2.0]
-    input_matrix = Matrix.from_matrix_array(test_inputs)
+    input_matrix = Matrix.from_array(test_inputs)
 
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(self):
         num_hidden_nodes = 5
@@ -24,7 +24,7 @@ class TestNNMath:
         assert actual_shape == expected_shape
 
     def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(self):
-        errors = Matrix.from_matrix_array([0.0, 1.0])
+        errors = Matrix.from_array([0.0, 1.0])
         lr = 0.1
 
         gradient = nn_math.calculate_gradient(self.input_matrix, errors, lr)
@@ -35,7 +35,7 @@ class TestNNMath:
         assert actual_shape == expected_shape
 
     def test_given_gradients_when_calculating_delta_then_check_delta_has_correct_shape(self):
-        gradient = Matrix.from_matrix_array([0.0, 1.0])
+        gradient = Matrix.from_array([0.0, 1.0])
 
         delta = nn_math.calculate_delta(self.input_matrix, gradient)
 
@@ -46,7 +46,7 @@ class TestNNMath:
 
     def test_given_errors_when_backpropagating_then_check_errors_have_correct_shape(self):
         weights = Matrix.random_matrix(2, 2, -1, 1)
-        errors = Matrix.from_matrix_array([0.0, 1.0])
+        errors = Matrix.from_array([0.0, 1.0])
 
         delta = nn_math.calculate_next_errors(weights, errors)
 

@@ -39,7 +39,7 @@ class Layer:
 
     @property
     def weights(self) -> Matrix:
-        _weights = Matrix.from_matrix_array([node._weights for node in self._nodes])
+        _weights = Matrix.from_array([node._weights for node in self._nodes])
         return _weights
 
     @weights.setter
@@ -49,7 +49,7 @@ class Layer:
 
     @property
     def bias(self) -> Matrix:
-        _bias = Matrix.from_matrix_array([node._bias for node in self._nodes])
+        _bias = Matrix.from_array([node._bias for node in self._nodes])
         return _bias
 
     @bias.setter

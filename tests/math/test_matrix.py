@@ -38,7 +38,7 @@ class TestMatrix:
         test_array = np.random.uniform(
             low=self.test_weights_range[0], high=self.test_weights_range[1], size=(test_rows, test_cols)
         )
-        test_matrix = Matrix.from_matrix_array(matrix_array=test_array)
+        test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (test_rows, test_cols)
         actual_shape = test_matrix.shape
@@ -50,7 +50,7 @@ class TestMatrix:
         test_array = np.random.uniform(
             low=self.test_weights_range[0], high=self.test_weights_range[1], size=(test_rows)
         )
-        test_matrix = Matrix.from_matrix_array(matrix_array=test_array)
+        test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (test_rows, test_cols)
         actual_shape = test_matrix.shape
@@ -61,8 +61,8 @@ class TestMatrix:
         test_array_1 = np.array([[1, 2], [4, 3]])
         test_array_2 = np.array([[-1, 1], [2, -5]])
 
-        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
-        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+        test_matrix_1 = Matrix.from_array(test_array_1)
+        test_matrix_2 = Matrix.from_array(test_array_2)
 
         new_matrix = Matrix.add(test_matrix_1, test_matrix_2)
 
@@ -75,8 +75,8 @@ class TestMatrix:
         test_array_1 = np.array([[1, 2], [4, 3]])
         test_array_2 = np.array([[-1, 1], [2, -5]])
 
-        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
-        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+        test_matrix_1 = Matrix.from_array(test_array_1)
+        test_matrix_2 = Matrix.from_array(test_array_2)
 
         new_matrix = Matrix.subtract(test_matrix_1, test_matrix_2)
 
@@ -89,8 +89,8 @@ class TestMatrix:
         test_array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         test_array_2 = np.array([[-1, 1], [2, -5]])
 
-        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
-        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+        test_matrix_1 = Matrix.from_array(test_array_1)
+        test_matrix_2 = Matrix.from_array(test_array_2)
 
         new_matrix = Matrix.multiply(test_matrix_1, test_matrix_2)
 
@@ -103,8 +103,8 @@ class TestMatrix:
         test_array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         test_array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
 
-        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
-        test_matrix_2 = Matrix.from_matrix_array(test_array_2)
+        test_matrix_1 = Matrix.from_array(test_array_1)
+        test_matrix_2 = Matrix.from_array(test_array_2)
 
         new_matrix = Matrix.multiply_element_wise(test_matrix_1, test_matrix_2)
 
@@ -117,7 +117,7 @@ class TestMatrix:
         test_array = np.array([[1, 2], [4, 3], [2, 4]])
         test_scale = 3
 
-        test_matrix = Matrix.from_matrix_array(test_array)
+        test_matrix = Matrix.from_array(test_array)
 
         new_matrix = Matrix.multiply(test_matrix, test_scale)
 
@@ -129,7 +129,7 @@ class TestMatrix:
     def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(self):
         test_array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 
-        test_matrix_1 = Matrix.from_matrix_array(test_array_1)
+        test_matrix_1 = Matrix.from_array(test_array_1)
 
         new_matrix = Matrix.map(test_matrix_1, activation_function)
 

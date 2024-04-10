@@ -1,3 +1,4 @@
+from src.math.matrix import Matrix
 from src.nn.layer import Layer
 
 
@@ -21,7 +22,7 @@ class TestLayer:
         assert actual_bias_shape == expected_bias_shape
 
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(self):
-        test_inputs = [1.0, 0.3, 0.7]
+        test_inputs = Matrix.from_array([1.0, 0.3, 0.7])
 
         output = self.test_layer.feedforward(test_inputs)
 

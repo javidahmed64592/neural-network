@@ -38,7 +38,7 @@ class Matrix:
         return (self._rows, self._cols)
 
     @classmethod
-    def from_matrix_array(cls, matrix_array: NDArray | List[List[float]] | List[float]) -> Matrix:
+    def from_array(cls, matrix_array: NDArray | List[List[float]] | List[float]) -> Matrix:
         """
         Create a Matrix from an array.
 
@@ -73,7 +73,7 @@ class Matrix:
             matrix (Matrix): Matrix with random values
         """
         _data = np.random.uniform(low=low, high=high, size=(rows, cols))
-        matrix = cls.from_matrix_array(_data)
+        matrix = cls.from_array(_data)
         return matrix
 
     @classmethod
@@ -105,7 +105,7 @@ class Matrix:
             new_matrix (Matrix): Sum of both matrices
         """
         new_matrix = matrix.data + other_matrix.data
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def subtract(matrix: Matrix, other_matrix: Matrix) -> Matrix:
@@ -120,7 +120,7 @@ class Matrix:
             new_matrix (Matrix): Difference between both matrices
         """
         new_matrix = matrix.data - other_matrix.data
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def multiply(matrix: Matrix, val: Matrix | float) -> Matrix:
@@ -137,7 +137,7 @@ class Matrix:
         if isinstance(val, Matrix):
             val = val.data
         new_matrix = matrix.data.dot(val)
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def multiply_element_wise(matrix: Matrix, other_matrix: Matrix) -> Matrix:
@@ -152,7 +152,7 @@ class Matrix:
             new_matrix (Matrix): Multiplied Matrix
         """
         new_matrix = matrix.data * other_matrix.data
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
@@ -166,7 +166,7 @@ class Matrix:
             new_matrix (Matrix): Transposed Matrix
         """
         new_matrix = matrix.data.transpose()
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def map(matrix: Matrix, func: Callable) -> Matrix:
@@ -180,4 +180,4 @@ class Matrix:
             new_matrix (Matrix): Matrix with mapped values
         """
         new_matrix = np.vectorize(func)(matrix.data)
-        return Matrix.from_matrix_array(new_matrix)
+        return Matrix.from_array(new_matrix)
