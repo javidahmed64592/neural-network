@@ -1,43 +1,36 @@
-from src.nn.node import Node
-
-
-def activation(x):
-    return x
-
-
 class TestNode:
-    test_weights_range = [-1.0, 1.0]
-    test_bias_range = [-1.0, 1.0]
-    test_inputs = [1.0, 2.0]
     test_expected_output = 1
-    test_num_inputs = len(test_inputs)
-    test_node = Node.random_node(test_num_inputs, test_weights_range, test_bias_range, activation)
 
-    def test_given_inputs_when_calculating_output_then_check_output_correctly_calculated(self):
+    def test_given_inputs_when_calculating_output_then_check_output_correctly_calculated(
+        self, mock_node, mock_inputs, mock_len_inputs
+    ):
         expected_output = (
-            sum([(self.test_inputs[i] * self.test_node._weights[i]) for i in range(self.test_num_inputs)])
-            + self.test_node._bias
+            sum([(mock_inputs[i] * mock_node._weights[i]) for i in range(mock_len_inputs)]) + mock_node._bias
         )
-        actual_output = self.test_node._calculate_output(self.test_inputs)
+        actual_output = mock_node._calculate_output(mock_inputs)
         assert actual_output == expected_output
 
-    def test_given_inputs_when_calculating_error_then_check_error_correctly_calculated(self):
-        output = self.test_node._calculate_output(self.test_inputs)
+    def test_given_inputs_when_calculating_error_then_check_error_correctly_calculated(self, mock_node, mock_inputs):
+        output = mock_node._calculate_output(mock_inputs)
         expected_error = self.test_expected_output - output
-        actual_error = self.test_node._calculate_error(output, self.test_expected_output)
+        actual_error = mock_node._calculate_error(output, self.test_expected_output)
         assert actual_error == expected_error
 
-    def test_given_inputs_and_error_when_calculating_delta_w_then_check_delta_w_correctly_calculated(self):
-        output = self.test_node._calculate_output(self.test_inputs)
-        error = self.test_node._calculate_error(output, self.test_expected_output)
-        expected_delta_w = [(self.test_inputs[i] * error * self.test_node.LR) for i in range(self.test_num_inputs)]
-        actual_delta_w = self.test_node._calculate_delta_w(self.test_inputs, error)
+    def test_given_inputs_and_error_when_calculating_delta_w_then_check_delta_w_correctly_calculated(
+        self, mock_node, mock_inputs, mock_len_inputs
+    ):
+        output = mock_node._calculate_output(mock_inputs)
+        error = mock_node._calculate_error(output, self.test_expected_output)
+        expected_delta_w = [(mock_inputs[i] * error * mock_node.LR) for i in range(mock_len_inputs)]
+        actual_delta_w = mock_node._calculate_delta_w(mock_inputs, error)
         for actual, expected in zip(actual_delta_w, expected_delta_w):
             assert actual == expected
 
-    def test_given_inputs_and_error_when_calculating_delta_b_then_check_delta_b_correctly_calculated(self):
-        output = self.test_node._calculate_output(self.test_inputs)
-        error = self.test_node._calculate_error(output, self.test_expected_output)
-        expected_delta_b = error * self.test_node.LR
-        actual_delta_b = self.test_node._calculate_delta_b(error)
+    def test_given_inputs_and_error_when_calculating_delta_b_then_check_delta_b_correctly_calculated(
+        self, mock_node, mock_inputs
+    ):
+        output = mock_node._calculate_output(mock_inputs)
+        error = mock_node._calculate_error(output, self.test_expected_output)
+        expected_delta_b = error * mock_node.LR
+        actual_delta_b = mock_node._calculate_delta_b(error)
         assert actual_delta_b == expected_delta_b

@@ -6,8 +6,9 @@ from src.nn.neural_network import NeuralNetwork
 from src.nn.node import Node
 
 
-def activation(x):
-    return x
+@pytest.fixture
+def mock_activation():
+    return lambda x: x * 3
 
 
 @pytest.fixture
@@ -51,13 +52,13 @@ def mock_nn(mock_len_inputs, mock_len_outputs):
 
 
 @pytest.fixture
-def mock_layer(mock_len_hidden, mock_len_inputs):
-    return Layer(size=mock_len_hidden, num_inputs=mock_len_inputs, activation=activation)
+def mock_layer(mock_len_hidden, mock_len_inputs, mock_activation):
+    return Layer(mock_len_hidden, mock_len_inputs, mock_activation)
 
 
 @pytest.fixture
-def mock_node(mock_len_inputs, mock_weights_range, mock_bias_range):
-    return Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, activation)
+def mock_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation):
+    return Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation)
 
 
 @pytest.fixture
