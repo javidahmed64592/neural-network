@@ -7,7 +7,6 @@ class TestLayer:
 
         actual_weights_shape = mock_layer.weights.shape
         actual_bias_shape = mock_layer.bias.shape
-
         assert actual_weights_shape == expected_weights_shape
         assert actual_bias_shape == expected_bias_shape
 
@@ -18,5 +17,4 @@ class TestLayer:
 
         expected_output_shape = (mock_len_hidden, 1)
         actual_output_shape = output.shape
-
         assert actual_output_shape == expected_output_shape

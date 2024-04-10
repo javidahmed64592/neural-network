@@ -27,7 +27,6 @@ class TestNNMath:
 
         expected_shape = (3, 1)
         actual_shape = gradient.shape
-
         assert actual_shape == expected_shape
 
     def test_given_gradients_when_calculating_delta_then_check_delta_has_correct_shape(self, mock_input_matrix):
@@ -37,7 +36,6 @@ class TestNNMath:
 
         expected_shape = (3, 3)
         actual_shape = delta.shape
-
         assert actual_shape == expected_shape
 
     def test_given_errors_when_backpropagating_then_check_errors_have_correct_shape(self):
@@ -48,5 +46,4 @@ class TestNNMath:
 
         expected_shape = (2, 1)
         actual_shape = delta.shape
-
         assert actual_shape == expected_shape
