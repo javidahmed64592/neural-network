@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -52,7 +52,7 @@ class NeuralNetwork:
         hidden = self._hidden_layer.feedforward(input_matrix)
         output = self._output_layer.feedforward(hidden)
         output = Matrix.transpose(output)
-        return cast(List[float], output.data[0])
+        return output.to_array()
 
     def train(self, inputs: List[float], expected_outputs: List[float]) -> List[float]:
         """
@@ -84,4 +84,4 @@ class NeuralNetwork:
         self._hidden_layer.backpropagate_error(layer_vals=hidden, input_vals=input_matrix, errors=hidden_errors)
 
         output_errors = Matrix.transpose(output_errors)
-        return cast(List[float], output_errors.data[0])
+        return output_errors.to_array()
