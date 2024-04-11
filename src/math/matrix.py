@@ -185,5 +185,9 @@ class Matrix:
     def to_array(self) -> List[float]:
         """
         Return Matrix as a list of floats.
+
+        Returns:
+            matrix_list (List[float]): Matrix as list of floats
         """
-        return cast(List[float], self.data.tolist()[0])
+        matrix_list = self.data.tolist()[0]
+        return cast(List[float], matrix_list)
