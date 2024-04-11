@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -181,3 +181,13 @@ class Matrix:
         """
         new_matrix = np.vectorize(func)(matrix.data)
         return Matrix.from_array(new_matrix)
+
+    def to_array(self) -> List[float]:
+        """
+        Return Matrix as a list of floats.
+
+        Returns:
+            matrix_list (List[float]): Matrix as list of floats
+        """
+        matrix_list = self.data.tolist()[0]
+        return cast(List[float], matrix_list)
