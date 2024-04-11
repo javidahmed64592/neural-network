@@ -154,6 +154,7 @@ class Matrix:
         new_matrix = matrix.data * other_matrix.data
         return Matrix.from_array(new_matrix)
 
+    @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
         """
         Return transpose of Matrix.
