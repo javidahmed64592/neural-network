@@ -1,7 +1,7 @@
 [![python](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=flat&logo=python&logoColor=ffd343)](https://docs.python.org/3.11/)
 <!-- omit from toc -->
 # Neural Network
-TODO: Write me
+This is a neural network library in Python which can be used to feedforward arrays of inputs, generate outputs, and be trained with expected outputs.
 
 <!-- omit from toc -->
 ## Table of Contents
