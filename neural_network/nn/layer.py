@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
-from src.math import nn_math
-from src.math.matrix import Matrix
-from src.nn.node import Node
+from neural_network.math import nn_math
+from neural_network.math.matrix import Matrix
+from neural_network.nn.node import Node
 
 
 class Layer:

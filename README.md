@@ -20,7 +20,7 @@ Install the required dependencies using [pipenv](https://github.com/pypa/pipenv)
 The neural network can be created in the following way:
 
 ```
-from src.nn.neural_network import NeuralNetwork
+from neural_network.nn.neural_network import NeuralNetwork
 
 nn = NeuralNetwork(input_nodes=num_inputs, hidden_nodes=num_hidden, output_nodes=num_outputs)
 ```

@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.math.matrix import Matrix
+from neural_network.math.matrix import Matrix
 
 
 class TestMatrix:

@@ -1,9 +1,9 @@
 import pytest
 
-from src.math.matrix import Matrix
-from src.nn.layer import Layer
-from src.nn.neural_network import NeuralNetwork
-from src.nn.node import Node
+from neural_network.math.matrix import Matrix
+from neural_network.nn.layer import Layer
+from neural_network.nn.neural_network import NeuralNetwork
+from neural_network.nn.node import Node
 
 
 @pytest.fixture
