@@ -48,7 +48,7 @@ def mock_len_outputs(mock_outputs):
 
 @pytest.fixture
 def mock_nn(mock_len_inputs, mock_len_outputs):
-    return NeuralNetwork(mock_len_inputs, 5, mock_len_outputs)
+    return NeuralNetwork(mock_len_inputs, mock_len_outputs, [5])
 
 
 @pytest.fixture
