@@ -37,7 +37,7 @@ class NeuralNetwork:
         """
         Create neural network layers using list of layer sizes.
         """
-        _prev_layer = None
+        _layer = None
         self._hidden_layers: List[Layer] = []
 
         for index in range(1, len(self.layer_sizes) - 1):
@@ -45,16 +45,15 @@ class NeuralNetwork:
                 size=self.layer_sizes[index],
                 num_inputs=self.layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
-                prev_layer=_prev_layer,
+                prev_layer=_layer,
             )
             self._hidden_layers.append(_layer)
-            _prev_layer = _layer
 
         self._output_layer = Layer(
             size=self.layer_sizes[-1],
             num_inputs=self.layer_sizes[-2],
             activation=ActivationFunctions.sigmoid,
-            prev_layer=_prev_layer,
+            prev_layer=_layer,
         )
 
     @property
@@ -72,11 +71,12 @@ class NeuralNetwork:
             output (List[float]): List of outputs
         """
         input_matrix = Matrix.from_array(np.array(inputs))
-        prev = input_matrix
+
+        hidden = input_matrix
         for layer in self._hidden_layers:
-            hidden = layer.feedforward(prev)
-            prev = hidden
-        output = self._output_layer.feedforward(prev)
+            hidden = layer.feedforward(hidden)
+
+        output = self._output_layer.feedforward(hidden)
         output = Matrix.transpose(output)
         return output.to_array()
 
@@ -91,33 +91,25 @@ class NeuralNetwork:
         Returns:
             output_errors (List[float]): List of output errors
         """
-        # Feedforward
         input_matrix = Matrix.from_array(np.array(inputs))
 
-        prev = input_matrix
-
+        hidden = input_matrix
         for layer in self._hidden_layers:
-            hidden = layer.feedforward(prev)
-            prev = hidden
+            hidden = layer.feedforward(hidden)
 
-        output = self._output_layer.feedforward(prev)
+        output = self._output_layer.feedforward(hidden)
 
-        # Calculate errors
         expected_output_matrix = Matrix.from_array(expected_outputs)
         output_errors = calculate_error_from_expected(expected_output_matrix, output)
-
-        # Calculate gradient and adjust weights and bias
         self._output_layer.backpropagate_error(layer_vals=output, input_vals=hidden, errors=output_errors)
 
-        # Calculate errors
         prev_layer = self._output_layer
-        prev_errors = output_errors
+        hidden_errors = output_errors
 
         for layer in self._hidden_layers:
-            hidden_errors = calculate_next_errors(prev_layer.weights, prev_errors)
+            hidden_errors = calculate_next_errors(prev_layer.weights, hidden_errors)
             layer.backpropagate_error(layer_vals=hidden, input_vals=input_matrix, errors=hidden_errors)
             prev_layer = layer
-            prev_errors = hidden_errors
 
         output_errors = Matrix.transpose(output_errors)
         return output_errors.to_array()
