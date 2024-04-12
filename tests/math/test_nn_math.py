@@ -1,5 +1,5 @@
-from src.math import nn_math
-from src.math.matrix import Matrix
+from neural_network.math import nn_math
+from neural_network.math.matrix import Matrix
 
 
 class TestNNMath:

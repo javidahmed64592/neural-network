@@ -3,6 +3,12 @@
 # Neural Network
 This is a neural network library in Python which can be used to feedforward arrays of inputs, generate outputs, and be trained with expected outputs.
 
+Install this package using `pipenv`:
+
+```
+pipenv install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+```
+
 <!-- omit from toc -->
 ## Table of Contents
 - [Installing Dependencies](#installing-dependencies)
@@ -20,7 +26,7 @@ Install the required dependencies using [pipenv](https://github.com/pypa/pipenv)
 The neural network can be created in the following way:
 
 ```
-from src.nn.neural_network import NeuralNetwork
+from neural_network.neural_network import NeuralNetwork
 
 nn = NeuralNetwork(input_nodes=num_inputs, hidden_nodes=num_hidden, output_nodes=num_outputs)
 ```

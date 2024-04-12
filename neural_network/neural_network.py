@@ -3,10 +3,10 @@ from typing import List
 import numpy as np
 from numpy.typing import NDArray
 
-from src.math.activation_functions import ActivationFunctions
-from src.math.matrix import Matrix
-from src.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from src.nn.layer import Layer
+from neural_network.math.activation_functions import ActivationFunctions
+from neural_network.math.matrix import Matrix
+from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
+from neural_network.nn.layer import Layer
 
 
 class NeuralNetwork:

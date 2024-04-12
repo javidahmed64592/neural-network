@@ -1,6 +1,6 @@
 from typing import Callable
 
-from src.math.matrix import Matrix
+from neural_network.math.matrix import Matrix
 
 
 def feedforward_through_layer(input_vals: Matrix, weights: Matrix, bias: Matrix, activation: Callable) -> Matrix:
