@@ -1,8 +1,8 @@
 import pytest
 
 from neural_network.math.matrix import Matrix
+from neural_network.neural_network import NeuralNetwork
 from neural_network.nn.layer import Layer
-from neural_network.nn.neural_network import NeuralNetwork
 from neural_network.nn.node import Node
 
 
