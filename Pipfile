@@ -5,13 +5,13 @@ name = "pypi"
 
 [packages]
 numpy = "*"
-pytest = "*"
 
 [dev-packages]
 isort = "*"
 black = "*"
 flake8 = "*"
 mypy = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"
