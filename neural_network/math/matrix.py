@@ -34,6 +34,11 @@ class Matrix:
         return self._data
 
     @property
+    def as_list(self) -> List[float]:
+        matrix_list = self.data.tolist()[0]
+        return cast(List[float], matrix_list)
+
+    @property
     def shape(self) -> tuple:
         return (self._rows, self._cols)
 
@@ -196,13 +201,3 @@ class Matrix:
         """
         new_matrix = np.average([matrix.data, other_matrix.data], axis=0)
         return Matrix.from_array(new_matrix)
-
-    def to_array(self) -> List[float]:
-        """
-        Return Matrix as a list of floats.
-
-        Returns:
-            matrix_list (List[float]): Matrix as list of floats
-        """
-        matrix_list = self.data.tolist()[0]
-        return cast(List[float], matrix_list)

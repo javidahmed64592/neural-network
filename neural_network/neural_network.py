@@ -106,7 +106,7 @@ class NeuralNetwork:
 
         output = self._output_layer.feedforward(hidden)
         output = Matrix.transpose(output)
-        return output.to_array()
+        return output.as_list
 
     def train(self, inputs: List[float], expected_outputs: List[float]) -> List[float]:
         """
@@ -140,4 +140,4 @@ class NeuralNetwork:
             prev_layer = layer
 
         output_errors = Matrix.transpose(output_errors)
-        return output_errors.to_array()
+        return output_errors.as_list
