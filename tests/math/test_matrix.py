@@ -118,3 +118,15 @@ class TestMatrix:
         expected_vals = np.array([[3, 6], [12, 9], [6, 12]])
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
+
+    def test_given_two_matrices_when_calculating_average_matrix_then_check_new_matrix_correctly_calculated(self):
+        array_1 = np.array([[1, 2], [4, 3], [2, 4]])
+        array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
+
+        matrix_1 = Matrix.from_array(array_1)
+        matrix_2 = Matrix.from_array(array_2)
+        new_matrix = Matrix.average_matrix(matrix_1, matrix_2)
+
+        expected_vals = np.array([[0, 1.5], [3, -1], [2.5, 3]])
+        actual_vals = new_matrix.data
+        assert np.all(actual_vals == expected_vals)

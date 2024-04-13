@@ -182,6 +182,21 @@ class Matrix:
         new_matrix = np.vectorize(func)(matrix.data)
         return Matrix.from_array(new_matrix)
 
+    @staticmethod
+    def average_matrix(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+        """
+        Get average of two Matrix objects.
+
+        Parameters:
+            matrix (Matrix): Matrix to use for average
+            other_matrix (Matrix): Other Matrix to use for average
+
+        Returns:
+            new_matrix (Matrix): Average of both matrices
+        """
+        new_matrix = np.average([matrix.data, other_matrix.data], axis=0)
+        return Matrix.from_array(new_matrix)
+
     def to_array(self) -> List[float]:
         """
         Return Matrix as a list of floats.
