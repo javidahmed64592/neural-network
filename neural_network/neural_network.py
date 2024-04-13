@@ -60,6 +60,34 @@ class NeuralNetwork:
     def layer_sizes(self) -> List[int]:
         return [self._num_inputs] + self._hidden_layer_sizes + [self._num_outputs]
 
+    @property
+    def layers(self) -> List[Layer]:
+        return self._hidden_layers + [self._output_layer]
+
+    @property
+    def weights(self) -> List[Matrix]:
+        _weights = []
+        for layer in self.layers:
+            _weights.append(layer.weights)
+        return _weights
+
+    @weights.setter
+    def weights(self, new_weights: List[Matrix]) -> None:
+        for layer, weights in zip(self.layers, new_weights):
+            layer.weights = weights
+
+    @property
+    def bias(self) -> List[Matrix]:
+        _bias = []
+        for layer in self.layers:
+            _bias.append(layer.bias)
+        return _bias
+
+    @bias.setter
+    def bias(self, new_bias: List[Matrix]) -> None:
+        for layer, bias in zip(self.layers, new_bias):
+            layer.bias = bias
+
     def feedforward(self, inputs: NDArray | List[float]) -> List[float]:
         """
         Feedforward a list of inputs.
