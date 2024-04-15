@@ -28,14 +28,14 @@ The neural network can be created in the following way:
 ```
 from neural_network.neural_network import NeuralNetwork
 
-nn = NeuralNetwork(input_nodes=num_inputs, hidden_nodes=num_hidden, output_nodes=num_outputs)
+nn = NeuralNetwork(num_inputs=num_inputs, num_outputs=num_outputs, hidden_layer_sizes=hidden_layer_sizes)
 ```
 
 where
 
 - `num_inputs`: Number of inputs to pass through neural network
-- `num_hidden`: Number of nodes in the hidden layer
 - `num_outputs`: Number of outputs to be generated
+- `hidden_layer_sizes`: List of number of nodes in each hidden layer
 
 To feedforward an array of inputs:
 
