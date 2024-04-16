@@ -130,3 +130,16 @@ class TestMatrix:
         expected_vals = np.array([[0, 1.5], [3, -1], [2.5, 3]])
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
+
+    def test_given_matrix_when_mutating_then_check_new_matrix_with_same_shape_returned(self):
+        array_1 = np.array([[1, 2], [4, 3], [2, 4]])
+        mutation_rate = 0.5
+        random_range = [1.0, 4.0]
+
+        matrix_1 = Matrix.from_array(array_1)
+        new_matrix = Matrix.mutated_matrix(matrix_1, mutation_rate, random_range)
+
+        expected_shape = matrix_1.shape
+        actual_shape = new_matrix.shape
+        assert np.all(actual_shape == expected_shape)
+        assert not np.all(matrix_1.data == new_matrix.data)

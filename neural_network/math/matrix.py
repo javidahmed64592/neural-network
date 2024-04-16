@@ -201,3 +201,22 @@ class Matrix:
         """
         new_matrix = np.average([matrix.data, other_matrix.data], axis=0)
         return Matrix.from_array(new_matrix)
+
+    @staticmethod
+    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: List[float]) -> Matrix:
+        """
+        Mutate Matrix with a mutation rate.
+
+        Parameters:
+            matrix (Matrix): Matrix to use for average
+            mutation_rate (float): Probability for mutation
+            random_range (List[float]): Range for random number
+
+        Returns:
+            new_matrix (Matrix): Mutated Matrix
+        """
+        _mutation_matrix = np.random.uniform(low=0, high=1, size=matrix.shape)
+        new_matrix = np.where(
+            _mutation_matrix < mutation_rate, np.random.uniform(low=random_range[0], high=random_range[1]), matrix.data
+        )
+        return Matrix.from_array(new_matrix)
