@@ -1,4 +1,5 @@
 [![python](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=flat&logo=python&logoColor=ffd343)](https://docs.python.org/3.11/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 <!-- omit from toc -->
 # Neural Network
 This is a neural network library in Python which can be used to feedforward arrays of inputs, generate outputs, and be trained with expected outputs.
@@ -14,7 +15,7 @@ pipenv install -e git+https://github.com/javidahmed64592/neural-network#egg=neur
 - [Installing Dependencies](#installing-dependencies)
 - [Using the Neural Network](#using-the-neural-network)
 - [Testing](#testing)
-- [Formatting, Type Checking and Linting](#formatting-type-checking-and-linting)
+- [Linting and Formatting](#linting-and-formatting)
 
 ## Installing Dependencies
 Install the required dependencies using [pipenv](https://github.com/pypa/pipenv):
@@ -59,21 +60,14 @@ To run the tests:
 
     pipenv run test
 
-## Formatting, Type Checking and Linting
-This library uses a number of tools for code formatting and linting. These tools are configured in `pyproject.toml`, `setup.cfg` and `mypy.ini`.
+## Linting and Formatting
+This library uses `ruff` for linting and formatting.
+This is configured in `ruff.toml`.
 
-Black is used as a code formatter:
+To check the code for linting errors:
 
-    black .
+    python -m ruff check .
 
-isort is used for tidying up imports:
+To format the code:
 
-    isort .
-
-Mypy is used as a type checker:
-
-    mypy .
-
-Flake8 is used for linting:
-
-    flake8
+    python -m ruff format .
