@@ -1,11 +1,19 @@
+from collections.abc import Callable
+
 from neural_network.math import nn_math
 from neural_network.math.matrix import Matrix
 
 
 class TestNNMath:
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
-        self, mock_input_matrix, mock_inputs, mock_len_hidden, mock_weights_range, mock_bias_range, mock_activation
-    ):
+        self,
+        mock_input_matrix: Matrix,
+        mock_inputs: list[float],
+        mock_len_hidden: int,
+        mock_weights_range: list[float],
+        mock_bias_range: list[float],
+        mock_activation: Callable,
+    ) -> None:
         weights_ih = Matrix.random_matrix(
             rows=mock_len_hidden, cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
         )
@@ -19,7 +27,9 @@ class TestNNMath:
         actual_shape = output.shape
         assert actual_shape == expected_shape
 
-    def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(self, mock_input_matrix):
+    def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(
+        self, mock_input_matrix: Matrix
+    ) -> None:
         errors = Matrix.from_array([0.0, 1.0, 0.5])
         lr = 0.1
 
@@ -29,7 +39,9 @@ class TestNNMath:
         actual_shape = gradient.shape
         assert actual_shape == expected_shape
 
-    def test_given_gradients_when_calculating_delta_then_check_delta_has_correct_shape(self, mock_input_matrix):
+    def test_given_gradients_when_calculating_delta_then_check_delta_has_correct_shape(
+        self, mock_input_matrix: Matrix
+    ) -> None:
         gradient = Matrix.from_array([0.0, 1.0, 0.2])
 
         delta = nn_math.calculate_delta(mock_input_matrix, gradient)
@@ -38,7 +50,7 @@ class TestNNMath:
         actual_shape = delta.shape
         assert actual_shape == expected_shape
 
-    def test_given_errors_when_backpropagating_then_check_errors_have_correct_shape(self):
+    def test_given_errors_when_backpropagating_then_check_errors_have_correct_shape(self) -> None:
         weights = Matrix.random_matrix(2, 2, -1, 1)
         errors = Matrix.from_array([0.0, 1.0])
 

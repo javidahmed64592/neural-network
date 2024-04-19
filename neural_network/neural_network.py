@@ -1,4 +1,4 @@
-from typing import List
+from typing import ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -15,11 +15,11 @@ class NeuralNetwork:
     list of inputs, and be trained through backpropagation of errors.
     """
 
-    WEIGHTS_RANGE = [-1, 1]
-    BIAS_RANGE = [-1, 1]
+    WEIGHTS_RANGE: ClassVar = [-1, 1]
+    BIAS_RANGE: ClassVar = [-1, 1]
     LR = 0.1
 
-    def __init__(self, num_inputs: int, num_outputs: int, hidden_layer_sizes: List[int]) -> None:
+    def __init__(self, num_inputs: int, num_outputs: int, hidden_layer_sizes: list[int]) -> None:
         """
         Initialise NeuralNetwork object with specified layer sizes.
 
@@ -38,7 +38,7 @@ class NeuralNetwork:
         Create neural network layers using list of layer sizes.
         """
         _layer = None
-        self._hidden_layers: List[Layer] = []
+        self._hidden_layers: list[Layer] = []
 
         for index in range(1, len(self.layer_sizes) - 1):
             _layer = Layer(
@@ -57,38 +57,38 @@ class NeuralNetwork:
         )
 
     @property
-    def layer_sizes(self) -> List[int]:
-        return [self._num_inputs] + self._hidden_layer_sizes + [self._num_outputs]
+    def layer_sizes(self) -> list[int]:
+        return [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
 
     @property
-    def layers(self) -> List[Layer]:
-        return self._hidden_layers + [self._output_layer]
+    def layers(self) -> list[Layer]:
+        return [*self._hidden_layers, self._output_layer]
 
     @property
-    def weights(self) -> List[Matrix]:
+    def weights(self) -> list[Matrix]:
         _weights = []
         for layer in self.layers:
             _weights.append(layer.weights)
         return _weights
 
     @weights.setter
-    def weights(self, new_weights: List[Matrix]) -> None:
-        for layer, weights in zip(self.layers, new_weights):
+    def weights(self, new_weights: list[Matrix]) -> None:
+        for layer, weights in zip(self.layers, new_weights, strict=False):
             layer.weights = weights
 
     @property
-    def bias(self) -> List[Matrix]:
+    def bias(self) -> list[Matrix]:
         _bias = []
         for layer in self.layers:
             _bias.append(layer.bias)
         return _bias
 
     @bias.setter
-    def bias(self, new_bias: List[Matrix]) -> None:
-        for layer, bias in zip(self.layers, new_bias):
+    def bias(self, new_bias: list[Matrix]) -> None:
+        for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
 
-    def feedforward(self, inputs: NDArray | List[float]) -> List[float]:
+    def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
         """
         Feedforward a list of inputs.
 
@@ -108,7 +108,7 @@ class NeuralNetwork:
         output = Matrix.transpose(output)
         return output.as_list
 
-    def train(self, inputs: List[float], expected_outputs: List[float]) -> List[float]:
+    def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:
         """
         Train NeuralNetwork using a list of input values and expected output values and backpropagate errors.
 

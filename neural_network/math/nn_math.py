@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from neural_network.math.matrix import Matrix
 
@@ -51,8 +51,8 @@ def calculate_delta(layer_vals: Matrix, gradients: Matrix) -> Matrix:
     Returns:
         delta (Matrix): Delta factors
     """
-    incoming_T = Matrix.transpose(layer_vals)
-    delta = Matrix.multiply(gradients, incoming_T)
+    incoming_transposed = Matrix.transpose(layer_vals)
+    delta = Matrix.multiply(gradients, incoming_transposed)
     return delta
 
 

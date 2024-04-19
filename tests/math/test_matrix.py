@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import numpy as np
 
 from neural_network.math.matrix import Matrix
@@ -5,30 +7,30 @@ from neural_network.math.matrix import Matrix
 
 class TestMatrix:
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range, mock_len_inputs, mock_len_outputs
-    ):
+        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
+    ) -> None:
         test_matrix = Matrix.random_matrix(
             rows=mock_len_inputs, cols=mock_len_outputs, low=mock_weights_range[0], high=mock_weights_range[1]
         )
 
         expected_shape = (mock_len_inputs, mock_len_outputs)
         actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape):
+        for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
 
     def test_given_shape_when_creating_random_column_then_check_matrix_has_correct_shape(
-        self, mock_weights_range, mock_len_inputs
-    ):
+        self, mock_weights_range: list[float], mock_len_inputs: int
+    ) -> None:
         test_matrix = Matrix.random_column(rows=mock_len_inputs, low=mock_weights_range[0], high=mock_weights_range[1])
 
         expected_shape = (mock_len_inputs, 1)
         actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape):
+        for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
 
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range, mock_len_inputs, mock_len_hidden
-    ):
+        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: int
+    ) -> None:
         test_array = np.random.uniform(
             low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden)
         )
@@ -36,21 +38,21 @@ class TestMatrix:
 
         expected_shape = (mock_len_inputs, mock_len_hidden)
         actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape):
+        for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
 
     def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range, mock_len_hidden
-    ):
+        self, mock_weights_range: list[float], mock_len_hidden: int
+    ) -> None:
         test_array = np.random.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden))
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (mock_len_hidden, 1)
         actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape):
+        for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
 
-    def test_given_two_matrices_when_adding_then_check_new_matrix_correctly_calculated(self):
+    def test_given_two_matrices_when_adding_then_check_new_matrix_correctly_calculated(self) -> None:
         array_1 = np.array([[1, 2], [4, 3]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -62,7 +64,7 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_subtracting_then_check_new_matrix_correctly_calculated(self):
+    def test_given_two_matrices_when_subtracting_then_check_new_matrix_correctly_calculated(self) -> None:
         array_1 = np.array([[1, 2], [4, 3]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -74,7 +76,7 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_multiplying_then_check_new_matrix_correctly_calculated(self):
+    def test_given_two_matrices_when_multiplying_then_check_new_matrix_correctly_calculated(self) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -86,7 +88,7 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_multiplying_element_wise_then_check_new_matrix_correctly_calculated(self):
+    def test_given_two_matrices_when_multiplying_element_wise_then_check_new_matrix_correctly_calculated(self) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
 
@@ -98,7 +100,7 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_matrix_and_scalar_when_multiplying_then_check_new_matrix_correctly_calculated(self):
+    def test_given_matrix_and_scalar_when_multiplying_then_check_new_matrix_correctly_calculated(self) -> None:
         array = np.array([[1, 2], [4, 3], [2, 4]])
         multiplier = 3
 
@@ -109,7 +111,9 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(self, mock_activation):
+    def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(
+        self, mock_activation: Callable
+    ) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 
         matrix_1 = Matrix.from_array(array_1)
@@ -119,7 +123,9 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_calculating_average_matrix_then_check_new_matrix_correctly_calculated(self):
+    def test_given_two_matrices_when_calculating_average_matrix_then_check_new_matrix_correctly_calculated(
+        self,
+    ) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
 
@@ -131,7 +137,7 @@ class TestMatrix:
         actual_vals = new_matrix.data
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_matrix_when_mutating_then_check_new_matrix_with_same_shape_returned(self):
+    def test_given_matrix_when_mutating_then_check_new_matrix_with_same_shape_returned(self) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         mutation_rate = 0.5
         random_range = [1.0, 4.0]
