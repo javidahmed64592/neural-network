@@ -26,7 +26,7 @@ class NeuralNetwork:
         Parameters:
             num_inputs (int): Number of inputs
             num_outputs (int): Number of outputs
-            hidden_layer_sizes (List[int]): List of hidden layer sizes
+            hidden_layer_sizes (list[int]): List of hidden layer sizes
         """
         self._num_inputs = num_inputs
         self._num_outputs = num_outputs
@@ -93,10 +93,10 @@ class NeuralNetwork:
         Feedforward a list of inputs.
 
         Parameters:
-            inputs (NDArray | List[float]): List of input values
+            inputs (NDArray | list[float]): List of input values
 
         Returns:
-            output (List[float]): List of outputs
+            output (list[float]): List of outputs
         """
         input_matrix = Matrix.from_array(np.array(inputs))
 
@@ -113,11 +113,11 @@ class NeuralNetwork:
         Train NeuralNetwork using a list of input values and expected output values and backpropagate errors.
 
         Parameters:
-            inputs (List[float]): List of input values
-            expected_outputs (List[float]): List of output values
+            inputs (list[float]): List of input values
+            expected_outputs (list[float]): List of output values
 
         Returns:
-            output_errors (List[float]): List of output errors
+            output_errors (list[float]): List of output errors
         """
         input_matrix = Matrix.from_array(np.array(inputs))
 

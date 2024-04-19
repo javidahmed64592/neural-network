@@ -49,7 +49,7 @@ class Matrix:
         Create a Matrix from an array.
 
         Parameters:
-            matrix_array (NDArray | List[List[float]] | List[float]): Array of matrix values
+            matrix_array (NDArray | list[list[float]] | list[float]): Array of matrix values
 
         Returns:
             matrix (Matrix): Matrix with assigned values
@@ -211,7 +211,7 @@ class Matrix:
         Parameters:
             matrix (Matrix): Matrix to use for average
             mutation_rate (float): Probability for mutation
-            random_range (List[float]): Range for random number
+            random_range (list[float]): Range for random number
 
         Returns:
             new_matrix (Matrix): Mutated Matrix

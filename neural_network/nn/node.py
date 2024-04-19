@@ -36,8 +36,8 @@ class Node:
 
         Parameters:
             size (int): Number of Node weights
-            weights_range (List[float]): Lower and upper limits for weights
-            bias_range (List[float]): Lower and upper limits for bias
+            weights_range (list[float]): Lower and upper limits for weights
+            bias_range (list[float]): Lower and upper limits for bias
             activation (Callable): Node activation function
 
         Returns:
@@ -53,7 +53,7 @@ class Node:
         Calculate node output from array of inputs.
 
         Parameters:
-            inputs (List[float]): List of input values
+            inputs (list[float]): List of input values
 
         Returns:
             output (float): Inputs multiplied by weight
@@ -80,7 +80,7 @@ class Node:
         Calculate delta_w to modify weights through backpropagation.
 
         Paremeters:
-            inputs (List[float]): List of input values
+            inputs (list[float]): List of input values
             error (float): Error from node output
 
         Returns:
@@ -108,7 +108,7 @@ class Node:
         Backpropagate error from inputs.
 
         Parameters:
-            inputs (List[float]): List of input values
+            inputs (list[float]): List of input values
             error (float): Error from node output
         """
         self._weights += self._calculate_delta_w(inputs, error)
@@ -119,7 +119,7 @@ class Node:
         Feedforward inputs and calculate output.
 
         Parameters:
-            inputs (List[float]): List of input values
+            inputs (list[float]): List of input values
 
         Returns:
             output (float): Node output
@@ -133,7 +133,7 @@ class Node:
         Train node with inputs and an expected output.
 
         Parameters:
-            inputs (List[float]): Inputs to pass through feedforward
+            inputs (list[float]): Inputs to pass through feedforward
             target (float): Expected output from inputs
         """
         _output = self.feedforward(inputs)
