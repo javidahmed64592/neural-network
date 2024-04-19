@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable, List, Optional, cast
+from collections.abc import Callable
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -11,7 +12,7 @@ class Matrix:
     This class handles the matrix mathematics required to pass data through neural networks.
     """
 
-    def __init__(self, rows: int, cols: int, data: Optional[NDArray] = None) -> None:
+    def __init__(self, rows: int, cols: int, data: NDArray | None = None) -> None:
         """
         Initialise Matrix with number of rows and columns, and optionally the matrix values.
 
@@ -28,22 +29,22 @@ class Matrix:
         return str(self.data)
 
     @property
-    def data(self):
+    def data(self) -> NDArray:
         if self._data is None:
             self._data = np.zeros(shape=self.shape)
         return self._data
 
     @property
-    def as_list(self) -> List[float]:
+    def as_list(self) -> list[float]:
         matrix_list = self.data.tolist()[0]
-        return cast(List[float], matrix_list)
+        return cast(list[float], matrix_list)
 
     @property
     def shape(self) -> tuple:
         return (self._rows, self._cols)
 
     @classmethod
-    def from_array(cls, matrix_array: NDArray | List[List[float]] | List[float]) -> Matrix:
+    def from_array(cls, matrix_array: NDArray | list[list[float]] | list[float]) -> Matrix:
         """
         Create a Matrix from an array.
 
@@ -203,7 +204,7 @@ class Matrix:
         return Matrix.from_array(new_matrix)
 
     @staticmethod
-    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: List[float]) -> Matrix:
+    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: list[float]) -> Matrix:
         """
         Mutate Matrix with a mutation rate.
 

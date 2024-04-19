@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable, Optional
+from collections.abc import Callable
+from typing import ClassVar
 
 from neural_network.math import nn_math
 from neural_network.math.matrix import Matrix
@@ -12,11 +13,11 @@ class Layer:
     This class creates a neural network Layer and has weights, biases, learning rate and activation function.
     """
 
-    WEIGHTS_RANGE = [-1.0, 1.0]
-    BIAS_RANGE = [-1.0, 1.0]
+    WEIGHTS_RANGE: ClassVar = [-1.0, 1.0]
+    BIAS_RANGE: ClassVar = [-1.0, 1.0]
     LR = 0.1
 
-    def __init__(self, size: int, num_inputs: int, activation: Callable, prev_layer: Optional[Layer] = None) -> None:
+    def __init__(self, size: int, num_inputs: int, activation: Callable, prev_layer: Layer | None = None) -> None:
         """
         Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
 
@@ -34,7 +35,7 @@ class Layer:
         self._nodes = [self.random_node for _ in range(size)]
 
     @property
-    def random_node(self):
+    def random_node(self) -> Node:
         return Node.random_node(self._num_inputs, self.WEIGHTS_RANGE, self.BIAS_RANGE, self._activation)
 
     @property

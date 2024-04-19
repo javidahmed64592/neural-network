@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable, List, cast
+from collections.abc import Callable
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -29,7 +30,7 @@ class Node:
         self._activation = activation
 
     @classmethod
-    def random_node(cls, size: int, weights_range: List[float], bias_range: List[float], activation: Callable) -> Node:
+    def random_node(cls, size: int, weights_range: list[float], bias_range: list[float], activation: Callable) -> Node:
         """
         Create a Node with random weights and bias.
 
@@ -47,7 +48,7 @@ class Node:
         node = cls(_weights, _bias, activation)
         return node
 
-    def _calculate_output(self, inputs: List[float]) -> float:
+    def _calculate_output(self, inputs: list[float]) -> float:
         """
         Calculate node output from array of inputs.
 
@@ -74,7 +75,7 @@ class Node:
         error = expected_output - predicted_output
         return error
 
-    def _calculate_delta_w(self, inputs: List[float], error: float) -> NDArray:
+    def _calculate_delta_w(self, inputs: list[float], error: float) -> NDArray:
         """
         Calculate delta_w to modify weights through backpropagation.
 
@@ -102,7 +103,7 @@ class Node:
         delta_b = error * self.LR
         return delta_b
 
-    def _backpropagate(self, inputs: List[float], error: float) -> None:
+    def _backpropagate(self, inputs: list[float], error: float) -> None:
         """
         Backpropagate error from inputs.
 
@@ -113,7 +114,7 @@ class Node:
         self._weights += self._calculate_delta_w(inputs, error)
         self._bias += self._calculate_delta_b(error)
 
-    def feedforward(self, inputs: List[float]) -> float:
+    def feedforward(self, inputs: list[float]) -> float:
         """
         Feedforward inputs and calculate output.
 
@@ -127,7 +128,7 @@ class Node:
         output = self._activation(_sum)
         return cast(float, output)
 
-    def train(self, inputs: List[float], target: float) -> None:
+    def train(self, inputs: list[float], target: float) -> None:
         """
         Train node with inputs and an expected output.
 
