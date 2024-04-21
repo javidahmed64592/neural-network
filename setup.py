@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup  # type: ignore
+from setuptools import find_packages, setup
 
 __version__ = "1.2.1"
 
