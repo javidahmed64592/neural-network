@@ -36,28 +36,20 @@ class NeuralNetwork:
         self._hidden_layer_sizes = hidden_layer_sizes
         self._create_layers()
 
-    def _create_layers(self) -> None:
+    @classmethod
+    def from_file(cls, filepath: str) -> NeuralNetwork:
         """
-        Create neural network layers using list of layer sizes.
+        Load neural network layer with weights and biases from JSON file.
+
+        Parameters:
+            filepath (str): Path to file with neural network data
         """
-        _layer = None
-        self._hidden_layers: list[Layer] = []
-
-        for index in range(1, len(self.layer_sizes) - 1):
-            _layer = Layer(
-                size=self.layer_sizes[index],
-                num_inputs=self.layer_sizes[index - 1],
-                activation=ActivationFunctions.sigmoid,
-                prev_layer=_layer,
-            )
-            self._hidden_layers.append(_layer)
-
-        self._output_layer = Layer(
-            size=self.layer_sizes[-1],
-            num_inputs=self.layer_sizes[-2],
-            activation=ActivationFunctions.sigmoid,
-            prev_layer=_layer,
-        )
+        with open(filepath) as file:
+            _data = json.load(file)
+        nn = cls(_data["num_inputs"], _data["num_outputs"], _data["hidden_layer_sizes"])
+        nn.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
+        nn.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
+        return nn
 
     @property
     def layer_sizes(self) -> list[int]:
@@ -90,6 +82,29 @@ class NeuralNetwork:
     def bias(self, new_bias: list[Matrix]) -> None:
         for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
+
+    def _create_layers(self) -> None:
+        """
+        Create neural network layers using list of layer sizes.
+        """
+        _layer = None
+        self._hidden_layers: list[Layer] = []
+
+        for index in range(1, len(self.layer_sizes) - 1):
+            _layer = Layer(
+                size=self.layer_sizes[index],
+                num_inputs=self.layer_sizes[index - 1],
+                activation=ActivationFunctions.sigmoid,
+                prev_layer=_layer,
+            )
+            self._hidden_layers.append(_layer)
+
+        self._output_layer = Layer(
+            size=self.layer_sizes[-1],
+            num_inputs=self.layer_sizes[-2],
+            activation=ActivationFunctions.sigmoid,
+            prev_layer=_layer,
+        )
 
     def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
         """
@@ -161,18 +176,3 @@ class NeuralNetwork:
         }
         with open(filepath, "w") as file:
             json.dump(_data, file)
-
-    @classmethod
-    def from_file(cls, filepath: str) -> NeuralNetwork:
-        """
-        Load neural network layer with weights and biases from JSON file.
-
-        Parameters:
-            filepath (str): Path to file with neural network data
-        """
-        with open(filepath) as file:
-            _data = json.load(file)
-        nn = cls(_data["num_inputs"], _data["num_outputs"], _data["hidden_layer_sizes"])
-        nn.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
-        nn.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
-        return nn
