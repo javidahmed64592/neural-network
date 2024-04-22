@@ -53,6 +53,18 @@ expected_outputs = [y_i, ..., y_m] # m: Number of outputs
 errors = nn.train(inputs, expected_outputs)
 ```
 
+The neural network weights and biases can be saved to a `json` file:
+
+```
+nn.save("/path/to/nn_model.json")
+```
+
+To load a neural network from a file:
+
+```
+nn = NeuralNetwork.from_file("/path/to/nn_model.json")
+```
+
 ## Testing
 This library uses Pytest for the unit tests.
 These tests are located in the `tests` directory.
