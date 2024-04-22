@@ -1,3 +1,4 @@
+import json
 from typing import ClassVar
 
 import numpy as np
@@ -141,3 +142,30 @@ class NeuralNetwork:
 
         output_errors = Matrix.transpose(output_errors)
         return output_errors.as_list
+
+    def save(self, filepath: str) -> None:
+        """
+        Save neural network layer weights and biases to JSON file.
+
+        Parameters:
+            filepath (str): Path to file with weights and biases
+        """
+        _data = {
+            "weights": [weights.data.tolist() for weights in self.weights],
+            "bias": [bias.data.tolist() for bias in self.bias],
+        }
+        with open(filepath, "w") as file:
+            json.dump(_data, file)
+
+    def load(self, filepath: str) -> None:
+        """
+        Load neural network layer weights and biases from JSON file.
+
+        Parameters:
+            filepath (str): Path to file with weights and biases
+        """
+        with open(filepath) as file:
+            _data = json.load(file)
+
+        self.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
+        self.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
