@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from typing import ClassVar
 
@@ -151,21 +153,26 @@ class NeuralNetwork:
             filepath (str): Path to file with weights and biases
         """
         _data = {
+            "num_inputs": self._num_inputs,
+            "num_outputs": self._num_outputs,
+            "hidden_layer_sizes": self._hidden_layer_sizes,
             "weights": [weights.data.tolist() for weights in self.weights],
             "bias": [bias.data.tolist() for bias in self.bias],
         }
         with open(filepath, "w") as file:
             json.dump(_data, file)
 
-    def load(self, filepath: str) -> None:
+    @classmethod
+    def from_file(cls, filepath: str) -> NeuralNetwork:
         """
-        Load neural network layer weights and biases from JSON file.
+        Load neural network layer with weights and biases from JSON file.
 
         Parameters:
-            filepath (str): Path to file with weights and biases
+            filepath (str): Path to file with neural network data
         """
         with open(filepath) as file:
             _data = json.load(file)
-
-        self.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
-        self.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
+        nn = cls(_data["num_inputs"], _data["num_outputs"], _data["hidden_layer_sizes"])
+        nn.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
+        nn.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
+        return nn
