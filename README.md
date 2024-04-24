@@ -24,6 +24,9 @@ Install the required dependencies using [pipenv](https://github.com/pypa/pipenv)
     pipenv install --dev
 
 ## Using the Neural Network
+For a complete example of how to create and train the neural network, see `example_training.ipynb` where it is trained on binary lists.
+
+
 The neural network can be created in the following way:
 
 ```
