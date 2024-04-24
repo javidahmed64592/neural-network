@@ -137,27 +137,25 @@ class NeuralNetwork:
         Returns:
             output_errors (list[float]): List of output errors
         """
-        input_matrix = Matrix.from_array(np.array(inputs))
-
-        hidden = input_matrix
-        for layer in self._hidden_layers:
-            hidden = layer.feedforward(hidden)
-
-        output = self._output_layer.feedforward(hidden)
-
+        layer_input_matrix = Matrix.from_array(np.array(inputs))
         expected_output_matrix = Matrix.from_array(expected_outputs)
-        output_errors = calculate_error_from_expected(expected_output_matrix, output)
-        self._output_layer.backpropagate_error(layer_vals=output, input_vals=hidden, errors=output_errors)
+
+        for layer in self._hidden_layers:
+            layer_input_matrix = layer.feedforward(layer_input_matrix)
+
+        output = self._output_layer.feedforward(layer_input_matrix)
+
+        errors = calculate_error_from_expected(expected_output_matrix, output)
+        self._output_layer.backpropagate_error(errors)
+        output_errors = Matrix.transpose(errors)
 
         prev_layer = self._output_layer
-        hidden_errors = output_errors
 
-        for layer in self._hidden_layers:
-            hidden_errors = calculate_next_errors(prev_layer.weights, hidden_errors)
-            layer.backpropagate_error(layer_vals=hidden, input_vals=input_matrix, errors=hidden_errors)
+        for layer in self._hidden_layers[::-1]:
+            errors = calculate_next_errors(prev_layer.weights, errors)
+            layer.backpropagate_error(errors)
             prev_layer = layer
 
-        output_errors = Matrix.transpose(output_errors)
         return output_errors.as_list
 
     def save(self, filepath: str) -> None:
