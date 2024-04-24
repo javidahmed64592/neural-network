@@ -71,18 +71,18 @@ class Layer:
         output = nn_math.feedforward_through_layer(
             input_vals=vals, weights=self.weights, bias=self.bias, activation=self._activation
         )
+        self._layer_input = vals
+        self._layer_output = output
         return output
 
-    def backpropagate_error(self, layer_vals: Matrix, input_vals: Matrix, errors: Matrix) -> None:
+    def backpropagate_error(self, errors: Matrix) -> None:
         """
         Backpropagate errors during training.
 
         Parameters:
-            layer_vals (Matrix): Values calculated by this Layer
-            input_vals (Matrix): Values from previous Layer
             errors (Matrix): Errors from next Layer
         """
-        gradient = nn_math.calculate_gradient(layer_vals=layer_vals, errors=errors, lr=self.LR)
-        delta = nn_math.calculate_delta(layer_vals=input_vals, gradients=gradient)
+        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=self.LR)
+        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
         self.weights = Matrix.add(self.weights, delta)
         self.bias = Matrix.add(self.bias, gradient)
