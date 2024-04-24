@@ -9,6 +9,7 @@ numpy = "*"
 [dev-packages]
 pytest = "*"
 ruff = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.11"
