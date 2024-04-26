@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import ClassVar
 
 from neural_network.math import nn_math
 from neural_network.math.matrix import Matrix
@@ -13,11 +12,15 @@ class Layer:
     This class creates a neural network Layer and has weights, biases, learning rate and activation function.
     """
 
-    WEIGHTS_RANGE: ClassVar = [-1.0, 1.0]
-    BIAS_RANGE: ClassVar = [-1.0, 1.0]
-    LR = 0.1
-
-    def __init__(self, size: int, num_inputs: int, activation: Callable, prev_layer: Layer | None = None) -> None:
+    def __init__(
+        self,
+        size: int,
+        num_inputs: int,
+        activation: Callable,
+        weights_range: tuple[float, float],
+        bias_range: tuple[float, float],
+        prev_layer: Layer | None = None,
+    ) -> None:
         """
         Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
 
@@ -25,18 +28,22 @@ class Layer:
             size (int): Size of Layer
             num_inputs (int): Number of inputs into Layer
             activation (Callable): Layer activation function
+            weights_range (tuple[float, float]): Range for Layer weights
+            bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (Layer): Previous Layer to connect
         """
         self._size = size
         self._num_inputs = num_inputs
         self._activation = activation
+        self._weights_range = weights_range
+        self._bias_range = bias_range
         self._prev_layer = prev_layer
 
         self._nodes = [self.random_node for _ in range(size)]
 
     @property
     def random_node(self) -> Node:
-        return Node.random_node(self._num_inputs, self.WEIGHTS_RANGE, self.BIAS_RANGE, self._activation)
+        return Node.random_node(self._num_inputs, self._weights_range, self._bias_range, self._activation)
 
     @property
     def weights(self) -> Matrix:
@@ -75,14 +82,15 @@ class Layer:
         self._layer_output = output
         return output
 
-    def backpropagate_error(self, errors: Matrix) -> None:
+    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
         """
         Backpropagate errors during training.
 
         Parameters:
             errors (Matrix): Errors from next Layer
+            learning_rate (float): Learning rate
         """
-        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=self.LR)
+        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=learning_rate)
         delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
         self.weights = Matrix.add(self.weights, delta)
         self.bias = Matrix.add(self.bias, gradient)
