@@ -221,3 +221,13 @@ class Matrix:
             _mutation_matrix < mutation_rate, np.random.uniform(low=random_range[0], high=random_range[1]), matrix.data
         )
         return Matrix.from_array(new_matrix)
+
+    def shift_vals(self, shift: float) -> None:
+        """
+        Adjust Matrix values by multiplying with some percentage.
+
+        Parameters:
+            shift (float): Factor to shift values by
+        """
+        _mult_array = np.random.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
+        self._data = _mult_array

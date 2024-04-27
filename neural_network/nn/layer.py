@@ -98,8 +98,8 @@ class Layer:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability for a new Node, range [0, 1]
         """
-        self.weights.adjust_vals(shift_vals)
-        self.bias.adjust_vals(shift_vals)
+        self.weights.shift_vals(shift_vals)
+        self.bias.shift_vals(shift_vals)
 
         if not self._prev_layer:
             return
