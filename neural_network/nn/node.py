@@ -151,3 +151,12 @@ class Node:
         """
         _weight = np.random.uniform(low=weights_range[0], high=weights_range[1])
         self._weights = np.append(self._weights, _weight)
+
+    def remove_weight(self, index: int) -> None:
+        """
+        Remove weight from Node at index.
+
+        Parameters:
+            index (int): Index to remove weight at
+        """
+        self._weights = np.delete(self._weights, index)

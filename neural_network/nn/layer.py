@@ -90,13 +90,36 @@ class Layer:
 
         self._prev_layer._add_node()
 
-    def mutate(self, shift_vals: float, prob_new_node: float) -> None:
+    def _remove_node(self, index: int) -> None:
+        """
+        Remove Node from Layer at index.
+
+        Parameters:
+            index (int): Index to remove Node at
+        """
+        del self._nodes[index]
+
+    def _remove_node_from_prev(self) -> None:
+        """
+        Remove a weight from all Nodes in Layer and remove Node from previous Layer.
+        """
+        if self._prev_layer.size == 1:
+            return
+
+        index = np.random.randint(low=0, high=self.num_inputs)
+        for node in self._nodes:
+            node.remove_weight(index)
+
+        self._prev_layer._remove_node(index)
+
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
         Mutate Layer weights and biases, and potentially add Node to previous Layer.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability for a new Node, range [0, 1]
+            prob_remove_node(float): Probability to remove a Node
         """
         self.weights.shift_vals(shift_vals)
         self.bias.shift_vals(shift_vals)
@@ -104,8 +127,11 @@ class Layer:
         if not self._prev_layer:
             return
 
-        if np.random.uniform(low=0, high=1) < prob_new_node:
+        rng = np.random.uniform(low=0, high=1)
+        if rng < prob_new_node:
             self._add_node_to_prev()
+        elif rng > 1 - prob_remove_node:
+            self._remove_node_from_prev()
 
     def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
         """
