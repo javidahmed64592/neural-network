@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import numpy as np
+
 from neural_network.math import nn_math
 from neural_network.math.matrix import Matrix
 from neural_network.nn.node import Node
@@ -32,18 +34,26 @@ class Layer:
             bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (Layer): Previous Layer to connect
         """
-        self._size = size
         self._num_inputs = num_inputs
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
         self._prev_layer = prev_layer
-
         self._nodes = [self.random_node for _ in range(size)]
 
     @property
+    def size(self) -> int:
+        return len(self._nodes)
+
+    @property
+    def num_inputs(self) -> int:
+        if self._prev_layer:
+            self._num_inputs = self._prev_layer.size
+        return self._num_inputs
+
+    @property
     def random_node(self) -> Node:
-        return Node.random_node(self._num_inputs, self._weights_range, self._bias_range, self._activation)
+        return Node.random_node(self.num_inputs, self._weights_range, self._bias_range, self._activation)
 
     @property
     def weights(self) -> Matrix:
@@ -65,6 +75,77 @@ class Layer:
         for index, node in enumerate(self._nodes):
             node._bias = new_bias.data[index]
 
+    def _add_node(self) -> None:
+        """
+        Add a random Node to Layer.
+        """
+        self._nodes.append(self.random_node)
+
+    def _add_node_to_prev(self) -> None:
+        """
+        Add a weight to all Nodes in Layer and a new Node to previous Layer.
+        """
+        for node in self._nodes:
+            node.add_weight(self._weights_range)
+
+        self._prev_layer._add_node()
+
+    def _remove_node(self, index: int) -> None:
+        """
+        Remove Node from Layer at index.
+
+        Parameters:
+            index (int): Index to remove Node at
+        """
+        del self._nodes[index]
+
+    def _remove_node_from_prev(self) -> None:
+        """
+        Remove a weight from all Nodes in Layer and remove Node from previous Layer.
+        """
+        if self._prev_layer.size == 1:
+            return
+
+        index = np.random.randint(low=0, high=self.num_inputs)
+        for node in self._nodes:
+            node.remove_weight(index)
+
+        self._prev_layer._remove_node(index)
+
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
+        """
+        Mutate Layer weights and biases, and potentially add Node to previous Layer.
+
+        Parameters:
+            shift_vals (float): Factor to adjust Layer weights and biases by
+            prob_new_node (float): Probability for a new Node, range [0, 1]
+            prob_remove_node(float): Probability to remove a Node
+        """
+        self.weights.shift_vals(shift_vals)
+        self.bias.shift_vals(shift_vals)
+
+        if not self._prev_layer:
+            return
+
+        rng = np.random.uniform(low=0, high=1)
+        if rng < prob_new_node:
+            self._add_node_to_prev()
+        elif rng > 1 - prob_remove_node:
+            self._remove_node_from_prev()
+
+    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
+        """
+        Backpropagate errors during training.
+
+        Parameters:
+            errors (Matrix): Errors from next Layer
+            learning_rate (float): Learning rate
+        """
+        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=learning_rate)
+        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
+        self.weights = Matrix.add(self.weights, delta)
+        self.bias = Matrix.add(self.bias, gradient)
+
     def feedforward(self, vals: Matrix) -> Matrix:
         """
         Feedforward values through Layer.
@@ -81,16 +162,3 @@ class Layer:
         self._layer_input = vals
         self._layer_output = output
         return output
-
-    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
-        """
-        Backpropagate errors during training.
-
-        Parameters:
-            errors (Matrix): Errors from next Layer
-            learning_rate (float): Learning rate
-        """
-        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=learning_rate)
-        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
-        self.weights = Matrix.add(self.weights, delta)
-        self.bias = Matrix.add(self.bias, gradient)
