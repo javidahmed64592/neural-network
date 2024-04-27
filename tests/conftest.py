@@ -54,7 +54,7 @@ def mock_nn(mock_len_inputs: int, mock_len_outputs: int) -> NeuralNetwork:
 
 
 @pytest.fixture
-def mock_layer(
+def mock_hidden_layer(
     mock_len_hidden: int,
     mock_len_inputs: int,
     mock_activation: Callable,
