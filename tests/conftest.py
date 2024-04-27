@@ -14,12 +14,12 @@ def mock_activation() -> Callable:
 
 
 @pytest.fixture
-def mock_weights_range() -> list[float]:
+def mock_weights_range() -> tuple[float, float]:
     return [-1.0, 1.0]
 
 
 @pytest.fixture
-def mock_bias_range() -> list[float]:
+def mock_bias_range() -> tuple[float, float]:
     return [-1.0, 1.0]
 
 
@@ -54,8 +54,28 @@ def mock_nn(mock_len_inputs: int, mock_len_outputs: int) -> NeuralNetwork:
 
 
 @pytest.fixture
-def mock_layer(mock_len_hidden: int, mock_len_inputs: int, mock_activation: Callable) -> Layer:
-    return Layer(mock_len_hidden, mock_len_inputs, mock_activation)
+def mock_hidden_layer(
+    mock_len_hidden: int,
+    mock_len_inputs: int,
+    mock_activation: Callable,
+    mock_weights_range: tuple[float, float],
+    mock_bias_range: tuple[float, float],
+) -> Layer:
+    return Layer(mock_len_hidden, mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
+
+
+@pytest.fixture
+def mock_output_layer(
+    mock_len_outputs: int,
+    mock_len_hidden: int,
+    mock_activation: Callable,
+    mock_weights_range: tuple[float, float],
+    mock_bias_range: tuple[float, float],
+    mock_hidden_layer: Layer,
+) -> Layer:
+    return Layer(
+        mock_len_outputs, mock_len_hidden, mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer
+    )
 
 
 @pytest.fixture

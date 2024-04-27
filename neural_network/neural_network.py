@@ -95,6 +95,8 @@ class NeuralNetwork:
                 size=self.layer_sizes[index],
                 num_inputs=self.layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
+                weights_range=self.WEIGHTS_RANGE,
+                bias_range=self.BIAS_RANGE,
                 prev_layer=_layer,
             )
             self._hidden_layers.append(_layer)
@@ -103,8 +105,22 @@ class NeuralNetwork:
             size=self.layer_sizes[-1],
             num_inputs=self.layer_sizes[-2],
             activation=ActivationFunctions.sigmoid,
+            weights_range=self.WEIGHTS_RANGE,
+            bias_range=self.BIAS_RANGE,
             prev_layer=_layer,
         )
+
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
+        """
+        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
+
+        Parameters:
+            shift_vals (float): Factor to adjust Layer weights and biases by
+            prob_new_node (float): Probability for a new Node, range [0, 1]
+            prob_remove_node(float): Probability to remove a Node
+        """
+        for layer in self.layers:
+            layer.mutate(shift_vals, prob_new_node, prob_remove_node)
 
     def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
         """
@@ -146,14 +162,14 @@ class NeuralNetwork:
         output = self._output_layer.feedforward(layer_input_matrix)
 
         errors = calculate_error_from_expected(expected_output_matrix, output)
-        self._output_layer.backpropagate_error(errors)
+        self._output_layer.backpropagate_error(errors, self.LR)
         output_errors = Matrix.transpose(errors)
 
         prev_layer = self._output_layer
 
         for layer in self._hidden_layers[::-1]:
             errors = calculate_next_errors(prev_layer.weights, errors)
-            layer.backpropagate_error(errors)
+            layer.backpropagate_error(errors, self.LR)
             prev_layer = layer
 
         return output_errors.as_list

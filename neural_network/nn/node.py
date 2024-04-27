@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -30,14 +29,16 @@ class Node:
         self._activation = activation
 
     @classmethod
-    def random_node(cls, size: int, weights_range: list[float], bias_range: list[float], activation: Callable) -> Node:
+    def random_node(
+        cls, size: int, weights_range: tuple[float, float], bias_range: tuple[float, float], activation: Callable
+    ) -> Node:
         """
         Create a Node with random weights and bias.
 
         Parameters:
             size (int): Number of Node weights
-            weights_range (list[float]): Lower and upper limits for weights
-            bias_range (list[float]): Lower and upper limits for bias
+            weights_range (tuple[float, float]): Lower and upper limits for weights
+            bias_range (tuple[float, float]): Lower and upper limits for bias
             activation (Callable): Node activation function
 
         Returns:
@@ -59,7 +60,7 @@ class Node:
             output (float): Inputs multiplied by weight
         """
         output = np.sum(self._weights * np.array(inputs)) + self._bias
-        return cast(float, output)
+        return float(output)
 
     def _calculate_error(self, predicted_output: float, expected_output: float) -> float:
         """
@@ -126,7 +127,7 @@ class Node:
         """
         _sum = self._calculate_output(inputs=inputs)
         output = self._activation(_sum)
-        return cast(float, output)
+        return float(output)
 
     def train(self, inputs: list[float], target: float) -> None:
         """
@@ -140,3 +141,22 @@ class Node:
         if _output != target:
             _error = self._calculate_error(_output, target)
             self._backpropagate(inputs, _error)
+
+    def add_weight(self, weights_range: tuple[float, float]) -> None:
+        """
+        Add a random weight to Node.
+
+        Parameters:
+            weights_range (tuple[float, float]): Range for random weight to add
+        """
+        _weight = np.random.uniform(low=weights_range[0], high=weights_range[1])
+        self._weights = np.append(self._weights, _weight)
+
+    def remove_weight(self, index: int) -> None:
+        """
+        Remove weight from Node at index.
+
+        Parameters:
+            index (int): Index to remove weight at
+        """
+        self._weights = np.delete(self._weights, index)
