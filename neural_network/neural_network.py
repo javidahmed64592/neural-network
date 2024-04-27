@@ -194,8 +194,8 @@ class NeuralNetwork:
             "num_inputs": self._num_inputs,
             "num_outputs": self._num_outputs,
             "hidden_layer_sizes": self._hidden_layer_sizes,
-            "weights": [weights.data.tolist() for weights in self.weights],
-            "bias": [bias.data.tolist() for bias in self.bias],
+            "weights": [weights.vals.tolist() for weights in self.weights],
+            "bias": [bias.vals.tolist() for bias in self.bias],
         }
         with open(filepath, "w") as file:
             json.dump(_data, file)
