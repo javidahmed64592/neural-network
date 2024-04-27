@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -18,11 +17,15 @@ class NeuralNetwork:
     list of inputs, and be trained through backpropagation of errors.
     """
 
-    WEIGHTS_RANGE: ClassVar = [-1, 1]
-    BIAS_RANGE: ClassVar = [-1, 1]
-    LR = 0.1
-
-    def __init__(self, num_inputs: int, num_outputs: int, hidden_layer_sizes: list[int]) -> None:
+    def __init__(
+        self,
+        num_inputs: int,
+        num_outputs: int,
+        hidden_layer_sizes: list[int],
+        weights_range: tuple[float, float] | None = None,
+        bias_range: tuple[float, float] | None = None,
+        lr: float | None = None,
+    ) -> None:
         """
         Initialise NeuralNetwork object with specified layer sizes.
 
@@ -30,10 +33,16 @@ class NeuralNetwork:
             num_inputs (int): Number of inputs
             num_outputs (int): Number of outputs
             hidden_layer_sizes (list[int]): List of hidden layer sizes
+            weights_range (tuple[float, float]): Range for random weights, defaults to [-1, 1]
+            bias_range (tuple[float, float]): Range for random biases, defaults to [-1, 1]
+            lr (float): Learning rate for training, defaults to 0.1
         """
         self._num_inputs = num_inputs
         self._num_outputs = num_outputs
         self._hidden_layer_sizes = hidden_layer_sizes
+        self._weights_range = weights_range or [-1.0, 1.0]
+        self._bias_range = bias_range or [-1.0, 1.0]
+        self._lr = lr or 0.1
         self._create_layers()
 
     @classmethod
@@ -95,8 +104,8 @@ class NeuralNetwork:
                 size=self.layer_sizes[index],
                 num_inputs=self.layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
-                weights_range=self.WEIGHTS_RANGE,
-                bias_range=self.BIAS_RANGE,
+                weights_range=self._weights_range,
+                bias_range=self._bias_range,
                 prev_layer=_layer,
             )
             self._hidden_layers.append(_layer)
@@ -105,8 +114,8 @@ class NeuralNetwork:
             size=self.layer_sizes[-1],
             num_inputs=self.layer_sizes[-2],
             activation=ActivationFunctions.sigmoid,
-            weights_range=self.WEIGHTS_RANGE,
-            bias_range=self.BIAS_RANGE,
+            weights_range=self._weights_range,
+            bias_range=self._bias_range,
             prev_layer=_layer,
         )
 
@@ -162,14 +171,14 @@ class NeuralNetwork:
         output = self._output_layer.feedforward(layer_input_matrix)
 
         errors = calculate_error_from_expected(expected_output_matrix, output)
-        self._output_layer.backpropagate_error(errors, self.LR)
+        self._output_layer.backpropagate_error(errors, self._lr)
         output_errors = Matrix.transpose(errors)
 
         prev_layer = self._output_layer
 
         for layer in self._hidden_layers[::-1]:
             errors = calculate_next_errors(prev_layer.weights, errors)
-            layer.backpropagate_error(errors, self.LR)
+            layer.backpropagate_error(errors, self._lr)
             prev_layer = layer
 
         return output_errors.as_list
