@@ -81,7 +81,7 @@ class Layer:
         """
         self._nodes.append(self.random_node)
 
-    def _add_input_to_nodes(self) -> None:
+    def _add_node_to_prev(self) -> None:
         """
         Add a weight to all Nodes in Layer and a new Node to previous Layer.
         """
@@ -105,7 +105,7 @@ class Layer:
             return
 
         if np.random.uniform(low=0, high=1) < prob_new_node:
-            self._add_input_to_nodes()
+            self._add_node_to_prev()
 
     def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
         """
