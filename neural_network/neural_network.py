@@ -119,6 +119,23 @@ class NeuralNetwork:
             prev_layer=_layer,
         )
 
+    def save(self, filepath: str) -> None:
+        """
+        Save neural network layer weights and biases to JSON file.
+
+        Parameters:
+            filepath (str): Path to file with weights and biases
+        """
+        _data = {
+            "num_inputs": self._num_inputs,
+            "num_outputs": self._num_outputs,
+            "hidden_layer_sizes": self._hidden_layer_sizes,
+            "weights": [weights.vals.tolist() for weights in self.weights],
+            "bias": [bias.vals.tolist() for bias in self.bias],
+        }
+        with open(filepath, "w") as file:
+            json.dump(_data, file)
+
     def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
         Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
@@ -182,23 +199,6 @@ class NeuralNetwork:
             prev_layer = layer
 
         return output_errors.as_list
-
-    def save(self, filepath: str) -> None:
-        """
-        Save neural network layer weights and biases to JSON file.
-
-        Parameters:
-            filepath (str): Path to file with weights and biases
-        """
-        _data = {
-            "num_inputs": self._num_inputs,
-            "num_outputs": self._num_outputs,
-            "hidden_layer_sizes": self._hidden_layer_sizes,
-            "weights": [weights.vals.tolist() for weights in self.weights],
-            "bias": [bias.vals.tolist() for bias in self.bias],
-        }
-        with open(filepath, "w") as file:
-            json.dump(_data, file)
 
     def crossover(
         self, nn: NeuralNetwork, other_nn: NeuralNetwork, mutation_rate: float
