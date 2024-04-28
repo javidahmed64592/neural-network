@@ -63,7 +63,7 @@ class Layer:
     @weights.setter
     def weights(self, new_weights: Matrix) -> None:
         for index, node in enumerate(self._nodes):
-            node._weights = new_weights.data[index]
+            node._weights = new_weights.vals[index]
 
     @property
     def bias(self) -> Matrix:
@@ -73,7 +73,7 @@ class Layer:
     @bias.setter
     def bias(self, new_bias: Matrix) -> None:
         for index, node in enumerate(self._nodes):
-            node._bias = new_bias.data[index]
+            node._bias = new_bias.vals[index]
 
     def _add_node(self) -> None:
         """

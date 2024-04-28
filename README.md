@@ -14,6 +14,7 @@ pipenv install -e git+https://github.com/javidahmed64592/neural-network#egg=neur
 ## Table of Contents
 - [Installing Dependencies](#installing-dependencies)
 - [Using the Neural Network](#using-the-neural-network)
+  - [Neuroevolution](#neuroevolution)
 - [Testing](#testing)
 - [Linting and Formatting](#linting-and-formatting)
 
@@ -32,7 +33,7 @@ The neural network can be created in the following way:
 ```
 from neural_network.neural_network import NeuralNetwork
 
-nn = NeuralNetwork(num_inputs=num_inputs, num_outputs=num_outputs, hidden_layer_sizes=hidden_layer_sizes)
+nn = NeuralNetwork(num_inputs, num_outputs, hidden_layer_sizes)
 ```
 
 where
@@ -67,6 +68,35 @@ To load a neural network from a file:
 ```
 nn = NeuralNetwork.from_file("/path/to/nn_model.json")
 ```
+
+### Neuroevolution
+The neural network also has methods which can be used in neuroevolution.
+
+The topology of the neural network can be mutated in the following way:
+
+```
+nn.mutate(shift_vals, prob_new_node, prob_remove_node)
+```
+
+where
+
+- `shift_vals`: Layer weights and biases *= random (1 - shift_vals, 1 + shift_vals)
+- `prob_new_node`: Probability for a new Node in a given hidden Layer, range [0, 1]
+- `prob_remove_node`: Probability to remove a Node from a given hidden Layer, range[0, 1]
+
+New weights and biases can also be calculated via crossover:
+
+```
+nn_1 = NeuralNetwork(num_inputs, num_outputs, [i])
+nn_2 = NeuralNetwork(num_inputs, num_outputs, [j])
+nn_3 = NeuralNetwork(num_inputs, num_outputs, [k])
+
+nn_1.weights, nn_1.bias = nn_1.crossover(nn_2, nn_3, mutation_rate)
+```
+
+where
+
+- `mutation_rate`: Percentage of weights and biases to be randomised
 
 ## Testing
 This library uses Pytest for the unit tests.

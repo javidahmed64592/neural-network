@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -18,11 +17,15 @@ class NeuralNetwork:
     list of inputs, and be trained through backpropagation of errors.
     """
 
-    WEIGHTS_RANGE: ClassVar = [-1, 1]
-    BIAS_RANGE: ClassVar = [-1, 1]
-    LR = 0.1
-
-    def __init__(self, num_inputs: int, num_outputs: int, hidden_layer_sizes: list[int]) -> None:
+    def __init__(
+        self,
+        num_inputs: int,
+        num_outputs: int,
+        hidden_layer_sizes: list[int],
+        weights_range: tuple[float, float] | None = None,
+        bias_range: tuple[float, float] | None = None,
+        lr: float | None = None,
+    ) -> None:
         """
         Initialise NeuralNetwork object with specified layer sizes.
 
@@ -30,10 +33,16 @@ class NeuralNetwork:
             num_inputs (int): Number of inputs
             num_outputs (int): Number of outputs
             hidden_layer_sizes (list[int]): List of hidden layer sizes
+            weights_range (tuple[float, float]): Range for random weights, defaults to [-1, 1]
+            bias_range (tuple[float, float]): Range for random biases, defaults to [-1, 1]
+            lr (float): Learning rate for training, defaults to 0.1
         """
         self._num_inputs = num_inputs
         self._num_outputs = num_outputs
         self._hidden_layer_sizes = hidden_layer_sizes
+        self._weights_range = weights_range or [-1.0, 1.0]
+        self._bias_range = bias_range or [-1.0, 1.0]
+        self._lr = lr or 0.1
         self._create_layers()
 
     @classmethod
@@ -53,7 +62,7 @@ class NeuralNetwork:
 
     @property
     def layer_sizes(self) -> list[int]:
-        return [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
+        return [self._num_inputs, *[layer.size for layer in self._hidden_layers], self._num_outputs]
 
     @property
     def layers(self) -> list[Layer]:
@@ -95,8 +104,8 @@ class NeuralNetwork:
                 size=self.layer_sizes[index],
                 num_inputs=self.layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
-                weights_range=self.WEIGHTS_RANGE,
-                bias_range=self.BIAS_RANGE,
+                weights_range=self._weights_range,
+                bias_range=self._bias_range,
                 prev_layer=_layer,
             )
             self._hidden_layers.append(_layer)
@@ -105,10 +114,27 @@ class NeuralNetwork:
             size=self.layer_sizes[-1],
             num_inputs=self.layer_sizes[-2],
             activation=ActivationFunctions.sigmoid,
-            weights_range=self.WEIGHTS_RANGE,
-            bias_range=self.BIAS_RANGE,
+            weights_range=self._weights_range,
+            bias_range=self._bias_range,
             prev_layer=_layer,
         )
+
+    def save(self, filepath: str) -> None:
+        """
+        Save neural network layer weights and biases to JSON file.
+
+        Parameters:
+            filepath (str): Path to file with weights and biases
+        """
+        _data = {
+            "num_inputs": self._num_inputs,
+            "num_outputs": self._num_outputs,
+            "hidden_layer_sizes": self._hidden_layer_sizes,
+            "weights": [weights.vals.tolist() for weights in self.weights],
+            "bias": [bias.vals.tolist() for bias in self.bias],
+        }
+        with open(filepath, "w") as file:
+            json.dump(_data, file)
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
@@ -117,7 +143,7 @@ class NeuralNetwork:
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability for a new Node, range [0, 1]
-            prob_remove_node(float): Probability to remove a Node
+            prob_remove_node(float): Probability to remove a Node, range[0, 1]
         """
         for layer in self.layers:
             layer.mutate(shift_vals, prob_new_node, prob_remove_node)
@@ -162,31 +188,43 @@ class NeuralNetwork:
         output = self._output_layer.feedforward(layer_input_matrix)
 
         errors = calculate_error_from_expected(expected_output_matrix, output)
-        self._output_layer.backpropagate_error(errors, self.LR)
+        self._output_layer.backpropagate_error(errors, self._lr)
         output_errors = Matrix.transpose(errors)
 
         prev_layer = self._output_layer
 
         for layer in self._hidden_layers[::-1]:
             errors = calculate_next_errors(prev_layer.weights, errors)
-            layer.backpropagate_error(errors, self.LR)
+            layer.backpropagate_error(errors, self._lr)
             prev_layer = layer
 
         return output_errors.as_list
 
-    def save(self, filepath: str) -> None:
+    def crossover(
+        self, nn: NeuralNetwork, other_nn: NeuralNetwork, mutation_rate: float
+    ) -> tuple[list[Matrix], list[Matrix]]:
         """
-        Save neural network layer weights and biases to JSON file.
+        Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
+        class.
 
         Parameters:
-            filepath (str): Path to file with weights and biases
+            nn (NeuralNetwork): Neural Network to use for average weights and biases
+            other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
+            mutation_rate (float): Percentage of weights and biases to be randomised
+
+        Returns:
+            new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
         """
-        _data = {
-            "num_inputs": self._num_inputs,
-            "num_outputs": self._num_outputs,
-            "hidden_layer_sizes": self._hidden_layer_sizes,
-            "weights": [weights.data.tolist() for weights in self.weights],
-            "bias": [bias.data.tolist() for bias in self.bias],
-        }
-        with open(filepath, "w") as file:
-            json.dump(_data, file)
+        new_weights = []
+        new_biases = []
+
+        for index in range(len(self.layers)):
+            new_weight = Matrix.mix_matrices(self.weights[index], nn.weights[index], other_nn.weights[index])
+            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, self._weights_range)
+            new_bias = Matrix.mix_matrices(self.bias[index], nn.bias[index], other_nn.bias[index])
+            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, self._bias_range)
+
+            new_weights.append(new_weight)
+            new_biases.append(new_bias)
+
+        return [new_weights, new_biases]

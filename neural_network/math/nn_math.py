@@ -34,7 +34,7 @@ def calculate_gradient(layer_vals: Matrix, errors: Matrix, lr: float) -> Matrix:
     Returns:
         gradient (Matrix): Gradient values
     """
-    gradient = Matrix.from_array(layer_vals.data * (1 - layer_vals.data))
+    gradient = Matrix.from_array(layer_vals.vals * (1 - layer_vals.vals))
     gradient = Matrix.multiply_element_wise(gradient, errors)
     gradient = Matrix.multiply(gradient, lr)
     return gradient
