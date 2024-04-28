@@ -143,7 +143,7 @@ class NeuralNetwork:
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability for a new Node, range [0, 1]
-            prob_remove_node(float): Probability to remove a Node
+            prob_remove_node(float): Probability to remove a Node, range[0, 1]
         """
         for layer in self.layers:
             layer.mutate(shift_vals, prob_new_node, prob_remove_node)
