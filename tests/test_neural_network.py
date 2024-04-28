@@ -31,3 +31,22 @@ class TestNeuralNetwork:
         output = mock_nn.feedforward(mock_inputs)
         actual_len = len(output)
         assert actual_len == mock_len_outputs
+
+    def test_given_three_nns_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
+        self, mock_inputs: list[float], mock_len_inputs: int, mock_len_outputs: int
+    ) -> None:
+        mock_nn_1 = NeuralNetwork(mock_len_inputs, mock_len_outputs, [5, 4, 3, 2, 1])
+        mock_nn_2 = NeuralNetwork(mock_len_inputs, mock_len_outputs, [6, 3, 2, 5, 3])
+        mock_nn_3 = NeuralNetwork(mock_len_inputs, mock_len_outputs, [3, 5, 4, 2, 3])
+
+        mock_nn_3.weights, mock_nn_3.bias = mock_nn_3.crossover(mock_nn_1, mock_nn_2, 0.01)
+        mock_nn_1.weights, mock_nn_1.bias = mock_nn_1.crossover(mock_nn_2, mock_nn_3, 0.01)
+        mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(mock_nn_3, mock_nn_1, 0.01)
+
+        output_1 = mock_nn_1.feedforward(mock_inputs)
+        output_2 = mock_nn_1.feedforward(mock_inputs)
+        output_3 = mock_nn_1.feedforward(mock_inputs)
+
+        assert len(output_1) == mock_len_outputs
+        assert len(output_2) == mock_len_outputs
+        assert len(output_3) == mock_len_outputs
