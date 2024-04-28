@@ -62,7 +62,7 @@ class NeuralNetwork:
 
     @property
     def layer_sizes(self) -> list[int]:
-        return [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
+        return [self._num_inputs, *[layer.size for layer in self._hidden_layers], self._num_outputs]
 
     @property
     def layers(self) -> list[Layer]:
@@ -199,3 +199,32 @@ class NeuralNetwork:
         }
         with open(filepath, "w") as file:
             json.dump(_data, file)
+
+    def crossover(
+        self, nn: NeuralNetwork, other_nn: NeuralNetwork, mutation_rate: float
+    ) -> tuple[list[Matrix], list[Matrix]]:
+        """
+        Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
+        class.
+
+        Parameters:
+            nn (NeuralNetwork): Neural Network to use for average weights and biases
+            other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
+            mutation_rate (float): Percentage of weights and biases to be randomised
+
+        Returns:
+            new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
+        """
+        new_weights = []
+        new_biases = []
+
+        for index in range(len(self.layers)):
+            new_weight = Matrix.mix_matrices(self.weights[index], nn.weights[index], other_nn.weights[index])
+            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, self._weights_range)
+            new_bias = Matrix.mix_matrices(self.bias[index], nn.bias[index], other_nn.bias[index])
+            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, self._bias_range)
+
+            new_weights.append(new_weight)
+            new_biases.append(new_bias)
+
+        return [new_weights, new_biases]

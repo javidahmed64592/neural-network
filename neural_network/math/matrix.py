@@ -221,7 +221,58 @@ class Matrix:
             _mutation_matrix < mutation_rate, np.random.uniform(low=random_range[0], high=random_range[1]), matrix.vals
         )
         return Matrix.from_array(new_matrix)
+
+    @staticmethod
+    def pad_matrix(matrix: Matrix, new_shape: tuple[int, int]) -> Matrix:
+        """
+        Pad a Matrix with 0s to match a new shape.
+
+        Parameters:
+            matrix (Matrix): Matrix to pad
+            new_shape (tuple[int, int]): New shape for Matrix
+
+        Returns:
+            new_matrix (Matrix): Padded Matrix
+        """
+        new_matrix = np.pad(
+            matrix.vals,
+            ((0, new_shape[0] - matrix.vals.shape[0]), (0, new_shape[1] - matrix.vals.shape[1])),
+            mode="constant",
+            constant_values=0,
         )
+        return Matrix.from_array(new_matrix)
+
+    @staticmethod
+    def mix_matrices(input_matrix_a: Matrix, input_matrix_b: Matrix, output_matrix: Matrix) -> Matrix:
+        """
+        Mix two input Matrices and fill to match output Matrix shape. This can be used to perform crossover on neural
+        networks with different topologies.
+
+        Parameters:
+            input_matrix_a (Matrix): Matrix to use for average
+            input_matrix_b (Matrix): Other Matrix to use for average
+            output_matrix (Matrix): Matrix to use for output shape and fill values
+
+        Returns:
+            new_matrix (Matrix): Average Matrix of both inputs with shape of output
+        """
+        max_shape = np.max([input_matrix_a.shape, input_matrix_b.shape, output_matrix.shape], axis=0)
+        out_shape = output_matrix.shape
+
+        padded_i1 = Matrix.pad_matrix(input_matrix_a, max_shape)
+        padded_i2 = Matrix.pad_matrix(input_matrix_b, max_shape)
+        padded_o = Matrix.pad_matrix(output_matrix, max_shape)
+
+        avg_matrix = np.where(
+            padded_i1.vals == 0,
+            padded_i2.vals,
+            np.where(
+                padded_i2.vals == 0,
+                padded_i1.vals,
+                (padded_i1.vals + padded_i2.vals) / 2,
+            ),
+        )
+        new_matrix = np.where(avg_matrix == 0, padded_o.vals, avg_matrix)[: out_shape[0], : out_shape[1]]
         return Matrix.from_array(new_matrix)
 
     def shift_vals(self, shift: float) -> None:
