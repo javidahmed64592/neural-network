@@ -26,6 +26,10 @@ class Node:
         self._bias = bias
         self._activation = activation
 
+    @property
+    def weights(self) -> NDArray:
+        return self._weights
+
     @classmethod
     def random_node(
         cls, size: int, weights_range: tuple[float, float], bias_range: tuple[float, float], activation: Callable
