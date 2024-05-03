@@ -13,8 +13,6 @@ class Node:
     rate. These values affect the node's output and training.
     """
 
-    LR = 0.00001
-
     def __init__(self, weights: NDArray, bias: float, activation: Callable) -> None:
         """
         Initialise Node object with number of weights, equal to number of inputs.
@@ -48,99 +46,6 @@ class Node:
         _bias = np.random.uniform(low=bias_range[0], high=bias_range[1])
         node = cls(_weights, _bias, activation)
         return node
-
-    def _calculate_output(self, inputs: list[float]) -> float:
-        """
-        Calculate node output from array of inputs.
-
-        Parameters:
-            inputs (list[float]): List of input values
-
-        Returns:
-            output (float): Inputs multiplied by weight
-        """
-        output = np.sum(self._weights * np.array(inputs)) + self._bias
-        return float(output)
-
-    def _calculate_error(self, predicted_output: float, expected_output: float) -> float:
-        """
-        Calculate error between predicted output from feedforward and expected output.
-
-        Parameters:
-            predicted_output (float): Output from feedforward algorithm
-            expected_output (float): Expected output from inputs
-
-        Returns:
-            error (float): Difference between predicted and expected output
-        """
-        error = expected_output - predicted_output
-        return error
-
-    def _calculate_delta_w(self, inputs: list[float], error: float) -> NDArray:
-        """
-        Calculate delta_w to modify weights through backpropagation.
-
-        Paremeters:
-            inputs (list[float]): List of input values
-            error (float): Error from node output
-
-        Returns:
-            delta_w (NDArray): Array to add to weights
-        """
-        _delta_factor = error * self.LR
-        delta_w = np.array(inputs) * _delta_factor
-        return delta_w
-
-    def _calculate_delta_b(self, error: float) -> float:
-        """
-        Calculate delta_b to modify bias through backpropagation.
-
-        Paremeters:
-            error (float): Error from node output
-
-        Returns:
-            delta_b (float): Number to add to bias
-        """
-        delta_b = error * self.LR
-        return delta_b
-
-    def _backpropagate(self, inputs: list[float], error: float) -> None:
-        """
-        Backpropagate error from inputs.
-
-        Parameters:
-            inputs (list[float]): List of input values
-            error (float): Error from node output
-        """
-        self._weights += self._calculate_delta_w(inputs, error)
-        self._bias += self._calculate_delta_b(error)
-
-    def feedforward(self, inputs: list[float]) -> float:
-        """
-        Feedforward inputs and calculate output.
-
-        Parameters:
-            inputs (list[float]): List of input values
-
-        Returns:
-            output (float): Node output
-        """
-        _sum = self._calculate_output(inputs=inputs)
-        output = self._activation(_sum)
-        return float(output)
-
-    def train(self, inputs: list[float], target: float) -> None:
-        """
-        Train node with inputs and an expected output.
-
-        Parameters:
-            inputs (list[float]): Inputs to pass through feedforward
-            target (float): Expected output from inputs
-        """
-        _output = self.feedforward(inputs)
-        if _output != target:
-            _error = self._calculate_error(_output, target)
-            self._backpropagate(inputs, _error)
 
     def add_weight(self, weights_range: tuple[float, float]) -> None:
         """
