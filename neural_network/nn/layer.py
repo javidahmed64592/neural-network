@@ -82,48 +82,15 @@ class Layer:
         for index, node in enumerate(self._nodes):
             node._bias = new_bias.vals[index]
 
-    def _add_node(self) -> None:
+    def mutate(self, shift_vals: float) -> None:
         """
-        Add a random Node to Layer.
-        """
-        self._nodes.append(self.random_node)
-
-        for node in self._next_layer._nodes:
-            node.add_weight(self._next_layer._weights_range)
-
-    def _remove_node(self) -> None:
-        """
-        Remove random Node from Layer.
-        """
-        if self.size == 1:
-            return
-
-        index = np.random.randint(low=0, high=self.size)
-        del self._nodes[index]
-
-        for node in self._next_layer._nodes:
-            node.remove_weight(index)
-
-    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
-        """
-        Mutate Layer weights and biases, and potentially add/remove Node to/from Layer.
+        Mutate Layer weights and biases.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
-            prob_new_node (float): Probability for a new Node, range [0, 1]
-            prob_remove_node(float): Probability to remove a Node
         """
         self.weights.shift_vals(shift_vals)
         self.bias.shift_vals(shift_vals)
-
-        if not self._next_layer:
-            return
-
-        rng = np.random.uniform(low=0, high=1)
-        if rng < prob_new_node:
-            self._add_node()
-        elif rng > 1 - prob_remove_node:
-            self._remove_node()
 
     def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
         """
@@ -154,3 +121,70 @@ class Layer:
         self._layer_input = vals
         self._layer_output = output
         return output
+
+
+class HiddenLayer(Layer):
+    """
+    A hidden Layer in the NeuralNetwork.
+    """
+
+    def __init__(
+        self,
+        size: int,
+        num_inputs: int,
+        activation: Callable,
+        weights_range: tuple[float, float],
+        bias_range: tuple[float, float],
+        prev_layer: Layer | None = None,
+    ) -> None:
+        """
+        Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
+
+        Parameters:
+            size (int): Size of Layer
+            num_inputs (int): Number of inputs into Layer
+            activation (Callable): Layer activation function
+            weights_range (tuple[float, float]): Range for Layer weights
+            bias_range (tuple[float, float]): Range for Layer bias
+            prev_layer (Layer): Previous Layer to connect
+        """
+        super().__init__(size, num_inputs, activation, weights_range, bias_range, prev_layer)
+
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
+        """
+        Mutate HiddenLayer weights and biases, and potentially add/remove Node to/from HiddenLayer.
+
+        Parameters:
+            shift_vals (float): Factor to adjust Layer weights and biases by
+            prob_new_node (float): Probability for a new Node, range [0, 1]
+            prob_remove_node(float): Probability to remove a Node
+        """
+        super().mutate(shift_vals)
+
+        rng = np.random.uniform(low=0, high=1)
+        if rng < prob_new_node:
+            self._add_node()
+        elif rng > 1 - prob_remove_node:
+            self._remove_node()
+
+    def _add_node(self) -> None:
+        """
+        Add a random Node to HiddenLayer.
+        """
+        self._nodes.append(self.random_node)
+
+        for node in self._next_layer._nodes:
+            node.add_weight(self._next_layer._weights_range)
+
+    def _remove_node(self) -> None:
+        """
+        Remove random Node from HiddenLayer.
+        """
+        if self.size == 1:
+            return
+
+        index = np.random.randint(low=0, high=self.size)
+        del self._nodes[index]
+
+        for node in self._next_layer._nodes:
+            node.remove_weight(index)

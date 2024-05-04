@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from neural_network.math.activation_functions import ActivationFunctions
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import Layer
+from neural_network.nn.layer import HiddenLayer, Layer
 
 
 class NeuralNetwork:
@@ -100,7 +100,7 @@ class NeuralNetwork:
         self._hidden_layers: list[Layer] = []
 
         for index in range(1, len(self.layer_sizes) - 1):
-            _layer = Layer(
+            _layer = HiddenLayer(
                 size=self.layer_sizes[index],
                 num_inputs=self.layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
@@ -145,8 +145,9 @@ class NeuralNetwork:
             prob_new_node (float): Probability for a new Node, range [0, 1]
             prob_remove_node(float): Probability to remove a Node, range[0, 1]
         """
-        for layer in self.layers:
+        for layer in self._hidden_layers:
             layer.mutate(shift_vals, prob_new_node, prob_remove_node)
+        self._output_layer.mutate(shift_vals)
 
     def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
         """

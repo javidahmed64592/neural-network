@@ -4,7 +4,7 @@ import pytest
 
 from neural_network.math.matrix import Matrix
 from neural_network.neural_network import NeuralNetwork
-from neural_network.nn.layer import Layer
+from neural_network.nn.layer import HiddenLayer, Layer
 from neural_network.nn.node import Node
 
 
@@ -60,8 +60,8 @@ def mock_hidden_layer(
     mock_activation: Callable,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
-) -> Layer:
-    return Layer(mock_len_hidden, mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
+) -> HiddenLayer:
+    return HiddenLayer(mock_len_hidden, mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
 
 
 @pytest.fixture
@@ -71,7 +71,7 @@ def mock_output_layer(
     mock_activation: Callable,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
-    mock_hidden_layer: Layer,
+    mock_hidden_layer: HiddenLayer,
 ) -> Layer:
     return Layer(
         mock_len_outputs, mock_len_hidden, mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer
