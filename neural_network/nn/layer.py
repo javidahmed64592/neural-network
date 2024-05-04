@@ -34,11 +34,18 @@ class Layer:
             bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (Layer): Previous Layer to connect
         """
+        self._prev_layer: Layer = None
+        self._next_layer: Layer = None
+
         self._num_inputs = num_inputs
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
-        self._prev_layer = prev_layer
+
+        if prev_layer:
+            self._prev_layer = prev_layer
+            prev_layer._next_layer = self
+
         self._nodes = [self.random_node for _ in range(size)]
 
     @property
@@ -81,40 +88,25 @@ class Layer:
         """
         self._nodes.append(self.random_node)
 
-    def _add_node_to_prev(self) -> None:
-        """
-        Add a weight to all Nodes in Layer and a new Node to previous Layer.
-        """
-        for node in self._nodes:
-            node.add_weight(self._weights_range)
+        for node in self._next_layer._nodes:
+            node.add_weight(self._next_layer._weights_range)
 
-        self._prev_layer._add_node()
-
-    def _remove_node(self, index: int) -> None:
+    def _remove_node(self) -> None:
         """
-        Remove Node from Layer at index.
-
-        Parameters:
-            index (int): Index to remove Node at
+        Remove random Node from Layer.
         """
-        del self._nodes[index]
-
-    def _remove_node_from_prev(self) -> None:
-        """
-        Remove a weight from all Nodes in Layer and remove Node from previous Layer.
-        """
-        if self._prev_layer.size == 1:
+        if self.size == 1:
             return
 
-        index = np.random.randint(low=0, high=self.num_inputs)
-        for node in self._nodes:
-            node.remove_weight(index)
+        index = np.random.randint(low=0, high=self.size)
+        del self._nodes[index]
 
-        self._prev_layer._remove_node(index)
+        for node in self._next_layer._nodes:
+            node.remove_weight(index)
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
-        Mutate Layer weights and biases, and potentially add Node to previous Layer.
+        Mutate Layer weights and biases, and potentially add/remove Node to/from Layer.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
@@ -124,14 +116,14 @@ class Layer:
         self.weights.shift_vals(shift_vals)
         self.bias.shift_vals(shift_vals)
 
-        if not self._prev_layer:
+        if not self._next_layer:
             return
 
         rng = np.random.uniform(low=0, high=1)
         if rng < prob_new_node:
-            self._add_node_to_prev()
+            self._add_node()
         elif rng > 1 - prob_remove_node:
-            self._remove_node_from_prev()
+            self._remove_node()
 
     def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
         """

@@ -31,7 +31,7 @@ class TestLayer:
         initial_size = mock_hidden_layer.size
         initial_inputs = mock_output_layer.num_inputs
 
-        mock_output_layer.mutate(0, 1, 0)
+        mock_hidden_layer.mutate(0, 1, 0)
 
         expected_size = initial_size + 1
         expected_inputs = initial_inputs + 1
@@ -49,7 +49,7 @@ class TestLayer:
         initial_size = mock_hidden_layer.size
         initial_inputs = mock_output_layer.num_inputs
 
-        mock_output_layer.mutate(0, 0, 1)
+        mock_hidden_layer.mutate(0, 0, 1)
 
         expected_size = initial_size - 1
         expected_inputs = initial_inputs - 1
