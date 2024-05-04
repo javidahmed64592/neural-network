@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from neural_network.math.activation_functions import ActivationFunctions
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import HiddenLayer, Layer
+from neural_network.nn.layer import HiddenLayer, Layer, OutputLayer
 
 
 class NeuralNetwork:
@@ -110,7 +110,7 @@ class NeuralNetwork:
             )
             self._hidden_layers.append(_layer)
 
-        self._output_layer = Layer(
+        self._output_layer = OutputLayer(
             size=self.layer_sizes[-1],
             num_inputs=self.layer_sizes[-2],
             activation=ActivationFunctions.sigmoid,

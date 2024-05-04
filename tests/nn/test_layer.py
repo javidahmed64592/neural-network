@@ -1,5 +1,5 @@
 from neural_network.math.matrix import Matrix
-from neural_network.nn.layer import HiddenLayer, Layer
+from neural_network.nn.layer import HiddenLayer, OutputLayer
 
 
 class TestLayer:
@@ -26,7 +26,7 @@ class TestLayer:
     def test_given_layers_when_adding_node_to_hidden_then_check_layers_have_correct_shape(
         self,
         mock_hidden_layer: HiddenLayer,
-        mock_output_layer: Layer,
+        mock_output_layer: OutputLayer,
     ) -> None:
         initial_size = mock_hidden_layer.size
         initial_inputs = mock_output_layer.num_inputs
@@ -44,7 +44,7 @@ class TestLayer:
     def test_given_layers_when_removing_node_from_hidden_then_check_layers_have_correct_shape(
         self,
         mock_hidden_layer: HiddenLayer,
-        mock_output_layer: Layer,
+        mock_output_layer: OutputLayer,
     ) -> None:
         initial_size = mock_hidden_layer.size
         initial_inputs = mock_output_layer.num_inputs

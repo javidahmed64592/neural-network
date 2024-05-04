@@ -188,3 +188,31 @@ class HiddenLayer(Layer):
 
         for node in self._next_layer._nodes:
             node.remove_weight(index)
+
+
+class OutputLayer(Layer):
+    """
+    A output Layer in the NeuralNetwork.
+    """
+
+    def __init__(
+        self,
+        size: int,
+        num_inputs: int,
+        activation: Callable,
+        weights_range: tuple[float, float],
+        bias_range: tuple[float, float],
+        prev_layer: HiddenLayer,
+    ) -> None:
+        """
+        Initialise OutputLayer object with number of nodes, inputs, activation function and previous layer if exists.
+
+        Parameters:
+            size (int): Size of Layer
+            num_inputs (int): Number of inputs into Layer
+            activation (Callable): Layer activation function
+            weights_range (tuple[float, float]): Range for Layer weights
+            bias_range (tuple[float, float]): Range for Layer bias
+            prev_layer (Layer): Previous Layer to connect
+        """
+        super().__init__(size, num_inputs, activation, weights_range, bias_range, prev_layer)
