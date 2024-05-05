@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from neural_network.math.activation_functions import ActivationFunctions
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import HiddenLayer, Layer, OutputLayer
+from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 
 
 class NeuralNetwork:
@@ -62,7 +62,7 @@ class NeuralNetwork:
 
     @property
     def layers(self) -> list[Layer]:
-        return [*self._hidden_layers, self._output_layer]
+        return [self._input_layer, *self._hidden_layers, self._output_layer]
 
     @property
     def weights(self) -> list[Matrix]:
@@ -93,7 +93,13 @@ class NeuralNetwork:
         Create neural network layers using list of layer sizes.
         """
         _layer_sizes = [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
-        _layer = None
+
+        self._input_layer = InputLayer(
+            size=_layer_sizes[0],
+            activation=ActivationFunctions.sigmoid,
+        )
+
+        _layer = self._input_layer
         self._hidden_layers: list[Layer] = []
 
         for index in range(1, len(_layer_sizes) - 1):
@@ -157,11 +163,11 @@ class NeuralNetwork:
         """
         input_matrix = Matrix.from_array(np.array(inputs))
 
-        hidden = input_matrix
+        vals = self._input_layer.feedforward(input_matrix)
         for layer in self._hidden_layers:
-            hidden = layer.feedforward(hidden)
+            vals = layer.feedforward(vals)
 
-        output = self._output_layer.feedforward(hidden)
+        output = self._output_layer.feedforward(vals)
         output = Matrix.transpose(output)
         return output.as_list
 
@@ -179,10 +185,12 @@ class NeuralNetwork:
         layer_input_matrix = Matrix.from_array(np.array(inputs))
         expected_output_matrix = Matrix.from_array(expected_outputs)
 
-        for layer in self._hidden_layers:
-            layer_input_matrix = layer.feedforward(layer_input_matrix)
+        vals = self._input_layer.feedforward(layer_input_matrix)
 
-        output = self._output_layer.feedforward(layer_input_matrix)
+        for layer in self._hidden_layers:
+            vals = layer.feedforward(vals)
+
+        output = self._output_layer.feedforward(vals)
 
         errors = calculate_error_from_expected(expected_output_matrix, output)
         self._output_layer.backpropagate_error(errors, self._lr)
