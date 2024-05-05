@@ -30,21 +30,23 @@ class Node:
     def weights(self) -> NDArray:
         return self._weights
 
+    @weights.setter
+    def weights(self, new_weights: list[float]) -> None:
+        self._weights = np.array(new_weights)
+
     @classmethod
-    def input_node(cls, size: int, activation: Callable) -> Node:
+    def input_node(cls, activation: Callable) -> Node:
         """
         Create a Node with random weights and bias.
 
         Parameters:
-            size (int): Number of Node weights
             activation (Callable): Node activation function
 
         Returns:
             node (Node): Node with random weights and bias
         """
-        _weights = np.ones(shape=(size))
         _bias = 0
-        node = cls(_weights, _bias, activation)
+        node = cls(1, _bias, activation)
         return node
 
     @classmethod

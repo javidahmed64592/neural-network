@@ -65,6 +65,7 @@ class Layer:
     @weights.setter
     def weights(self, new_weights: Matrix) -> None:
         for index, node in enumerate(self._nodes):
+            node.weights = new_weights.vals[index]
 
     @property
     def random_weight(self) -> float:
@@ -146,7 +147,7 @@ class InputLayer(Layer):
 
     @property
     def new_node(self) -> Node:
-        return Node.input_node(self.num_inputs, self._activation)
+        return Node.input_node(self._activation)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
