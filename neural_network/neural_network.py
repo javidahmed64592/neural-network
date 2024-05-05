@@ -111,12 +111,11 @@ class NeuralNetwork:
             self._hidden_layers.append(_layer)
 
         self._output_layer = OutputLayer(
-            size=self.layer_sizes[-1],
-            num_inputs=self.layer_sizes[-2],
+            size=_layer_sizes[-1],
             activation=ActivationFunctions.sigmoid,
             weights_range=self._weights_range,
             bias_range=self._bias_range,
-            prev_layer=_layer,
+            prev_layer=self._hidden_layers[-1],
         )
 
     def save(self, filepath: str) -> None:
