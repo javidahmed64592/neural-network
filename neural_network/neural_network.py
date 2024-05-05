@@ -61,10 +61,6 @@ class NeuralNetwork:
         return nn
 
     @property
-    def layer_sizes(self) -> list[int]:
-        return [self._num_inputs, *[layer.size for layer in self._hidden_layers], self._num_outputs]
-
-    @property
     def layers(self) -> list[Layer]:
         return [*self._hidden_layers, self._output_layer]
 
