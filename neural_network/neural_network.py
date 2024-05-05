@@ -96,13 +96,14 @@ class NeuralNetwork:
         """
         Create neural network layers using list of layer sizes.
         """
+        _layer_sizes = [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
         _layer = None
         self._hidden_layers: list[Layer] = []
 
-        for index in range(1, len(self.layer_sizes) - 1):
+        for index in range(1, len(_layer_sizes) - 1):
             _layer = HiddenLayer(
-                size=self.layer_sizes[index],
-                num_inputs=self.layer_sizes[index - 1],
+                size=_layer_sizes[index],
+                num_inputs=_layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
                 weights_range=self._weights_range,
                 bias_range=self._bias_range,

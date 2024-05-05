@@ -9,21 +9,21 @@ class TestNNMath:
         self,
         mock_input_matrix: Matrix,
         mock_inputs: list[float],
-        mock_len_hidden: int,
+        mock_len_hidden: list[int],
         mock_weights_range: list[float],
         mock_bias_range: list[float],
         mock_activation: Callable,
     ) -> None:
         weights_ih = Matrix.random_matrix(
-            rows=mock_len_hidden, cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
+            rows=mock_len_hidden[0], cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
         )
-        bias_h = Matrix.random_column(rows=mock_len_hidden, low=mock_bias_range[0], high=mock_bias_range[1])
+        bias_h = Matrix.random_column(rows=mock_len_hidden[0], low=mock_bias_range[0], high=mock_bias_range[1])
 
         output = nn_math.feedforward_through_layer(
             input_vals=mock_input_matrix, weights=weights_ih, bias=bias_h, activation=mock_activation
         )
 
-        expected_shape = (mock_len_hidden, 1)
+        expected_shape = (mock_len_hidden[0], 1)
         actual_shape = output.shape
         assert actual_shape == expected_shape
 

@@ -34,8 +34,8 @@ def mock_len_inputs(mock_inputs: list[float]) -> int:
 
 
 @pytest.fixture
-def mock_len_hidden() -> int:
-    return 5
+def mock_len_hidden() -> list[int]:
+    return [5, 4, 3]
 
 
 @pytest.fixture
@@ -49,19 +49,19 @@ def mock_len_outputs(mock_outputs: list[float]) -> int:
 
 
 @pytest.fixture
-def mock_nn(mock_len_inputs: int, mock_len_outputs: int) -> NeuralNetwork:
-    return NeuralNetwork(mock_len_inputs, mock_len_outputs, [5])
+def mock_nn(mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int) -> NeuralNetwork:
+    return NeuralNetwork(mock_len_inputs, mock_len_outputs, mock_len_hidden)
 
 
 @pytest.fixture
 def mock_hidden_layer(
-    mock_len_hidden: int,
+    mock_len_hidden: list[int],
     mock_len_inputs: int,
     mock_activation: Callable,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
 ) -> HiddenLayer:
-    return HiddenLayer(mock_len_hidden, mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
+    return HiddenLayer(mock_len_hidden[0], mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
 
 
 @pytest.fixture
