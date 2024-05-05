@@ -37,6 +37,10 @@ class NeuralNetwork:
             bias_range (tuple[float, float]): Range for random biases, defaults to [-1, 1]
             lr (float): Learning rate for training, defaults to 0.1
         """
+        self._input_layer: InputLayer = None
+        self._hidden_layers: list[HiddenLayer] = []
+        self._output_layer: OutputLayer = None
+
         self._num_inputs = num_inputs
         self._num_outputs = num_outputs
         self._hidden_layer_sizes = hidden_layer_sizes
@@ -63,6 +67,10 @@ class NeuralNetwork:
     @property
     def layers(self) -> list[Layer]:
         return [self._input_layer, *self._hidden_layers, self._output_layer]
+
+    @property
+    def layers_reversed(self) -> list[Layer]:
+        return self.layers[::-1]
 
     @property
     def weights(self) -> list[Matrix]:
@@ -99,26 +107,24 @@ class NeuralNetwork:
             activation=ActivationFunctions.sigmoid,
         )
 
-        _layer = self._input_layer
-        self._hidden_layers: list[Layer] = []
-
         for index in range(1, len(_layer_sizes) - 1):
-            _layer = HiddenLayer(
-                size=_layer_sizes[index],
-                num_inputs=_layer_sizes[index - 1],
-                activation=ActivationFunctions.sigmoid,
-                weights_range=self._weights_range,
-                bias_range=self._bias_range,
-                prev_layer=_layer,
+            self._hidden_layers.append(
+                HiddenLayer(
+                    size=_layer_sizes[index],
+                    num_inputs=_layer_sizes[index - 1],
+                    activation=ActivationFunctions.sigmoid,
+                    weights_range=self._weights_range,
+                    bias_range=self._bias_range,
+                    prev_layer=self.layers[index - 1],
+                )
             )
-            self._hidden_layers.append(_layer)
 
         self._output_layer = OutputLayer(
             size=_layer_sizes[-1],
             activation=ActivationFunctions.sigmoid,
             weights_range=self._weights_range,
             bias_range=self._bias_range,
-            prev_layer=self._hidden_layers[-1],
+            prev_layer=self.layers[-2],
         )
 
     def save(self, filepath: str) -> None:
@@ -162,8 +168,8 @@ class NeuralNetwork:
             output (list[float]): List of outputs
         """
         input_matrix = Matrix.from_array(np.array(inputs))
-
         vals = self._input_layer.feedforward(input_matrix)
+
         for layer in self._hidden_layers:
             vals = layer.feedforward(vals)
 
@@ -183,8 +189,6 @@ class NeuralNetwork:
             output_errors (list[float]): List of output errors
         """
         layer_input_matrix = Matrix.from_array(np.array(inputs))
-        expected_output_matrix = Matrix.from_array(expected_outputs)
-
         vals = self._input_layer.feedforward(layer_input_matrix)
 
         for layer in self._hidden_layers:
@@ -192,16 +196,14 @@ class NeuralNetwork:
 
         output = self._output_layer.feedforward(vals)
 
+        expected_output_matrix = Matrix.from_array(expected_outputs)
         errors = calculate_error_from_expected(expected_output_matrix, output)
         self._output_layer.backpropagate_error(errors, self._lr)
         output_errors = Matrix.transpose(errors)
 
-        prev_layer = self._output_layer
-
-        for layer in self._hidden_layers[::-1]:
-            errors = calculate_next_errors(prev_layer.weights, errors)
-            layer.backpropagate_error(errors, self._lr)
-            prev_layer = layer
+        for index in range(len(self._hidden_layers)):
+            errors = calculate_next_errors(self.layers_reversed[index].weights, errors)
+            self.layers_reversed[index + 1].backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
 
