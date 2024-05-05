@@ -46,7 +46,7 @@ class Layer:
             self._prev_layer = prev_layer
             prev_layer._next_layer = self
 
-        self._nodes = [self.random_node for _ in range(size)]
+        self._nodes = [self.new_node for _ in range(size)]
 
     @property
     def size(self) -> int:
@@ -59,7 +59,7 @@ class Layer:
         return self._num_inputs
 
     @property
-    def random_node(self) -> Node:
+    def new_node(self) -> Node:
         return Node.random_node(self.num_inputs, self._weights_range, self._bias_range, self._activation)
 
     @property
@@ -142,6 +142,10 @@ class InputLayer(Layer):
         """
         super().__init__(size, 1, activation, [1, 1], [0, 0], None)
 
+    @property
+    def new_node(self) -> Node:
+        return Node.input_node(self.num_inputs, self._activation)
+
     def feedforward(self, vals: Matrix) -> Matrix:
         """
         Set InputLayer values.
@@ -205,7 +209,7 @@ class HiddenLayer(Layer):
         """
         Add a random Node to HiddenLayer.
         """
-        self._nodes.append(self.random_node)
+        self._nodes.append(self.new_node)
 
         for node in self._next_layer._nodes:
             node.add_weight(self._next_layer._weights_range)

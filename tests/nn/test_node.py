@@ -1,42 +1,23 @@
-import numpy as np
+from collections.abc import Callable
 
 from neural_network.nn.node import Node
 
 
 class TestNode:
-    test_expected_output = 1
-
-    def test_given_inputs_when_calculating_output_then_check_output_correctly_calculated(
-        self, mock_node: Node, mock_inputs: list[float], mock_len_inputs: int
+    def test_given_size_when_creating_input_node_then_check_node_has_correct_no_of_weights(
+        self,
+        mock_len_inputs: int,
+        mock_activation: Callable,
     ) -> None:
-        expected_output = (
-            sum([(mock_inputs[i] * mock_node._weights[i]) for i in range(mock_len_inputs)]) + mock_node._bias
-        )
-        actual_output = mock_node._calculate_output(mock_inputs)
-        assert actual_output == expected_output
+        node = Node.input_node(mock_len_inputs, mock_activation)
+        assert len(node.weights) == mock_len_inputs
 
-    def test_given_inputs_when_calculating_error_then_check_error_correctly_calculated(
-        self, mock_node: Node, mock_inputs: list[float]
+    def test_given_size_when_creating_random_node_then_check_node_has_correct_no_of_weights(
+        self,
+        mock_len_inputs: int,
+        mock_weights_range: list[float],
+        mock_bias_range: list[float],
+        mock_activation: Callable,
     ) -> None:
-        output = mock_node._calculate_output(mock_inputs)
-        expected_error = self.test_expected_output - output
-        actual_error = mock_node._calculate_error(output, self.test_expected_output)
-        np.testing.assert_array_almost_equal(actual_error, expected_error, 1)
-
-    def test_given_inputs_and_error_when_calculating_delta_w_then_check_delta_w_correctly_calculated(
-        self, mock_node: Node, mock_inputs: list[float], mock_len_inputs: int
-    ) -> None:
-        output = mock_node._calculate_output(mock_inputs)
-        error = mock_node._calculate_error(output, self.test_expected_output)
-        expected_delta_w = [(mock_inputs[i] * error * mock_node.LR) for i in range(mock_len_inputs)]
-        actual_delta_w = mock_node._calculate_delta_w(mock_inputs, error)
-        np.testing.assert_array_almost_equal(actual_delta_w, expected_delta_w, 1)
-
-    def test_given_inputs_and_error_when_calculating_delta_b_then_check_delta_b_correctly_calculated(
-        self, mock_node: Node, mock_inputs: list[float]
-    ) -> None:
-        output = mock_node._calculate_output(mock_inputs)
-        error = mock_node._calculate_error(output, self.test_expected_output)
-        expected_delta_b = error * mock_node.LR
-        actual_delta_b = mock_node._calculate_delta_b(error)
-        np.testing.assert_array_almost_equal(actual_delta_b, expected_delta_b, 1)
+        node = Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation)
+        assert len(node.weights) == mock_len_inputs

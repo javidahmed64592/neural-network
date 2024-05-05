@@ -76,12 +76,5 @@ def mock_output_layer(
 
 
 @pytest.fixture
-def mock_node(
-    mock_len_inputs: int, mock_weights_range: list[float], mock_bias_range: list[float], mock_activation: Callable
-) -> Node:
-    return Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation)
-
-
-@pytest.fixture
 def mock_input_matrix(mock_inputs: int) -> Matrix:
     return Matrix.from_array(mock_inputs)

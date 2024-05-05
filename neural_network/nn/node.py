@@ -31,6 +31,23 @@ class Node:
         return self._weights
 
     @classmethod
+    def input_node(cls, size: int, activation: Callable) -> Node:
+        """
+        Create a Node with random weights and bias.
+
+        Parameters:
+            size (int): Number of Node weights
+            activation (Callable): Node activation function
+
+        Returns:
+            node (Node): Node with random weights and bias
+        """
+        _weights = np.ones(shape=(size))
+        _bias = 0
+        node = cls(_weights, _bias, activation)
+        return node
+
+    @classmethod
     def random_node(
         cls, size: int, weights_range: tuple[float, float], bias_range: tuple[float, float], activation: Callable
     ) -> Node:
