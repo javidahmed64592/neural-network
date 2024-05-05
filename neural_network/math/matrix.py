@@ -54,7 +54,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with assigned values
         """
-        matrix_array = np.array(matrix_array)
+        matrix_array = np.array(matrix_array, dtype=object)
         try:
             _rows, _cols = matrix_array.shape
         except ValueError:

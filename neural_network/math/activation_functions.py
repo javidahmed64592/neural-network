@@ -1,6 +1,5 @@
-from typing import cast
-
 import numpy as np
+from numpy.typing import NDArray
 
 
 class ActivationFunctions:
@@ -17,5 +16,9 @@ class ActivationFunctions:
         return max(x, 0)
 
     @staticmethod
-    def sigmoid(x: float) -> float:
-        return cast(float, 1 / (1 + np.exp(-x)))
+    def sigmoid(x: NDArray | float) -> float:
+        try:
+            y = 1 / (1 + np.exp(-x))
+        except TypeError:
+            y = 1 / (1 + np.exp(-x.astype(float)))
+        return float(y)
