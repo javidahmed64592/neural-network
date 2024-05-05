@@ -29,25 +29,25 @@ class TestMatrix:
             assert actual == expected
 
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: int
+        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
         test_array = np.random.uniform(
-            low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden)
+            low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden[0])
         )
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
-        expected_shape = (mock_len_inputs, mock_len_hidden)
+        expected_shape = (mock_len_inputs, mock_len_hidden[0])
         actual_shape = test_matrix.shape
         for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
 
     def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range: list[float], mock_len_hidden: int
+        self, mock_weights_range: list[float], mock_len_hidden: list[int]
     ) -> None:
-        test_array = np.random.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden))
+        test_array = np.random.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
-        expected_shape = (mock_len_hidden, 1)
+        expected_shape = (mock_len_hidden[0], 1)
         actual_shape = test_matrix.shape
         for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected

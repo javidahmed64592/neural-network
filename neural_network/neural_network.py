@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from neural_network.math.activation_functions import ActivationFunctions
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import Layer
+from neural_network.nn.layer import HiddenLayer, Layer, OutputLayer
 
 
 class NeuralNetwork:
@@ -61,10 +61,6 @@ class NeuralNetwork:
         return nn
 
     @property
-    def layer_sizes(self) -> list[int]:
-        return [self._num_inputs, *[layer.size for layer in self._hidden_layers], self._num_outputs]
-
-    @property
     def layers(self) -> list[Layer]:
         return [*self._hidden_layers, self._output_layer]
 
@@ -96,13 +92,14 @@ class NeuralNetwork:
         """
         Create neural network layers using list of layer sizes.
         """
+        _layer_sizes = [self._num_inputs, *self._hidden_layer_sizes, self._num_outputs]
         _layer = None
         self._hidden_layers: list[Layer] = []
 
-        for index in range(1, len(self.layer_sizes) - 1):
-            _layer = Layer(
-                size=self.layer_sizes[index],
-                num_inputs=self.layer_sizes[index - 1],
+        for index in range(1, len(_layer_sizes) - 1):
+            _layer = HiddenLayer(
+                size=_layer_sizes[index],
+                num_inputs=_layer_sizes[index - 1],
                 activation=ActivationFunctions.sigmoid,
                 weights_range=self._weights_range,
                 bias_range=self._bias_range,
@@ -110,13 +107,12 @@ class NeuralNetwork:
             )
             self._hidden_layers.append(_layer)
 
-        self._output_layer = Layer(
-            size=self.layer_sizes[-1],
-            num_inputs=self.layer_sizes[-2],
+        self._output_layer = OutputLayer(
+            size=_layer_sizes[-1],
             activation=ActivationFunctions.sigmoid,
             weights_range=self._weights_range,
             bias_range=self._bias_range,
-            prev_layer=_layer,
+            prev_layer=self._hidden_layers[-1],
         )
 
     def save(self, filepath: str) -> None:
@@ -145,8 +141,9 @@ class NeuralNetwork:
             prob_new_node (float): Probability for a new Node, range [0, 1]
             prob_remove_node(float): Probability to remove a Node, range[0, 1]
         """
-        for layer in self.layers:
+        for layer in self._hidden_layers:
             layer.mutate(shift_vals, prob_new_node, prob_remove_node)
+        self._output_layer.mutate(shift_vals)
 
     def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
         """
@@ -219,9 +216,9 @@ class NeuralNetwork:
         new_biases = []
 
         for index in range(len(self.layers)):
-            new_weight = Matrix.mix_matrices(self.weights[index], nn.weights[index], other_nn.weights[index])
+            new_weight = Matrix.mix_matrices(nn.weights[index], other_nn.weights[index], self.weights[index])
             new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, self._weights_range)
-            new_bias = Matrix.mix_matrices(self.bias[index], nn.bias[index], other_nn.bias[index])
+            new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
             new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, self._bias_range)
 
             new_weights.append(new_weight)
