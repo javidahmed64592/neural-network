@@ -21,7 +21,7 @@ class Layer:
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None = None,
+        prev_layer: Layer | None,
     ) -> None:
         """
         Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
@@ -135,7 +135,7 @@ class HiddenLayer(Layer):
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None = None,
+        prev_layer: Layer | None,
     ) -> None:
         """
         Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
