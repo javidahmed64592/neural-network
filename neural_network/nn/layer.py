@@ -65,7 +65,10 @@ class Layer:
     @weights.setter
     def weights(self, new_weights: Matrix) -> None:
         for index, node in enumerate(self._nodes):
-            node._weights = new_weights.vals[index]
+
+    @property
+    def random_weight(self) -> float:
+        return np.random.uniform(low=self._weights_range[0], high=self._weights_range[1])
 
     @property
     def bias(self) -> Matrix:
