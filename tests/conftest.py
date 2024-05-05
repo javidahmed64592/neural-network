@@ -61,7 +61,7 @@ def mock_hidden_layer(
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
 ) -> HiddenLayer:
-    return HiddenLayer(mock_len_hidden[0], mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range)
+    return HiddenLayer(mock_len_hidden[0], mock_len_inputs, mock_activation, mock_weights_range, mock_bias_range, None)
 
 
 @pytest.fixture

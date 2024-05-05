@@ -21,7 +21,7 @@ class Layer:
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None = None,
+        prev_layer: Layer | None,
     ) -> None:
         """
         Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
@@ -123,6 +123,40 @@ class Layer:
         return output
 
 
+class InputLayer(Layer):
+    """
+    An input Layer in the NeuralNetwork.
+    """
+
+    def __init__(
+        self,
+        size: int,
+        activation: Callable,
+    ) -> None:
+        """
+        Initialise InputLayer object with number of nodes and activation function.
+
+        Parameters:
+            size (int): Size of OutputLayer
+            activation (Callable): OutputLayer activation function
+        """
+        super().__init__(size, 1, activation, [1, 1], [0, 0], None)
+
+    def feedforward(self, vals: Matrix) -> Matrix:
+        """
+        Set InputLayer values.
+
+        Parameters:
+            vals (Matrix): Input values
+
+        Returns:
+            vals (Matrix): Input values
+        """
+        self._layer_input = vals
+        self._layer_output = vals
+        return vals
+
+
 class HiddenLayer(Layer):
     """
     A hidden Layer in the NeuralNetwork.
@@ -135,7 +169,7 @@ class HiddenLayer(Layer):
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None = None,
+        prev_layer: InputLayer | Layer,
     ) -> None:
         """
         Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
@@ -146,7 +180,7 @@ class HiddenLayer(Layer):
             activation (Callable): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
-            prev_layer (Layer): Previous Layer to connect
+            prev_layer (InputLayer | Layer): Previous Layer to connect
         """
         super().__init__(size, num_inputs, activation, weights_range, bias_range, prev_layer)
 
@@ -192,7 +226,7 @@ class HiddenLayer(Layer):
 
 class OutputLayer(Layer):
     """
-    A output Layer in the NeuralNetwork.
+    An output Layer in the NeuralNetwork.
     """
 
     def __init__(
@@ -204,13 +238,13 @@ class OutputLayer(Layer):
         prev_layer: HiddenLayer,
     ) -> None:
         """
-        Initialise OutputLayer object with number of nodes, inputs, activation function and previous layer if exists.
+        Initialise OutputLayer object with number of nodes, inputs, activation function and previous layer.
 
         Parameters:
             size (int): Size of OutputLayer
             activation (Callable): OutputLayer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
-            prev_layer (Layer): Previous HiddenLayer to connect
+            prev_layer (HiddenLayer): Previous HiddenLayer to connect
         """
         super().__init__(size, prev_layer.size, activation, weights_range, bias_range, prev_layer)

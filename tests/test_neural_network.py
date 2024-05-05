@@ -3,9 +3,9 @@ from neural_network.neural_network import NeuralNetwork
 
 class TestNeuralNetwork:
     def test_given_nn_when_creating_layers_then_check_nn_has_correct_layers(
-        self, mock_nn: NeuralNetwork, mock_len_hidden: list[int], mock_len_outputs: int
+        self, mock_nn: NeuralNetwork, mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int
     ) -> None:
-        expected_sizes = [*mock_len_hidden, mock_len_outputs]
+        expected_sizes = [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
         for index, layer in enumerate(mock_nn.layers):
             assert layer.size == expected_sizes[index]
 
