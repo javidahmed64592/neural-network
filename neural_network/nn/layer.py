@@ -139,9 +139,6 @@ class InputLayer(Layer):
         Parameters:
             size (int): Size of OutputLayer
             activation (Callable): OutputLayer activation function
-            weights_range (tuple[float, float]): Range for OutputLayer weights
-            bias_range (tuple[float, float]): Range for OutputLayer bias
-            prev_layer (Layer): Previous HiddenLayer to connect
         """
         super().__init__(size, 1, activation, [1, 1], [0, 0], None)
 
@@ -172,7 +169,7 @@ class HiddenLayer(Layer):
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None,
+        prev_layer: InputLayer | Layer,
     ) -> None:
         """
         Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
@@ -183,7 +180,7 @@ class HiddenLayer(Layer):
             activation (Callable): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
-            prev_layer (Layer): Previous Layer to connect
+            prev_layer (InputLayer | Layer): Previous Layer to connect
         """
         super().__init__(size, num_inputs, activation, weights_range, bias_range, prev_layer)
 
@@ -248,6 +245,6 @@ class OutputLayer(Layer):
             activation (Callable): OutputLayer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
-            prev_layer (Layer): Previous HiddenLayer to connect
+            prev_layer (HiddenLayer): Previous HiddenLayer to connect
         """
         super().__init__(size, prev_layer.size, activation, weights_range, bias_range, prev_layer)
