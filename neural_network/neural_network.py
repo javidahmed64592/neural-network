@@ -111,7 +111,6 @@ class NeuralNetwork:
             self._hidden_layers.append(
                 HiddenLayer(
                     size=_layer_sizes[index],
-                    num_inputs=_layer_sizes[index - 1],
                     activation=ActivationFunctions.sigmoid,
                     weights_range=self._weights_range,
                     bias_range=self._bias_range,

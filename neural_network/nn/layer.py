@@ -169,7 +169,6 @@ class HiddenLayer(Layer):
     def __init__(
         self,
         size: int,
-        num_inputs: int,
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
@@ -180,13 +179,12 @@ class HiddenLayer(Layer):
 
         Parameters:
             size (int): Size of Layer
-            num_inputs (int): Number of inputs into Layer
             activation (Callable): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (InputLayer | Layer): Previous Layer to connect
         """
-        super().__init__(size, num_inputs, activation, weights_range, bias_range, prev_layer)
+        super().__init__(size, prev_layer.size, activation, weights_range, bias_range, prev_layer)
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
