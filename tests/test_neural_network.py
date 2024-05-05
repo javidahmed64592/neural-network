@@ -44,8 +44,8 @@ class TestNeuralNetwork:
         mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(mock_nn_3, mock_nn_1, 0.01)
 
         output_1 = mock_nn_1.feedforward(mock_inputs)
-        output_2 = mock_nn_1.feedforward(mock_inputs)
-        output_3 = mock_nn_1.feedforward(mock_inputs)
+        output_2 = mock_nn_2.feedforward(mock_inputs)
+        output_3 = mock_nn_3.feedforward(mock_inputs)
 
         assert len(output_1) == mock_len_outputs
         assert len(output_2) == mock_len_outputs
