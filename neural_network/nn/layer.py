@@ -17,7 +17,6 @@ class Layer:
     def __init__(
         self,
         size: int,
-        num_inputs: int,
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
@@ -28,7 +27,6 @@ class Layer:
 
         Parameters:
             size (int): Size of Layer
-            num_inputs (int): Number of inputs into Layer
             activation (Callable): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
@@ -37,7 +35,6 @@ class Layer:
         self._prev_layer: Layer = None
         self._next_layer: Layer = None
 
-        self._num_inputs = num_inputs
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
@@ -54,9 +51,7 @@ class Layer:
 
     @property
     def num_inputs(self) -> int:
-        if self._prev_layer:
-            self._num_inputs = self._prev_layer.size
-        return self._num_inputs
+        return self._prev_layer.size
 
     @property
     def new_node(self) -> Node:
@@ -140,7 +135,11 @@ class InputLayer(Layer):
             size (int): Size of OutputLayer
             activation (Callable): OutputLayer activation function
         """
-        super().__init__(size, 1, activation, [1, 1], [0, 0], None)
+        super().__init__(size, activation, [1, 1], [0, 0], None)
+
+    @property
+    def num_inputs(self) -> int:
+        return 1
 
     @property
     def new_node(self) -> Node:
@@ -172,7 +171,7 @@ class HiddenLayer(Layer):
         activation: Callable,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: InputLayer | Layer,
+        prev_layer: InputLayer | HiddenLayer,
     ) -> None:
         """
         Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
@@ -182,9 +181,9 @@ class HiddenLayer(Layer):
             activation (Callable): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
-            prev_layer (InputLayer | Layer): Previous Layer to connect
+            prev_layer (InputLayer | HiddenLayer): Previous Layer to connect
         """
-        super().__init__(size, prev_layer.size, activation, weights_range, bias_range, prev_layer)
+        super().__init__(size, activation, weights_range, bias_range, prev_layer)
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
         """
@@ -249,4 +248,4 @@ class OutputLayer(Layer):
             bias_range (tuple[float, float]): Range for OutputLayer bias
             prev_layer (HiddenLayer): Previous HiddenLayer to connect
         """
-        super().__init__(size, prev_layer.size, activation, weights_range, bias_range, prev_layer)
+        super().__init__(size, activation, weights_range, bias_range, prev_layer)
