@@ -1,9 +1,12 @@
-from collections.abc import Callable
+import numpy as np
 
+from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 
 
-def feedforward_through_layer(input_vals: Matrix, weights: Matrix, bias: Matrix, activation: Callable) -> Matrix:
+def feedforward_through_layer(
+    input_vals: Matrix, weights: Matrix, bias: Matrix, activation: ActivationFunction
+) -> Matrix:
     """
     Feedforward layer to next layer.
 
@@ -11,7 +14,7 @@ def feedforward_through_layer(input_vals: Matrix, weights: Matrix, bias: Matrix,
         input_vals (Matrix): Values to feedforward through layer
         weights (Matrix): Layer weights
         bias (Matrix): Layer bias
-        activation (Callable): Layer activation function
+        activation (ActivationFunction): Layer activation function
 
     Returns:
         output_vals (Matrix): Output values
@@ -22,19 +25,20 @@ def feedforward_through_layer(input_vals: Matrix, weights: Matrix, bias: Matrix,
     return output_vals
 
 
-def calculate_gradient(layer_vals: Matrix, errors: Matrix, lr: float) -> Matrix:
+def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: ActivationFunction, lr: float) -> Matrix:
     """
     Calculate gradient for gradient descent.
 
     Parameters:
         layer_vals (Matrix): Layer values from feedforward
         errors (Matrix): Errors from feedforward
+        activation (ActivationFunction): Layer activation function
         lr (float): Learning rate
 
     Returns:
         gradient (Matrix): Gradient values
     """
-    gradient = Matrix.from_array(layer_vals.vals * (1 - layer_vals.vals))
+    gradient = Matrix.from_array(np.vectorize(activation.derivative)(layer_vals.vals))
     gradient = Matrix.multiply_element_wise(gradient, errors)
     gradient = Matrix.multiply(gradient, lr)
     return gradient

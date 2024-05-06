@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-
 import numpy as np
 
 from neural_network.math import nn_math
+from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 from neural_network.nn.node import Node
 
@@ -17,7 +16,7 @@ class Layer:
     def __init__(
         self,
         size: int,
-        activation: Callable,
+        activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
         prev_layer: Layer | None,
@@ -27,7 +26,7 @@ class Layer:
 
         Parameters:
             size (int): Size of Layer
-            activation (Callable): Layer activation function
+            activation (ActivationFunction): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (Layer): Previous Layer to connect
@@ -57,9 +56,7 @@ class Layer:
 
     @property
     def new_node(self) -> Node:
-        return Node.random_node(
-            self.size, self._weights_range, self._bias_range, self._activation, self._prev_layer._nodes
-        )
+        return Node.random_node(self.size, self._weights_range, self._bias_range, self._prev_layer._nodes)
 
     @property
     def weights(self) -> Matrix:
@@ -103,7 +100,9 @@ class Layer:
             errors (Matrix): Errors from next Layer
             learning_rate (float): Learning rate
         """
-        gradient = nn_math.calculate_gradient(layer_vals=self._layer_output, errors=errors, lr=learning_rate)
+        gradient = nn_math.calculate_gradient(
+            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
+        )
         delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
         self.weights = Matrix.add(self.weights, delta)
         self.bias = Matrix.add(self.bias, gradient)
@@ -134,14 +133,14 @@ class InputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: Callable,
+        activation: ActivationFunction,
     ) -> None:
         """
         Initialise InputLayer object with number of nodes and activation function.
 
         Parameters:
             size (int): Size of OutputLayer
-            activation (Callable): OutputLayer activation function
+            activation (ActivationFunction): OutputLayer activation function
         """
         super().__init__(size, activation, [1, 1], [0, 0], None)
 
@@ -151,7 +150,7 @@ class InputLayer(Layer):
 
     @property
     def new_node(self) -> Node:
-        return Node.input_node(self.size, self._activation)
+        return Node.input_node(self.size)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
@@ -176,7 +175,7 @@ class HiddenLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: Callable,
+        activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
         prev_layer: InputLayer | HiddenLayer,
@@ -186,7 +185,7 @@ class HiddenLayer(Layer):
 
         Parameters:
             size (int): Size of Layer
-            activation (Callable): Layer activation function
+            activation (ActivationFunction): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
             prev_layer (InputLayer | HiddenLayer): Previous Layer to connect
@@ -238,7 +237,7 @@ class OutputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: Callable,
+        activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
         prev_layer: HiddenLayer,
@@ -248,7 +247,7 @@ class OutputLayer(Layer):
 
         Parameters:
             size (int): Size of OutputLayer
-            activation (Callable): OutputLayer activation function
+            activation (ActivationFunction): OutputLayer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
             prev_layer (HiddenLayer): Previous HiddenLayer to connect

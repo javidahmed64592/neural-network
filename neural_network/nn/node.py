@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
@@ -14,19 +13,17 @@ class Node:
     NodeConnection with a weight of 1, and the Node will have a bias of 0.
     """
 
-    def __init__(self, index: int, bias: float, activation: Callable) -> None:
+    def __init__(self, index: int, bias: float) -> None:
         """
-        Initialise Node object with index, bias and activation function.
+        Initialise Node object with index and bias.
 
         Parameters:
             index (int): Node position in Layer
             bias (float): Node bias
-            activation (Callable): Activation function for Node
         """
         self._node_connections: list[NodeConnection] = []
         self._index = index
         self._bias = bias
-        self._activation = activation
 
     @property
     def weights(self) -> NDArray:
@@ -38,18 +35,17 @@ class Node:
             nc.connection_weight = new_weights[index]
 
     @classmethod
-    def input_node(cls, index: int, activation: Callable) -> Node:
+    def input_node(cls, index: int) -> Node:
         """
         Create a Node with random weights and bias.
 
         Parameters:
             index (int): Node position in Layer
-            activation (Callable): Node activation function
 
         Returns:
             node (Node): Node with random weights and bias
         """
-        node = cls(index, 0, activation)
+        node = cls(index, 0)
         node.add_node(node, 1)
         return node
 
@@ -59,7 +55,6 @@ class Node:
         index: int,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        activation: Callable,
         input_nodes: list[Node],
     ) -> Node:
         """
@@ -69,13 +64,12 @@ class Node:
             index (int): Node position in Layer
             weights_range (tuple[float, float]): Lower and upper limits for weights
             bias_range (tuple[float, float]): Lower and upper limits for bias
-            activation (Callable): Node activation function
             input_nodes (list[Node]): Input Nodes for new random Node
 
         Returns:
             node (Node): Node with random weights and bias with NodeConnections to input Nodes
         """
-        node = cls(index, np.random.uniform(low=bias_range[0], high=bias_range[1]), activation)
+        node = cls(index, np.random.uniform(low=bias_range[0], high=bias_range[1]))
 
         new_weights = np.random.uniform(low=weights_range[0], high=weights_range[1], size=len(input_nodes))
         for input_node, new_weight in zip(input_nodes, new_weights, strict=False):

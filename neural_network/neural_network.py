@@ -5,7 +5,7 @@ import json
 import numpy as np
 from numpy.typing import NDArray
 
-from neural_network.math.activation_functions import ActivationFunctions
+from neural_network.math.activation_functions import SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
@@ -104,14 +104,14 @@ class NeuralNetwork:
 
         self._input_layer = InputLayer(
             size=_layer_sizes[0],
-            activation=ActivationFunctions.sigmoid,
+            activation=SigmoidActivation,
         )
 
         for index in range(1, len(_layer_sizes) - 1):
             self._hidden_layers.append(
                 HiddenLayer(
                     size=_layer_sizes[index],
-                    activation=ActivationFunctions.sigmoid,
+                    activation=SigmoidActivation,
                     weights_range=self._weights_range,
                     bias_range=self._bias_range,
                     prev_layer=self.layers[index - 1],
@@ -120,7 +120,7 @@ class NeuralNetwork:
 
         self._output_layer = OutputLayer(
             size=_layer_sizes[-1],
-            activation=ActivationFunctions.sigmoid,
+            activation=SigmoidActivation,
             weights_range=self._weights_range,
             bias_range=self._bias_range,
             prev_layer=self.layers[-2],

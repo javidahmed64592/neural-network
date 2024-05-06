@@ -1,15 +1,14 @@
-from collections.abc import Callable
-
 import pytest
 
+from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
 from neural_network.neural_network import NeuralNetwork
 from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 
 
 @pytest.fixture
-def mock_activation() -> Callable:
-    return lambda x: x * 3
+def mock_activation() -> LinearActivation:
+    return LinearActivation
 
 
 @pytest.fixture
@@ -53,14 +52,14 @@ def mock_nn(mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: 
 
 
 @pytest.fixture
-def mock_input_layer(mock_len_inputs: int, mock_activation: Callable) -> InputLayer:
+def mock_input_layer(mock_len_inputs: int, mock_activation: LinearActivation) -> InputLayer:
     return InputLayer(mock_len_inputs, mock_activation)
 
 
 @pytest.fixture
 def mock_hidden_layer(
     mock_len_hidden: list[int],
-    mock_activation: Callable,
+    mock_activation: LinearActivation,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_input_layer: InputLayer,
@@ -71,7 +70,7 @@ def mock_hidden_layer(
 @pytest.fixture
 def mock_output_layer(
     mock_len_outputs: int,
-    mock_activation: Callable,
+    mock_activation: LinearActivation,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer: HiddenLayer,

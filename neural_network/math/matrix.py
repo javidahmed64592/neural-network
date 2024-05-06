@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
+
+from neural_network.math.activation_functions import ActivationFunction
 
 
 class Matrix:
@@ -175,17 +176,18 @@ class Matrix:
         return Matrix.from_array(new_matrix)
 
     @staticmethod
-    def map(matrix: Matrix, func: Callable) -> Matrix:
+    def map(matrix: Matrix, activation: ActivationFunction) -> Matrix:
         """
         Map all values of Matrix through specified function.
 
         Parameters:
             matrix (Matrix): Matrix to map
+            activation (ActivationFunction): Activation function to use for mapping
 
         Returns:
             new_matrix (Matrix): Matrix with mapped values
         """
-        new_matrix = np.vectorize(func)(matrix.vals)
+        new_matrix = np.vectorize(activation.func)(matrix.vals)
         return Matrix.from_array(new_matrix)
 
     @staticmethod
