@@ -1,6 +1,5 @@
-from collections.abc import Callable
-
 from neural_network.math import nn_math
+from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
 
 
@@ -12,7 +11,7 @@ class TestNNMath:
         mock_len_hidden: list[int],
         mock_weights_range: list[float],
         mock_bias_range: list[float],
-        mock_activation: Callable,
+        mock_activation: LinearActivation,
     ) -> None:
         weights_ih = Matrix.random_matrix(
             rows=mock_len_hidden[0], cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
@@ -28,12 +27,12 @@ class TestNNMath:
         assert actual_shape == expected_shape
 
     def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(
-        self, mock_input_matrix: Matrix
+        self, mock_input_matrix: Matrix, mock_activation: LinearActivation
     ) -> None:
         errors = Matrix.from_array([0.0, 1.0, 0.5])
         lr = 0.1
 
-        gradient = nn_math.calculate_gradient(mock_input_matrix, errors, lr)
+        gradient = nn_math.calculate_gradient(mock_input_matrix, errors, mock_activation, lr)
 
         expected_shape = (3, 1)
         actual_shape = gradient.shape

@@ -1,7 +1,6 @@
-from collections.abc import Callable
-
 import numpy as np
 
+from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 
 
@@ -112,14 +111,14 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(
-        self, mock_activation: Callable
+        self, mock_activation: ActivationFunction
     ) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 
         matrix_1 = Matrix.from_array(array_1)
         new_matrix = Matrix.map(matrix_1, mock_activation)
 
-        expected_vals = np.array([[3, 6], [12, 9], [6, 12]])
+        expected_vals = np.array([[1, 2], [4, 3], [2, 4]])
         actual_vals = new_matrix.vals
         assert np.all(actual_vals == expected_vals)
 
