@@ -1,13 +1,13 @@
 import numpy as np
 
-from neural_network.nn.node import Node
+from neural_network.nn.node import InputNode, Node
 
 
 class TestNode:
     def test_given_size_when_creating_input_node_then_check_node_has_correct_weight(
         self,
     ) -> None:
-        node = Node.input_node(0)
+        node = InputNode(0)
         assert node.weights == 1
 
     def test_given_size_when_creating_random_node_then_check_node_has_correct_no_of_weights(
@@ -16,8 +16,8 @@ class TestNode:
         mock_weights_range: list[float],
         mock_bias_range: list[float],
     ) -> None:
-        input_node = Node.input_node(0)
-        node = Node.random_node(0, mock_weights_range, mock_bias_range, [input_node] * mock_len_inputs)
+        input_node = InputNode(0)
+        node = Node.fully_connected(0, mock_weights_range, mock_bias_range, [input_node] * mock_len_inputs)
         assert len(node.weights) == mock_len_inputs
         assert np.all([mock_weights_range[0] <= weight <= mock_weights_range[1] for weight in node.weights])
 
@@ -27,8 +27,8 @@ class TestNode:
         mock_weights_range: list[float],
         mock_bias_range: list[float],
     ) -> None:
-        input_node = Node.input_node(0)
-        node = Node.random_node(0, mock_weights_range, mock_bias_range, [input_node] * mock_len_inputs)
+        input_node = InputNode(0)
+        node = Node.fully_connected(0, mock_weights_range, mock_bias_range, [input_node] * mock_len_inputs)
 
         new_weights = [0.1, 0.2, 0.3]
         node.weights = new_weights

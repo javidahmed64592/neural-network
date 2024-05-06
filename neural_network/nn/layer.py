@@ -5,7 +5,7 @@ import numpy as np
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-from neural_network.nn.node import Node
+from neural_network.nn.node import InputNode, Node
 
 
 class Layer:
@@ -56,7 +56,7 @@ class Layer:
 
     @property
     def new_node(self) -> Node:
-        return Node.random_node(self.size, self._weights_range, self._bias_range, self._prev_layer._nodes)
+        return Node.fully_connected(self.size, self._weights_range, self._bias_range, self._prev_layer._nodes)
 
     @property
     def weights(self) -> Matrix:
@@ -150,7 +150,7 @@ class InputLayer(Layer):
 
     @property
     def new_node(self) -> Node:
-        return Node.input_node(self.size)
+        return InputNode(self.size)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """

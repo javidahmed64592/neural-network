@@ -35,22 +35,7 @@ class Node:
             nc.connection_weight = new_weights[index]
 
     @classmethod
-    def input_node(cls, index: int) -> Node:
-        """
-        Create a Node with random weights and bias.
-
-        Parameters:
-            index (int): Node position in Layer
-
-        Returns:
-            node (Node): Node with random weights and bias
-        """
-        node = cls(index, 0)
-        node.add_node(node, 1)
-        return node
-
-    @classmethod
-    def random_node(
+    def fully_connected(
         cls,
         index: int,
         weights_range: tuple[float, float],
@@ -95,6 +80,29 @@ class Node:
             index (int): Node index in Layer to toggle connection
         """
         self._node_connections[index].toggle_active()
+
+
+class InputNode(Node):
+    """
+    An InputNode with a weight of 1 and bias of 0.
+    """
+
+    def __init__(self, index: int) -> None:
+        """
+        Initialise InputNode object with index.
+
+        Parameters:
+            index (int): Node position in Layer
+        """
+        super().__init__(index, 0)
+
+    @property
+    def weights(self) -> NDArray:
+        return np.ones(shape=(1))
+
+    @weights.setter
+    def weights(self, new_weights: list[float]) -> None:
+        return
 
 
 @dataclass
