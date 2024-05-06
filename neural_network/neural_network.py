@@ -166,7 +166,7 @@ class NeuralNetwork:
         Returns:
             output (list[float]): List of outputs
         """
-        input_matrix = Matrix.from_array(np.array(inputs))
+        input_matrix = Matrix.from_array(inputs)
         vals = self._input_layer.feedforward(input_matrix)
 
         for layer in self._hidden_layers:
@@ -187,7 +187,7 @@ class NeuralNetwork:
         Returns:
             output_errors (list[float]): List of output errors
         """
-        layer_input_matrix = Matrix.from_array(np.array(inputs))
+        layer_input_matrix = Matrix.from_array(inputs)
         vals = self._input_layer.feedforward(layer_input_matrix)
 
         for layer in self._hidden_layers:

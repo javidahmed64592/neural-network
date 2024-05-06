@@ -60,7 +60,7 @@ class Layer:
 
     @property
     def output(self) -> Matrix:
-        layer_output = Matrix.from_array(np.array([node.output for node in self._nodes]))
+        layer_output = Matrix.from_array([node.output for node in self._nodes])
         return Matrix.map(layer_output, self._activation)
 
     @property
