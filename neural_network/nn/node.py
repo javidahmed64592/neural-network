@@ -9,8 +9,8 @@ from numpy.typing import NDArray
 class Node:
     """
     This class can be used to create a Node object to be used within neural network layers.
-    Each node has a random bias and connections to other Nodes. If the Node is an input Node, it will have one
-    NodeConnection with a weight of 1, and the Node will have a bias of 0.
+    Each node has a random bias and connections to other Nodes. If the Node is an input Node, it will have a weight of
+    1, and the Node will have a bias of 0.
     """
 
     def __init__(self, index: int, bias: float) -> None:
@@ -24,6 +24,12 @@ class Node:
         self._node_connections: list[NodeConnection] = []
         self._index = index
         self._bias = bias
+        self._val = 0
+
+    @property
+    def output(self) -> float:
+        self._val = np.sum([nc.output for nc in self._node_connections])
+        return self._val + self._bias
 
     @property
     def weights(self) -> NDArray:
@@ -33,6 +39,25 @@ class Node:
     def weights(self, new_weights: list[float]) -> None:
         for index, nc in enumerate(self._node_connections):
             nc.connection_weight = new_weights[index]
+
+    @classmethod
+    def random_node(
+        cls,
+        index: int,
+        bias_range: tuple[float, float],
+    ) -> Node:
+        """
+        Create a Node with random weights and bias.
+
+        Parameters:
+            index (int): Node position in Layer
+            bias_range (tuple[float, float]): Lower and upper limits for bias
+
+        Returns:
+            node (Node): Node with random weights and bias with NodeConnections to input Nodes
+        """
+        node = cls(index, np.random.uniform(low=bias_range[0], high=bias_range[1]))
+        return node
 
     @classmethod
     def fully_connected(
@@ -54,7 +79,7 @@ class Node:
         Returns:
             node (Node): Node with random weights and bias with NodeConnections to input Nodes
         """
-        node = cls(index, np.random.uniform(low=bias_range[0], high=bias_range[1]))
+        node = cls.random_node(index, bias_range)
 
         new_weights = np.random.uniform(low=weights_range[0], high=weights_range[1], size=len(input_nodes))
         for input_node, new_weight in zip(input_nodes, new_weights, strict=False):
@@ -97,12 +122,25 @@ class InputNode(Node):
         super().__init__(index, 0)
 
     @property
+    def output(self) -> float:
+        return self._val + self._bias
+
+    @property
     def weights(self) -> NDArray:
         return np.ones(shape=(1))
 
     @weights.setter
     def weights(self, new_weights: list[float]) -> None:
         return
+
+    def set_input(self, val: float) -> None:
+        """
+        Set InputNode value.
+
+        Parameters:
+            val (float): Value to set
+        """
+        self._val = val
 
 
 @dataclass
@@ -129,6 +167,14 @@ class NodeConnection:
     @property
     def connection_index(self) -> tuple[int, int]:
         return [self.input_node._index, self.output_node._index]
+
+    @property
+    def input(self) -> float:
+        return self.input_node.output
+
+    @property
+    def output(self) -> float:
+        return self.weight * self.input
 
     def toggle_active(self) -> None:
         """
