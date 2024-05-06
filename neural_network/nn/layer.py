@@ -34,6 +34,7 @@ class Layer:
         """
         self._prev_layer: Layer = None
         self._next_layer: Layer = None
+        self._nodes: list[Node] = []
 
         self._activation = activation
         self._weights_range = weights_range
@@ -43,7 +44,8 @@ class Layer:
             self._prev_layer = prev_layer
             prev_layer._next_layer = self
 
-        self._nodes = [self.new_node for _ in range(size)]
+        for _ in range(size):
+            self._nodes.append(self.new_node)
 
     @property
     def size(self) -> int:
@@ -55,7 +57,9 @@ class Layer:
 
     @property
     def new_node(self) -> Node:
-        return Node.random_node(self._weights_range, self._bias_range, self._activation, self._prev_layer._nodes)
+        return Node.random_node(
+            self.size, self._weights_range, self._bias_range, self._activation, self._prev_layer._nodes
+        )
 
     @property
     def weights(self) -> Matrix:
@@ -147,7 +151,7 @@ class InputLayer(Layer):
 
     @property
     def new_node(self) -> Node:
-        return Node.input_node(self._activation)
+        return Node.input_node(self.size, self._activation)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
