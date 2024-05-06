@@ -75,14 +75,14 @@ The neural network also has methods which can be used in neuroevolution.
 The topology of the neural network can be mutated in the following way:
 
 ```
-nn.mutate(shift_vals, prob_new_node, prob_remove_node)
+nn.mutate(shift_vals, prob_new_node, prob_toggle_connection)
 ```
 
 where
 
 - `shift_vals`: Layer weights and biases *= random (1 - shift_vals, 1 + shift_vals)
-- `prob_new_node`: Probability for a new Node in a given hidden Layer, range [0, 1]
-- `prob_remove_node`: Probability to remove a Node from a given hidden Layer, range[0, 1]
+- `prob_new_node`: Probability per Layer for a new Node in hidden Layer, range [0, 1]
+- `prob_toggle_connection`: Probability per Layer to toggle a random Node, range[0, 1]
 
 New weights and biases can also be calculated via crossover:
 

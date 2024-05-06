@@ -55,7 +55,7 @@ class Layer:
 
     @property
     def new_node(self) -> Node:
-        return Node.random_node(self.num_inputs, self._weights_range, self._bias_range, self._activation)
+        return Node.random_node(self._weights_range, self._bias_range, self._activation, self._prev_layer._nodes)
 
     @property
     def weights(self) -> Matrix:
@@ -189,44 +189,41 @@ class HiddenLayer(Layer):
         """
         super().__init__(size, activation, weights_range, bias_range, prev_layer)
 
-    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_toggle_connection: float) -> None:
         """
         Mutate HiddenLayer weights and biases, and potentially add/remove Node to/from HiddenLayer.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability for a new Node, range [0, 1]
-            prob_remove_node(float): Probability to remove a Node
+            prob_toggle_connection (float): Probability to toggle a random Node between active and inactive
         """
         super().mutate(shift_vals)
 
         rng = np.random.uniform(low=0, high=1)
         if rng < prob_new_node:
             self._add_node()
-        elif rng > 1 - prob_remove_node:
-            self._remove_node()
+        elif rng > 1 - prob_toggle_connection:
+            self._toggle_connection()
 
     def _add_node(self) -> None:
         """
         Add a random Node to HiddenLayer.
         """
-        self._nodes.append(self.new_node)
+        new_node = self.new_node
+        self._nodes.append(new_node)
 
         for node in self._next_layer._nodes:
-            node.add_weight(self._next_layer._weights_range)
+            node.add_node(new_node, self._next_layer.random_weight)
 
-    def _remove_node(self) -> None:
+    def _toggle_connection(self) -> None:
         """
-        Remove random Node from HiddenLayer.
+        Toggle random Node between active and inactive.
         """
-        if self.size == 1:
-            return
-
         index = np.random.randint(low=0, high=self.size)
-        del self._nodes[index]
 
         for node in self._next_layer._nodes:
-            node.remove_weight(index)
+            node.toggle_node_connection(index)
 
 
 class OutputLayer(Layer):

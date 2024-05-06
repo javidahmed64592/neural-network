@@ -20,7 +20,8 @@ class TestNode:
         mock_bias_range: list[float],
         mock_activation: Callable,
     ) -> None:
-        node = Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation)
+        input_node = Node.input_node(mock_activation)
+        node = Node.random_node(mock_weights_range, mock_bias_range, mock_activation, [input_node] * mock_len_inputs)
         assert len(node.weights) == mock_len_inputs
         assert np.all([mock_weights_range[0] <= weight <= mock_weights_range[1] for weight in node.weights])
 
@@ -31,10 +32,36 @@ class TestNode:
         mock_bias_range: list[float],
         mock_activation: Callable,
     ) -> None:
-        node = Node.random_node(mock_len_inputs, mock_weights_range, mock_bias_range, mock_activation)
+        input_node = Node.input_node(mock_activation)
+        node = Node.random_node(mock_weights_range, mock_bias_range, mock_activation, [input_node] * mock_len_inputs)
 
         new_weights = [0.1, 0.2, 0.3]
         node.weights = new_weights
 
         for node_weight, new_weight in zip(node.weights, new_weights, strict=False):
             assert node_weight == new_weight
+
+
+class TestNodeConnection:
+    def test_given_two_nodes_when_getting_active_connection_weight_then_check_correct_weight_returned(
+        self, mock_activation: Callable
+    ) -> None:
+        node_1 = Node(0.3, mock_activation)
+        node_2 = Node(0.4, mock_activation)
+        connection_weight = 0.5
+
+        node_1.add_node(node_2, connection_weight)
+
+        assert node_1._node_connections[0].weight == connection_weight
+
+    def test_given_two_nodes_when_getting_inactive_connection_weight_then_check_correct_weight_returned(
+        self, mock_activation: Callable
+    ) -> None:
+        node_1 = Node(0.3, mock_activation)
+        node_2 = Node(0.4, mock_activation)
+        connection_weight = 0.5
+
+        node_1.add_node(node_2, connection_weight)
+        node_1.toggle_node_connection(0)
+
+        assert node_1._node_connections[0].weight == 0

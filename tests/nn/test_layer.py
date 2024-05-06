@@ -51,21 +51,3 @@ class TestLayer:
 
         assert actual_size == expected_size
         assert actual_inputs == expected_inputs
-
-    def test_given_layers_when_removing_node_from_hidden_then_check_layers_have_correct_shape(
-        self,
-        mock_hidden_layer: HiddenLayer,
-        mock_output_layer: OutputLayer,
-    ) -> None:
-        initial_size = mock_hidden_layer.size
-        initial_inputs = mock_output_layer.num_inputs
-
-        mock_hidden_layer.mutate(0, 0, 1)
-
-        expected_size = initial_size - 1
-        expected_inputs = initial_inputs - 1
-        actual_size = mock_hidden_layer.size
-        actual_inputs = mock_output_layer.num_inputs
-
-        assert actual_size == expected_size
-        assert actual_inputs == expected_inputs

@@ -143,17 +143,17 @@ class NeuralNetwork:
         with open(filepath, "w") as file:
             json.dump(_data, file)
 
-    def mutate(self, shift_vals: float, prob_new_node: float, prob_remove_node: float) -> None:
+    def mutate(self, shift_vals: float, prob_new_node: float, prob_toggle_connection: float) -> None:
         """
         Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
-            prob_new_node (float): Probability for a new Node, range [0, 1]
-            prob_remove_node(float): Probability to remove a Node, range[0, 1]
+            prob_new_node (float): Probability per Layer for a new Node, range [0, 1]
+            prob_toggle_connection (float): Probability per Layer to toggle a random Node, range[0, 1]
         """
         for layer in self._hidden_layers:
-            layer.mutate(shift_vals, prob_new_node, prob_remove_node)
+            layer.mutate(shift_vals, prob_new_node, prob_toggle_connection)
         self._output_layer.mutate(shift_vals)
 
     def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
