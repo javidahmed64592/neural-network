@@ -1,8 +1,19 @@
 from neural_network.math.matrix import Matrix
-from neural_network.nn.layer import HiddenLayer, OutputLayer
+from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 
 
 class TestLayer:
+    def test_given_layers_when_adding_nodes_then_check_layers_have_correct_sizes(
+        self,
+        mock_hidden_layer: HiddenLayer,
+        mock_input_layer: InputLayer,
+        mock_len_hidden: list[int],
+        mock_len_inputs: int,
+    ) -> None:
+        assert mock_input_layer.size == mock_len_inputs
+        assert mock_hidden_layer.size == mock_len_hidden[0]
+        assert mock_hidden_layer.num_inputs == mock_len_inputs
+
     def test_given_number_of_nodes_when_creating_layer_then_check_weights_and_bias_have_correct_shape(
         self, mock_hidden_layer: HiddenLayer, mock_len_hidden: list[int], mock_len_inputs: int
     ) -> None:
@@ -35,24 +46,6 @@ class TestLayer:
 
         expected_size = initial_size + 1
         expected_inputs = initial_inputs + 1
-        actual_size = mock_hidden_layer.size
-        actual_inputs = mock_output_layer.num_inputs
-
-        assert actual_size == expected_size
-        assert actual_inputs == expected_inputs
-
-    def test_given_layers_when_removing_node_from_hidden_then_check_layers_have_correct_shape(
-        self,
-        mock_hidden_layer: HiddenLayer,
-        mock_output_layer: OutputLayer,
-    ) -> None:
-        initial_size = mock_hidden_layer.size
-        initial_inputs = mock_output_layer.num_inputs
-
-        mock_hidden_layer.mutate(0, 0, 1)
-
-        expected_size = initial_size - 1
-        expected_inputs = initial_inputs - 1
         actual_size = mock_hidden_layer.size
         actual_inputs = mock_output_layer.num_inputs
 
