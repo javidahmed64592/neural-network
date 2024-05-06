@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import json
 
-from numpy.typing import NDArray
-
 from neural_network.math.activation_functions import SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
@@ -155,12 +153,12 @@ class NeuralNetwork:
             layer.mutate(shift_vals, prob_new_node, prob_toggle_connection)
         self._output_layer.mutate(shift_vals)
 
-    def feedforward(self, inputs: NDArray | list[float]) -> list[float]:
+    def feedforward(self, inputs: list[float]) -> list[float]:
         """
         Feedforward a list of inputs.
 
         Parameters:
-            inputs (NDArray | list[float]): List of input values
+            inputs (list[float]): List of input values
 
         Returns:
             output (list[float]): List of outputs
