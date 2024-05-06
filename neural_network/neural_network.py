@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 
-import numpy as np
 from numpy.typing import NDArray
 
 from neural_network.math.activation_functions import SigmoidActivation
