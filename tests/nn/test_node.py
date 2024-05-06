@@ -66,6 +66,19 @@ class TestNodeConnection:
 
         assert node_1._node_connections[0].weight == 0
 
+    def test_given_two_nodes_when_reactivating_then_check_correct_weight_returned(
+        self, mock_activation: Callable
+    ) -> None:
+        node_1 = Node(0, 0.3, mock_activation)
+        node_2 = Node(0, 0.4, mock_activation)
+        connection_weight = 0.5
+
+        node_1.add_node(node_2, connection_weight)
+        node_1.toggle_node_connection(0)
+        node_1.toggle_node_connection(0)
+
+        assert node_1._node_connections[0].weight == connection_weight
+
     def test_given_two_nodes_when_getting_connection_index_then_check_correct_values_returned(
         self, mock_activation: Callable
     ) -> None:
