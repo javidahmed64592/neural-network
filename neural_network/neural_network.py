@@ -163,14 +163,12 @@ class NeuralNetwork:
         Returns:
             output (list[float]): List of outputs
         """
-        input_matrix = Matrix.from_array(inputs)
-        vals = self._input_layer.feedforward(input_matrix)
+        vals = Matrix.from_array(inputs)
 
-        for layer in self._hidden_layers:
+        for layer in self.layers:
             vals = layer.feedforward(vals)
 
-        output = self._output_layer.feedforward(vals)
-        output = Matrix.transpose(output)
+        output = Matrix.transpose(vals)
         return output.as_list
 
     def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:
@@ -184,22 +182,19 @@ class NeuralNetwork:
         Returns:
             output_errors (list[float]): List of output errors
         """
-        layer_input_matrix = Matrix.from_array(inputs)
-        vals = self._input_layer.feedforward(layer_input_matrix)
+        vals = Matrix.from_array(inputs)
 
-        for layer in self._hidden_layers:
+        for layer in self.layers:
             vals = layer.feedforward(vals)
 
-        output = self._output_layer.feedforward(vals)
-
         expected_output_matrix = Matrix.from_array(expected_outputs)
-        errors = calculate_error_from_expected(expected_output_matrix, output)
+        errors = calculate_error_from_expected(expected_output_matrix, vals)
         self._output_layer.backpropagate_error(errors, self._lr)
         output_errors = Matrix.transpose(errors)
 
-        for index in range(len(self._hidden_layers)):
-            errors = calculate_next_errors(self.layers_reversed[index].weights, errors)
-            self.layers_reversed[index + 1].backpropagate_error(errors, self._lr)
+        for layer in self._hidden_layers[::-1]:
+            errors = calculate_next_errors(layer._next_layer.weights, errors)
+            layer.backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
 
