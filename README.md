@@ -10,6 +10,12 @@ Install this package using `pipenv`:
 pipenv install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 ```
 
+To update the package:
+
+```
+pipenv update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+```
+
 <!-- omit from toc -->
 ## Table of Contents
 - [Installing Dependencies](#installing-dependencies)
