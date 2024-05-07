@@ -165,7 +165,7 @@ class InputLayer(Layer):
             output (Matrix): Layer output from inputs
         """
         for node, val in zip(self._nodes, vals.vals, strict=False):
-            node.set_input(val)
+            node.set_input(val[0])
 
         return super().feedforward(vals)
 
