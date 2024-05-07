@@ -85,7 +85,7 @@ class Layer:
     @bias.setter
     def bias(self, new_bias: Matrix) -> None:
         for index, node in enumerate(self._nodes):
-            node._bias = new_bias.vals[index]
+            node._bias = new_bias.vals[index][0]
 
     def mutate(self, shift_vals: float) -> None:
         """
