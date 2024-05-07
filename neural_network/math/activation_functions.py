@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.typing import NDArray
 
 
 class ActivationFunction:
@@ -38,14 +37,12 @@ class ReluActivation(ActivationFunction):
 
 class SigmoidActivation(ActivationFunction):
     @staticmethod
-    def func(x: NDArray | float) -> float:
+    def func(x: float) -> float:
         try:
             y = 1 / (1 + np.exp(-x))
-        except TypeError:
-            y = 1 / (1 + np.exp(-x.astype(float)))
         except RuntimeWarning:
-            return 1
-        return float(y)
+            return 1.0
+        return y
 
     @staticmethod
     def derivative(x: float) -> float:
