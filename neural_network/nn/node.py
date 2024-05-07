@@ -140,7 +140,7 @@ class InputNode(Node):
         Parameters:
             val (float): Value to set
         """
-        self._val = val
+        self._val = val[0]
 
 
 @dataclass
@@ -162,7 +162,7 @@ class NodeConnection:
 
     @property
     def weight(self) -> float:
-        return float([0, self.connection_weight][self.is_active])
+        return [0, self.connection_weight][self.is_active]
 
     @property
     def connection_index(self) -> tuple[int, int]:
@@ -170,11 +170,11 @@ class NodeConnection:
 
     @property
     def input(self) -> float:
-        return float(self.input_node.output)
+        return self.input_node.output
 
     @property
     def output(self) -> float:
-        return float(self.weight * self.input)
+        return self.weight * self.input
 
     def toggle_active(self) -> None:
         """
