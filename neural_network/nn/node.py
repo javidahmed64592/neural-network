@@ -127,7 +127,7 @@ class InputNode(Node):
 
     @property
     def weights(self) -> NDArray:
-        return np.ones(shape=(1))
+        return np.ones(shape=1)
 
     @weights.setter
     def weights(self, new_weights: list[float]) -> None:
@@ -162,7 +162,7 @@ class NodeConnection:
 
     @property
     def weight(self) -> float:
-        return [0, self.connection_weight][self.is_active]
+        return float([0, self.connection_weight][self.is_active])
 
     @property
     def connection_index(self) -> tuple[int, int]:
@@ -170,11 +170,11 @@ class NodeConnection:
 
     @property
     def input(self) -> float:
-        return self.input_node.output
+        return float(self.input_node.output)
 
     @property
     def output(self) -> float:
-        return self.weight * self.input
+        return float(self.weight * self.input)
 
     def toggle_active(self) -> None:
         """
