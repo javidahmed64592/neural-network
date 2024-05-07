@@ -47,6 +47,11 @@ def mock_len_outputs(mock_outputs: list[float]) -> int:
 
 
 @pytest.fixture
+def mock_layer_sizes(mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int) -> list[int]:
+    return [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
+
+
+@pytest.fixture
 def mock_nn(mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int) -> NeuralNetwork:
     return NeuralNetwork(mock_len_inputs, mock_len_outputs, mock_len_hidden)
 

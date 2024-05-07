@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
+
 from neural_network.math.activation_functions import SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
+from neural_network.nn.node import NodeConnection
 
 
 class NeuralNetwork:
@@ -93,6 +96,11 @@ class NeuralNetwork:
         for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
 
+    @property
+    def connections(self) -> list[NodeConnection]:
+        _connections = [node._node_connections for layer in self.layers[1:] for node in layer._nodes]
+        return np.array([nc for node in _connections for nc in node])
+
     def _create_layers(self) -> None:
         """
         Create neural network layers using list of layer sizes.
@@ -142,16 +150,27 @@ class NeuralNetwork:
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_toggle_connection: float) -> None:
         """
-        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
+        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes. NodeConnections
+        also get randomly toggled between active and inactive.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
             prob_new_node (float): Probability per Layer for a new Node, range [0, 1]
             prob_toggle_connection (float): Probability per Layer to toggle a random Node, range[0, 1]
         """
-        for layer in self._hidden_layers:
-            layer.mutate(shift_vals, prob_new_node, prob_toggle_connection)
-        self._output_layer.mutate(shift_vals)
+        for layer in self.layers[1:]:
+            layer.mutate(shift_vals)
+
+        add_node_array = np.random.uniform(low=0, high=1, size=len(self._hidden_layers))
+        masked_layers = np.array(self._hidden_layers)[add_node_array < prob_new_node]
+        for layer in masked_layers:
+            layer._add_node()
+
+        connections = self.connections
+        toggle_connections_array = np.random.uniform(low=0, high=1, size=len(connections))
+        masked_connections = connections[toggle_connections_array < prob_toggle_connection]
+        for connection in masked_connections:
+            connection.toggle_active()
 
     def feedforward(self, inputs: list[float]) -> list[float]:
         """
