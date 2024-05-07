@@ -163,12 +163,8 @@ class NeuralNetwork:
         Returns:
             output (list[float]): List of outputs
         """
-        vals = Matrix.from_array(inputs)
-
-        for layer in self.layers:
-            vals = layer.feedforward(vals)
-
-        output = Matrix.transpose(vals)
+        self._input_layer.feedforward(Matrix.from_array(inputs))
+        output = Matrix.transpose(self._output_layer.output)
         return output.as_list
 
     def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:

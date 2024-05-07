@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-__version__ = "1.9.2"
+__version__ = "1.9.3"
 
 setup(
     name="neural_network",
