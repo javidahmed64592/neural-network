@@ -150,7 +150,8 @@ class NeuralNetwork:
 
     def mutate(self, shift_vals: float, prob_new_node: float, prob_toggle_connection: float) -> None:
         """
-        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
+        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes. NodeConnections
+        also get randomly toggled between active and inactive.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
