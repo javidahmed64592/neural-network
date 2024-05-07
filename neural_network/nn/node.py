@@ -140,7 +140,7 @@ class InputNode(Node):
         Parameters:
             val (float): Value to set
         """
-        self._val = val[0]
+        self._val = val
 
 
 @dataclass
