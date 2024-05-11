@@ -62,7 +62,7 @@ def mock_input_layer(mock_len_inputs: int, mock_activation: LinearActivation) ->
 
 
 @pytest.fixture
-def mock_hidden_layer(
+def mock_hidden_layer_1(
     mock_len_hidden: list[int],
     mock_activation: LinearActivation,
     mock_weights_range: tuple[float, float],
@@ -73,14 +73,36 @@ def mock_hidden_layer(
 
 
 @pytest.fixture
+def mock_hidden_layer_2(
+    mock_len_hidden: list[int],
+    mock_activation: LinearActivation,
+    mock_weights_range: tuple[float, float],
+    mock_bias_range: tuple[float, float],
+    mock_hidden_layer_1: HiddenLayer,
+) -> HiddenLayer:
+    return HiddenLayer(mock_len_hidden[1], mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer_1)
+
+
+@pytest.fixture
+def mock_hidden_layer_3(
+    mock_len_hidden: list[int],
+    mock_activation: LinearActivation,
+    mock_weights_range: tuple[float, float],
+    mock_bias_range: tuple[float, float],
+    mock_hidden_layer_2: HiddenLayer,
+) -> HiddenLayer:
+    return HiddenLayer(mock_len_hidden[2], mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer_2)
+
+
+@pytest.fixture
 def mock_output_layer(
     mock_len_outputs: int,
     mock_activation: LinearActivation,
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
-    mock_hidden_layer: HiddenLayer,
+    mock_hidden_layer_3: HiddenLayer,
 ) -> OutputLayer:
-    return OutputLayer(mock_len_outputs, mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer)
+    return OutputLayer(mock_len_outputs, mock_activation, mock_weights_range, mock_bias_range, mock_hidden_layer_3)
 
 
 @pytest.fixture
