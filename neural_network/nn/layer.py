@@ -52,11 +52,6 @@ class Layer:
         return Node.fully_connected(self._size, self._weights_range, self._bias_range, self._prev_layer._nodes)
 
     @property
-    def output(self) -> Matrix:
-        layer_output = Matrix.from_array([node.output for node in self._nodes])
-        return Matrix.map(layer_output, self._activation)
-
-    @property
     def weights(self) -> Matrix:
         _weights = Matrix.from_array([node.weights for node in self._nodes])
         return _weights
@@ -114,7 +109,7 @@ class Layer:
             learning_rate (float): Learning rate
         """
         gradient = nn_math.calculate_gradient(
-            activation=self._activation, layer_vals=self.output, errors=errors, lr=learning_rate
+            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
         )
         delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
         self.weights = Matrix.add(self.weights, delta)
@@ -130,8 +125,12 @@ class Layer:
         Returns:
             output (Matrix): Layer output from inputs
         """
+        output = nn_math.feedforward_through_layer(
+            input_vals=vals, weights=self.weights, bias=self.bias, activation=self._activation
+        )
         self._layer_input = vals
-        return self.output
+        self._layer_output = output
+        return output
 
 
 class InputLayer(Layer):
@@ -172,10 +171,9 @@ class InputLayer(Layer):
         Returns:
             output (Matrix): Layer output from inputs
         """
-        for node, val in zip(self._nodes, vals.vals, strict=False):
-            node.set_input(val[0])
-
-        return super().feedforward(vals)
+        self._layer_input = vals
+        self._layer_output = vals
+        return vals
 
 
 class HiddenLayer(Layer):

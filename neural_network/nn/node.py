@@ -24,12 +24,6 @@ class Node:
         self._node_connections: list[NodeConnection] = []
         self._index = index
         self._bias = bias
-        self._val = 0
-
-    @property
-    def output(self) -> float:
-        self._val = np.sum([nc.output for nc in self._node_connections])
-        return self._val + self._bias
 
     @property
     def weights(self) -> NDArray:
@@ -122,25 +116,12 @@ class InputNode(Node):
         super().__init__(index, 0)
 
     @property
-    def output(self) -> float:
-        return self._val + self._bias
-
-    @property
     def weights(self) -> NDArray:
         return np.ones(shape=1)
 
     @weights.setter
     def weights(self, new_weights: list[float]) -> None:
         return
-
-    def set_input(self, val: float) -> None:
-        """
-        Set InputNode value.
-
-        Parameters:
-            val (float): Value to set
-        """
-        self._val = val
 
 
 @dataclass
@@ -167,14 +148,6 @@ class NodeConnection:
     @property
     def connection_index(self) -> tuple[int, int]:
         return [self.input_node._index, self.output_node._index]
-
-    @property
-    def input(self) -> float:
-        return self.input_node.output
-
-    @property
-    def output(self) -> float:
-        return self.weight * self.input
 
     def toggle_active(self) -> None:
         """

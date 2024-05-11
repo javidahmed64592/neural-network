@@ -142,8 +142,13 @@ class NeuralNetwork:
         Returns:
             output (list[float]): List of outputs
         """
-        self._input_layer.feedforward(Matrix.from_array(inputs))
-        output = Matrix.transpose(self._output_layer.output)
+        vals = self._input_layer.feedforward(Matrix.from_array(inputs))
+
+        for layer in self._hidden_layers:
+            vals = layer.feedforward(vals)
+
+        output = self._output_layer.feedforward(vals)
+        output = Matrix.transpose(output)
         return output.as_list
 
     def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:
@@ -191,7 +196,7 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers):
+        for index, layer in enumerate(self.layers[1:]):
             new_weight = Matrix.mix_matrices(nn.weights[index], other_nn.weights[index], self.weights[index])
             new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
             new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
