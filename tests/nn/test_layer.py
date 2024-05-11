@@ -5,8 +5,8 @@ from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 class TestLayer:
     def test_given_layers_when_adding_nodes_then_check_layers_have_correct_sizes(
         self,
-        mock_hidden_layer_1: HiddenLayer,
         mock_input_layer: InputLayer,
+        mock_hidden_layer_1: HiddenLayer,
         mock_len_hidden: list[int],
         mock_len_inputs: int,
     ) -> None:
