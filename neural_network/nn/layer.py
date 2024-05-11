@@ -10,7 +10,7 @@ from neural_network.nn.node import InputNode, Node
 
 class Layer:
     """
-    This class creates a neural network Layer and has weights, biases, learning rate and activation function.
+    This class creates a NeuralNetwork Layer and has weights, biases, and activation function.
     """
 
     def __init__(
@@ -19,36 +19,29 @@ class Layer:
         activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: Layer | None,
     ) -> None:
         """
-        Initialise Layer object with number of nodes, inputs, activation function and previous layer if exists.
+        Initialise Layer object with number of nodes, activation function, weights range and bias range.
 
         Parameters:
             size (int): Size of Layer
             activation (ActivationFunction): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
-            prev_layer (Layer): Previous Layer to connect
         """
         self._prev_layer: Layer = None
         self._next_layer: Layer = None
         self._nodes: list[Node] = []
 
+        self._size = size
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
 
-        if prev_layer:
-            self._prev_layer = prev_layer
-            prev_layer._next_layer = self
-
-        for _ in range(size):
-            self._nodes.append(self.new_node)
-
     @property
     def size(self) -> int:
-        return len(self._nodes)
+        self._size = len(self._nodes)
+        return self._size
 
     @property
     def num_inputs(self) -> int:
@@ -56,7 +49,7 @@ class Layer:
 
     @property
     def new_node(self) -> Node:
-        return Node.fully_connected(self.size, self._weights_range, self._bias_range, self._prev_layer._nodes)
+        return Node.fully_connected(self._size, self._weights_range, self._bias_range, self._prev_layer._nodes)
 
     @property
     def output(self) -> Matrix:
@@ -86,6 +79,21 @@ class Layer:
     def bias(self, new_bias: Matrix) -> None:
         for index, node in enumerate(self._nodes):
             node._bias = new_bias.vals[index][0]
+
+    def _create_nodes(self) -> None:
+        if not self._nodes:
+            self._nodes = [self.new_node for _ in range(self._size)]
+
+    def set_prev_layer(self, prev_layer: Layer) -> None:
+        """
+        Connect Layer with previous Layer.
+
+        Parameters:
+            prev_layer (Layer): Layer preceding this one
+        """
+        self._prev_layer = prev_layer
+        prev_layer._next_layer = self
+        self._create_nodes()
 
     def mutate(self, shift_vals: float) -> None:
         """
@@ -143,8 +151,8 @@ class InputLayer(Layer):
             size (int): Size of InputLayer
             activation (ActivationFunction): Layer activation function
         """
-        super().__init__(size, activation, [1, 1], [0, 0], None)
-        self._nodes: list[InputNode]
+        super().__init__(size, activation, [1, 1], [0, 0])
+        self._nodes: list[InputNode] = [self.new_node for _ in range(self._size)]
 
     @property
     def num_inputs(self) -> int:
@@ -152,7 +160,7 @@ class InputLayer(Layer):
 
     @property
     def new_node(self) -> Node:
-        return InputNode(self.size)
+        return InputNode(self._size)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
@@ -181,19 +189,17 @@ class HiddenLayer(Layer):
         activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: InputLayer | HiddenLayer,
     ) -> None:
         """
-        Initialise HiddenLayer object with number of nodes, inputs, activation function and previous layer if exists.
+        Initialise HiddenLayer object with number of nodes, activation function, weights range and bias range.
 
         Parameters:
             size (int): Size of Layer
             activation (ActivationFunction): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
-            prev_layer (InputLayer | HiddenLayer): Previous Layer to connect
         """
-        super().__init__(size, activation, weights_range, bias_range, prev_layer)
+        super().__init__(size, activation, weights_range, bias_range)
 
     def _add_node(self) -> None:
         """
@@ -226,16 +232,14 @@ class OutputLayer(Layer):
         activation: ActivationFunction,
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        prev_layer: HiddenLayer,
     ) -> None:
         """
-        Initialise OutputLayer object with number of nodes, inputs, activation function and previous layer.
+        Initialise OutputLayer object with number of nodes, activation function, weights range and bias range.
 
         Parameters:
             size (int): Size of OutputLayer
             activation (ActivationFunction): Layer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
-            prev_layer (HiddenLayer): Previous HiddenLayer to connect
         """
-        super().__init__(size, activation, weights_range, bias_range, prev_layer)
+        super().__init__(size, activation, weights_range, bias_range)

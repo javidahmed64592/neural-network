@@ -37,9 +37,19 @@ For a complete example of how to create and train the neural network, see `examp
 The neural network can be created in the following way:
 
 ```
+from neural_network.math.activation_functions import LinearActivation, SigmoidActivation
 from neural_network.neural_network import NeuralNetwork
+from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 
-nn = NeuralNetwork(num_inputs, num_outputs, hidden_layer_sizes)
+
+input_layer = InputLayer(size=num_inputs, activation=LinearActivation)
+hidden_layers = [
+    HiddenLayer(size=size, activation=SigmoidActivation, weights_range=[-1, 1], bias_range=[-1, 1])
+    for size in hidden_layer_sizes
+]
+output_layer = OutputLayer(size=num_outputs, activation=SigmoidActivation, weights_range=[-1, 1], bias_range=[-1, 1])
+
+nn = NeuralNetwork(layers=[input_layer, *hidden_layers, output_layer])
 ```
 
 where
@@ -57,7 +67,7 @@ outputs = nn.feedforward([x_i, ..., x_n]) # n: Number of inputs
 The neural network can also be trained by providing an array of inputs and expected outputs, and backpropagating the error using gradient descent.
 
 ```
-inputs = [x_i, ..., x_n]
+inputs = [x_i, ..., x_n] # n: Number of inputs
 expected_outputs = [y_i, ..., y_m] # m: Number of outputs
 
 errors = nn.train(inputs, expected_outputs)
