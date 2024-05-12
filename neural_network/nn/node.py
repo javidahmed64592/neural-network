@@ -34,6 +34,10 @@ class Node:
         for index, nc in enumerate(self._node_connections):
             nc.connection_weight = new_weights[index]
 
+    @property
+    def connection_weights(self) -> NDArray:
+        return np.array([nc.connection_weight for nc in self._node_connections])
+
     @classmethod
     def random_node(
         cls,

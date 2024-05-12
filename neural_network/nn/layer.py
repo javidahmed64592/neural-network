@@ -62,6 +62,11 @@ class Layer:
             node.weights = new_weights.vals[index]
 
     @property
+    def connection_weights(self) -> Matrix:
+        _weights = Matrix.from_array([node.connection_weights for node in self._nodes])
+        return _weights
+
+    @property
     def random_weight(self) -> float:
         return np.random.uniform(low=self._weights_range[0], high=self._weights_range[1])
 
