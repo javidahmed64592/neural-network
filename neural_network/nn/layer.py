@@ -5,7 +5,7 @@ import numpy as np
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-from neural_network.nn.node import InputNode, Node
+from neural_network.nn.node import InputNode, Node, NodeConnection
 
 
 class Layer:
@@ -79,6 +79,10 @@ class Layer:
     def bias(self, new_bias: Matrix) -> None:
         for index, node in enumerate(self._nodes):
             node._bias = new_bias.vals[index][0]
+
+    @property
+    def connections(self) -> list[NodeConnection]:
+        return np.array([node._node_connections for node in self._nodes])
 
     def _create_nodes(self) -> None:
         if not self._nodes:
@@ -213,15 +217,6 @@ class HiddenLayer(Layer):
 
         for node in self._next_layer._nodes:
             node.add_node(new_node, self._next_layer.random_weight)
-
-    def _toggle_connection(self) -> None:
-        """
-        Toggle random Node between active and inactive.
-        """
-        index = np.random.randint(low=0, high=self.size)
-
-        for node in self._next_layer._nodes:
-            node.toggle_node_connection(index)
 
 
 class OutputLayer(Layer):

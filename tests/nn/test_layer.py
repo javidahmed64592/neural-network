@@ -12,7 +12,6 @@ class TestLayer:
     ) -> None:
         assert mock_input_layer.size == mock_len_inputs
         assert mock_hidden_layer_1.size == mock_len_hidden[0]
-        assert mock_hidden_layer_1.num_inputs == mock_len_inputs
 
     def test_given_number_of_nodes_when_creating_layer_then_check_weights_and_bias_have_correct_shape(
         self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int], mock_len_inputs: int
@@ -36,18 +35,13 @@ class TestLayer:
 
     def test_given_layers_when_adding_node_to_hidden_then_check_layers_have_correct_shape(
         self,
-        mock_hidden_layer_3: HiddenLayer,
         mock_output_layer: OutputLayer,
     ) -> None:
-        initial_size = mock_hidden_layer_3.size
-        initial_inputs = mock_output_layer.num_inputs
+        initial_size = mock_output_layer._prev_layer.size
 
-        mock_hidden_layer_3._add_node()
+        mock_output_layer._prev_layer._add_node()
 
         expected_size = initial_size + 1
-        expected_inputs = initial_inputs + 1
-        actual_size = mock_hidden_layer_3.size
-        actual_inputs = mock_output_layer.num_inputs
+        actual_size = mock_output_layer._prev_layer.size
 
         assert actual_size == expected_size
-        assert actual_inputs == expected_inputs

@@ -86,7 +86,7 @@ class NeuralNetwork:
 
     @property
     def connections(self) -> list[NodeConnection]:
-        _connections = [node._node_connections for layer in self.layers[1:] for node in layer._nodes]
+        _connections = [node for layer in self.layers[1:] for node in layer.connections]
         return np.array([nc for node in _connections for nc in node])
 
     def save(self, filepath: str) -> None:
