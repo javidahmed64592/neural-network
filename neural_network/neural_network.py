@@ -64,10 +64,7 @@ class NeuralNetwork:
 
     @property
     def weights(self) -> list[Matrix]:
-        _weights = []
-        for layer in self.layers:
-            _weights.append(layer.weights)
-        return _weights
+        return np.array([layer.weights for layer in self.layers])
 
     @weights.setter
     def weights(self, new_weights: list[Matrix]) -> None:
@@ -76,10 +73,7 @@ class NeuralNetwork:
 
     @property
     def bias(self) -> list[Matrix]:
-        _bias = []
-        for layer in self.layers:
-            _bias.append(layer.bias)
-        return _bias
+        return np.array([layer.bias for layer in self.layers])
 
     @bias.setter
     def bias(self, new_bias: list[Matrix]) -> None:
