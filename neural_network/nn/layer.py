@@ -5,7 +5,7 @@ import numpy as np
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-from neural_network.nn.node import InputNode, Node
+from neural_network.nn.node import InputNode, Node, NodeConnection
 
 
 class Layer:
@@ -44,12 +44,12 @@ class Layer:
         return self._size
 
     @property
-    def num_inputs(self) -> int:
-        return self._prev_layer.size
-
-    @property
     def new_node(self) -> Node:
         return Node.fully_connected(self._size, self._weights_range, self._bias_range, self._prev_layer._nodes)
+
+    @property
+    def connections(self) -> list[list[NodeConnection]]:
+        return np.array([node._node_connections for node in self._nodes])
 
     @property
     def weights(self) -> Matrix:
@@ -213,15 +213,6 @@ class HiddenLayer(Layer):
 
         for node in self._next_layer._nodes:
             node.add_node(new_node, self._next_layer.random_weight)
-
-    def _toggle_connection(self) -> None:
-        """
-        Toggle random Node between active and inactive.
-        """
-        index = np.random.randint(low=0, high=self.size)
-
-        for node in self._next_layer._nodes:
-            node.toggle_node_connection(index)
 
 
 class OutputLayer(Layer):

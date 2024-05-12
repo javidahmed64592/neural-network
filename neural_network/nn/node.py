@@ -45,14 +45,14 @@ class Node:
         bias_range: tuple[float, float],
     ) -> Node:
         """
-        Create a Node with random weights and bias.
+        Create a Node with random bias.
 
         Parameters:
             index (int): Node position in Layer
             bias_range (tuple[float, float]): Lower and upper limits for bias
 
         Returns:
-            node (Node): Node with random weights and bias with NodeConnections to input Nodes
+            node (Node): Node with random bias
         """
         node = cls(index, np.random.uniform(low=bias_range[0], high=bias_range[1]))
         return node
@@ -85,7 +85,7 @@ class Node:
 
         return node
 
-    def add_node(self, node: Node, weight: float) -> None:
+    def add_node(self, node: Node, weight: float, innovation: int = 0) -> NodeConnection:
         """
         Add a NodeConnection to Node.
 
@@ -93,7 +93,9 @@ class Node:
             node (Node): Node to connect
             weight (float): Weight of NodeConnection
         """
-        self._node_connections.append(NodeConnection(node, self, weight))
+        connection = NodeConnection(input_node=node, output_node=self, connection_weight=weight, innovation=innovation)
+        self._node_connections.append(connection)
+        return connection
 
     def toggle_node_connection(self, index: int) -> None:
         """
@@ -138,12 +140,14 @@ class NodeConnection:
         output_node (Node): Output Node of connection
         connection_weight (float): Weight of connection
         is_active (bool): Inactive returns connection weight as 0
+        innovation (int): Innovation number for historical tracking of genes
     """
 
     input_node: Node
     output_node: Node
     connection_weight: float
     is_active: bool = True
+    innovation: int = 0
 
     @property
     def weight(self) -> float:

@@ -86,7 +86,7 @@ class NeuralNetwork:
 
     @property
     def connections(self) -> list[NodeConnection]:
-        _connections = [node._node_connections for layer in self.layers[1:] for node in layer._nodes]
+        _connections = [node for layer in self.layers[1:] for node in layer.connections]
         return np.array([nc for node in _connections for nc in node])
 
     def save(self, filepath: str) -> None:
@@ -194,13 +194,13 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers[1:]):
+        for index in range(len(self.layers)):
             new_weight = Matrix.mix_matrices(
                 nn.connection_weights[index], other_nn.connection_weights[index], self.connection_weights[index]
             )
-            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
+            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, self.layers[index]._weights_range)
             new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
-            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)
+            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, self.layers[index]._bias_range)
 
             new_weights.append(new_weight)
             new_biases.append(new_bias)
