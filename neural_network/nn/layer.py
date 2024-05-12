@@ -44,12 +44,12 @@ class Layer:
         return self._size
 
     @property
-    def num_inputs(self) -> int:
-        return self._prev_layer.size
-
-    @property
     def new_node(self) -> Node:
         return Node.fully_connected(self._size, self._weights_range, self._bias_range, self._prev_layer._nodes)
+
+    @property
+    def connections(self) -> list[list[NodeConnection]]:
+        return np.array([node._node_connections for node in self._nodes])
 
     @property
     def weights(self) -> Matrix:
@@ -79,10 +79,6 @@ class Layer:
     def bias(self, new_bias: Matrix) -> None:
         for index, node in enumerate(self._nodes):
             node._bias = new_bias.vals[index][0]
-
-    @property
-    def connections(self) -> list[NodeConnection]:
-        return np.array([node._node_connections for node in self._nodes])
 
     def _create_nodes(self) -> None:
         if not self._nodes:
