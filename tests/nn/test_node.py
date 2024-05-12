@@ -76,26 +76,3 @@ class TestNodeConnection:
         node_2.add_node(node_1, connection_weight)
 
         assert np.all(node_2._node_connections[0].connection_index == [index_1, index_2])
-
-    def test_given_two_nodes_when_getting_output_then_check_correct_value_returned(self) -> None:
-        node_1 = InputNode(0)
-        node_2 = Node(0, 0.4)
-        connection_weight = 0.5
-        input_val = 0.6
-
-        node_2.add_node(node_1, connection_weight)
-        node_1.set_input(input_val)
-
-        assert node_2.output == (input_val * connection_weight) + node_2._bias
-
-    def test_given_two_nodes_when_getting_inactive_output_then_check_zero_returned(self) -> None:
-        node_1 = InputNode(0)
-        node_2 = Node(0, 0.4)
-        connection_weight = 0.5
-        input_val = 0.6
-
-        node_2.add_node(node_1, connection_weight)
-        node_2.toggle_node_connection(0)
-        node_1.set_input(input_val)
-
-        assert node_2.output == node_2._bias

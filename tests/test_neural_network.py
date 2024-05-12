@@ -18,7 +18,6 @@ class TestNeuralNetwork:
     ) -> None:
         expected_sizes = [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
         for index, layer in enumerate(mock_nn.layers):
-            print(layer, layer.size, expected_sizes[index])
             assert layer.size == expected_sizes[index]
 
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
@@ -58,8 +57,8 @@ class TestNeuralNetwork:
                 mock_input_layer,
                 *[
                     make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
                     make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(2, mock_activation, mock_weights_range, mock_bias_range),
                 ],
                 mock_output_layer,
             ]
@@ -69,12 +68,14 @@ class TestNeuralNetwork:
                 mock_input_layer,
                 *[
                     make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
                     make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(2, mock_activation, mock_weights_range, mock_bias_range),
                 ],
                 mock_output_layer,
             ]
         )
+
+        output_1 = mock_nn_1.feedforward(mock_inputs)
 
         mock_nn_1.weights, mock_nn_1.bias = mock_nn_1.crossover(mock_nn_2, mock_nn_1, 0.01)
         mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(mock_nn_1, mock_nn_2, 0.01)
@@ -100,8 +101,8 @@ class TestNeuralNetwork:
                 mock_input_layer,
                 *[
                     make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
                     make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(2, mock_activation, mock_weights_range, mock_bias_range),
                 ],
                 mock_output_layer,
             ]
@@ -112,7 +113,7 @@ class TestNeuralNetwork:
                 *[
                     make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
                     make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(6, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
                 ],
                 mock_output_layer,
             ]
@@ -122,8 +123,8 @@ class TestNeuralNetwork:
                 mock_input_layer,
                 *[
                     make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(2, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(6, mock_activation, mock_weights_range, mock_bias_range),
+                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
                 ],
                 mock_output_layer,
             ]

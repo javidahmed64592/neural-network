@@ -64,10 +64,11 @@ class NeuralNetwork:
 
     @property
     def weights(self) -> list[Matrix]:
-        _weights = []
-        for layer in self.layers:
-            _weights.append(layer.weights)
-        return _weights
+        return np.array([layer.weights for layer in self.layers])
+
+    @property
+    def connection_weights(self) -> list[Matrix]:
+        return np.array([layer.connection_weights for layer in self.layers])
 
     @weights.setter
     def weights(self, new_weights: list[Matrix]) -> None:
@@ -76,10 +77,7 @@ class NeuralNetwork:
 
     @property
     def bias(self) -> list[Matrix]:
-        _bias = []
-        for layer in self.layers:
-            _bias.append(layer.bias)
-        return _bias
+        return np.array([layer.bias for layer in self.layers])
 
     @bias.setter
     def bias(self, new_bias: list[Matrix]) -> None:
@@ -142,8 +140,13 @@ class NeuralNetwork:
         Returns:
             output (list[float]): List of outputs
         """
-        self._input_layer.feedforward(Matrix.from_array(inputs))
-        output = Matrix.transpose(self._output_layer.output)
+        vals = self._input_layer.feedforward(Matrix.from_array(inputs))
+
+        for layer in self._hidden_layers:
+            vals = layer.feedforward(vals)
+
+        output = self._output_layer.feedforward(vals)
+        output = Matrix.transpose(output)
         return output.as_list
 
     def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:
@@ -191,8 +194,10 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers):
-            new_weight = Matrix.mix_matrices(nn.weights[index], other_nn.weights[index], self.weights[index])
+        for index, layer in enumerate(self.layers[1:]):
+            new_weight = Matrix.mix_matrices(
+                nn.connection_weights[index], other_nn.connection_weights[index], self.connection_weights[index]
+            )
             new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
             new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
             new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)
