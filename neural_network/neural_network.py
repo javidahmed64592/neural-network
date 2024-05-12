@@ -194,13 +194,13 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers[1:]):
+        for index in range(len(self.layers)):
             new_weight = Matrix.mix_matrices(
                 nn.connection_weights[index], other_nn.connection_weights[index], self.connection_weights[index]
             )
-            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
+            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, self.layers[index]._weights_range)
             new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
-            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)
+            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, self.layers[index]._bias_range)
 
             new_weights.append(new_weight)
             new_biases.append(new_bias)
