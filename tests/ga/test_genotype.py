@@ -1,7 +1,7 @@
 import pytest
 
 from neural_network.ga.genotype import Genotype
-from neural_network.nn.node import InputNode, Node, NodeConnection
+from neural_network.nn.node import InputNode, Node
 
 
 @pytest.fixture
@@ -21,14 +21,7 @@ def mock_output_nodes(mock_bias_range: tuple[float, float]) -> list[Node]:
 
 @pytest.fixture
 def mock_genotype(mock_input_nodes: list[InputNode], mock_output_nodes: list[Node]) -> Genotype:
-    connections: list[NodeConnection] = []
-    innovation = 1
-    for output_node in mock_output_nodes:
-        for input_node in mock_input_nodes:
-            connections.append(output_node.add_node(node=input_node, weight=0.5, innovation=innovation))
-            innovation += 1
-
-    return Genotype(genotype=connections)
+    return Genotype.from_nodes(input_nodes=mock_input_nodes, output_nodes=mock_output_nodes)
 
 
 class TestGenotype:
