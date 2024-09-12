@@ -12,7 +12,7 @@ ruff = "*"
 ipykernel = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"
 
 [scripts]
 test = "python -m pytest -vx"
