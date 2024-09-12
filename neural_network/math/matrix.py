@@ -20,7 +20,7 @@ class Matrix:
         Parameters:
             rows (int): Number of rows in matrix
             cols (int): Number of columns in matrix
-            vals (Optional[NDArray]): Matrix values if specified
+            vals (NDArray | None): Matrix values if specified
         """
         self._rows = rows
         self._cols = cols
