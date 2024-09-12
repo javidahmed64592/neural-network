@@ -7,7 +7,6 @@ import numpy as np
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
-from neural_network.nn.node import NodeConnection
 
 
 class NeuralNetwork:
@@ -66,10 +65,6 @@ class NeuralNetwork:
     def weights(self) -> list[Matrix]:
         return np.array([layer.weights for layer in self.layers])
 
-    @property
-    def connection_weights(self) -> list[Matrix]:
-        return np.array([layer.connection_weights for layer in self.layers])
-
     @weights.setter
     def weights(self, new_weights: list[Matrix]) -> None:
         for layer, weights in zip(self.layers, new_weights, strict=False):
@@ -83,11 +78,6 @@ class NeuralNetwork:
     def bias(self, new_bias: list[Matrix]) -> None:
         for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
-
-    @property
-    def connections(self) -> list[NodeConnection]:
-        _connections = [node._node_connections for layer in self.layers[1:] for node in layer._nodes]
-        return np.array([nc for node in _connections for nc in node])
 
     def save(self, filepath: str) -> None:
         """
@@ -106,10 +96,9 @@ class NeuralNetwork:
         with open(filepath, "w") as file:
             json.dump(_data, file)
 
-    def mutate(self, shift_vals: float, prob_new_node: float, prob_toggle_connection: float) -> None:
+    def mutate(self, shift_vals: float) -> None:
         """
-        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes. NodeConnections
-        also get randomly toggled between active and inactive.
+        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
@@ -118,17 +107,6 @@ class NeuralNetwork:
         """
         for layer in self.layers[1:]:
             layer.mutate(shift_vals)
-
-        add_node_array = np.random.uniform(low=0, high=1, size=len(self._hidden_layers))
-        masked_layers = np.array(self._hidden_layers)[add_node_array < prob_new_node]
-        for layer in masked_layers:
-            layer._add_node()
-
-        connections = self.connections
-        toggle_connections_array = np.random.uniform(low=0, high=1, size=len(connections))
-        masked_connections = connections[toggle_connections_array < prob_toggle_connection]
-        for connection in masked_connections:
-            connection.toggle_active()
 
     def feedforward(self, inputs: list[float]) -> list[float]:
         """
@@ -195,9 +173,7 @@ class NeuralNetwork:
         new_biases = []
 
         for index, layer in enumerate(self.layers[1:]):
-            new_weight = Matrix.mix_matrices(
-                nn.connection_weights[index], other_nn.connection_weights[index], self.connection_weights[index]
-            )
+            new_weight = Matrix.mix_matrices(nn.weights[index], other_nn.weights[index], self.weights[index])
             new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
             new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
             new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)

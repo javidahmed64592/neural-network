@@ -5,7 +5,6 @@ import numpy as np
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-from neural_network.nn.node import InputNode, Node
 
 
 class Layer:
@@ -31,16 +30,17 @@ class Layer:
         """
         self._prev_layer: Layer = None
         self._next_layer: Layer = None
-        self._nodes: list[Node] = []
 
         self._size = size
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
 
+        self._weights: Matrix = None
+        self._bias: Matrix = None
+
     @property
     def size(self) -> int:
-        self._size = len(self._nodes)
         return self._size
 
     @property
@@ -48,23 +48,16 @@ class Layer:
         return self._prev_layer.size
 
     @property
-    def new_node(self) -> Node:
-        return Node.fully_connected(self._size, self._weights_range, self._bias_range, self._prev_layer._nodes)
-
-    @property
     def weights(self) -> Matrix:
-        _weights = Matrix.from_array([node.weights for node in self._nodes])
-        return _weights
+        if not self._weights:
+            self._weights = Matrix.random_matrix(
+                self._size, self.num_inputs, self._weights_range[0], self._weights_range[1]
+            )
+        return self._weights
 
     @weights.setter
     def weights(self, new_weights: Matrix) -> None:
-        for index, node in enumerate(self._nodes):
-            node.weights = new_weights.vals[index]
-
-    @property
-    def connection_weights(self) -> Matrix:
-        _weights = Matrix.from_array([node.connection_weights for node in self._nodes])
-        return _weights
+        self._weights = new_weights
 
     @property
     def random_weight(self) -> float:
@@ -72,17 +65,13 @@ class Layer:
 
     @property
     def bias(self) -> Matrix:
-        _bias = Matrix.from_array([node._bias for node in self._nodes])
-        return _bias
+        if not self._bias:
+            self._bias = Matrix.random_column(self._size, self._bias_range[0], self._bias_range[1])
+        return self._bias
 
     @bias.setter
     def bias(self, new_bias: Matrix) -> None:
-        for index, node in enumerate(self._nodes):
-            node._bias = new_bias.vals[index][0]
-
-    def _create_nodes(self) -> None:
-        if not self._nodes:
-            self._nodes = [self.new_node for _ in range(self._size)]
+        self._bias = new_bias
 
     def set_prev_layer(self, prev_layer: Layer) -> None:
         """
@@ -93,7 +82,6 @@ class Layer:
         """
         self._prev_layer = prev_layer
         prev_layer._next_layer = self
-        self._create_nodes()
 
     def mutate(self, shift_vals: float) -> None:
         """
@@ -156,15 +144,10 @@ class InputLayer(Layer):
             activation (ActivationFunction): Layer activation function
         """
         super().__init__(size, activation, [1, 1], [0, 0])
-        self._nodes: list[InputNode] = [self.new_node for _ in range(self._size)]
 
     @property
     def num_inputs(self) -> int:
         return 1
-
-    @property
-    def new_node(self) -> Node:
-        return InputNode(self._size)
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
@@ -203,25 +186,6 @@ class HiddenLayer(Layer):
             bias_range (tuple[float, float]): Range for Layer bias
         """
         super().__init__(size, activation, weights_range, bias_range)
-
-    def _add_node(self) -> None:
-        """
-        Add a random Node to HiddenLayer.
-        """
-        new_node = self.new_node
-        self._nodes.append(new_node)
-
-        for node in self._next_layer._nodes:
-            node.add_node(new_node, self._next_layer.random_weight)
-
-    def _toggle_connection(self) -> None:
-        """
-        Toggle random Node between active and inactive.
-        """
-        index = np.random.randint(low=0, high=self.size)
-
-        for node in self._next_layer._nodes:
-            node.toggle_node_connection(index)
 
 
 class OutputLayer(Layer):
