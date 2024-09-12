@@ -1,9 +1,9 @@
 import pytest
 
+from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
 from neural_network.neural_network import NeuralNetwork
-from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 
 
 @pytest.fixture

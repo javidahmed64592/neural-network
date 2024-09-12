@@ -4,9 +4,9 @@ import json
 
 import numpy as np
 
+from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 
 
 class NeuralNetwork:

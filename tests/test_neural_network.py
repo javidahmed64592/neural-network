@@ -1,6 +1,6 @@
+from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.neural_network import NeuralNetwork
-from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
 
 
 def make_hidden_layer(
