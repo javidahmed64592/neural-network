@@ -1,5 +1,5 @@
+from neural_network.layer import HiddenLayer, InputLayer
 from neural_network.math.matrix import Matrix
-from neural_network.nn.layer import HiddenLayer, InputLayer
 
 
 class TestLayer:

@@ -141,7 +141,7 @@ class InputLayer(Layer):
 
         Parameters:
             size (int): Size of InputLayer
-            activation (ActivationFunction): Layer activation function
+            activation (ActivationFunction): InputLayer activation function
         """
         super().__init__(size, activation, [1, 1], [0, 0])
 
@@ -180,10 +180,10 @@ class HiddenLayer(Layer):
         Initialise HiddenLayer object with number of nodes, activation function, weights range and bias range.
 
         Parameters:
-            size (int): Size of Layer
-            activation (ActivationFunction): Layer activation function
-            weights_range (tuple[float, float]): Range for Layer weights
-            bias_range (tuple[float, float]): Range for Layer bias
+            size (int): Size of HiddenLayer
+            activation (ActivationFunction): HiddenLayer activation function
+            weights_range (tuple[float, float]): Range for HiddenLayer weights
+            bias_range (tuple[float, float]): Range for HiddenLayer bias
         """
         super().__init__(size, activation, weights_range, bias_range)
 
@@ -205,7 +205,7 @@ class OutputLayer(Layer):
 
         Parameters:
             size (int): Size of OutputLayer
-            activation (ActivationFunction): Layer activation function
+            activation (ActivationFunction): OutputLayer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
         """

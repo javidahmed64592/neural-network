@@ -5,6 +5,12 @@ from neural_network.math.matrix import Matrix
 
 
 class TestMatrix:
+    def test_given_no_vals_when_creating_matrix_then_check_matrix_has_zero_vals(
+        self, mock_len_inputs: int, mock_len_outputs: int
+    ) -> None:
+        test_matrix = Matrix(rows=mock_len_inputs, cols=mock_len_outputs)
+        assert not np.any(test_matrix.vals)
+
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
     ) -> None:
@@ -161,3 +167,14 @@ class TestMatrix:
         new_matrix = Matrix.mix_matrices(matrix_in_1, matrix_in_2, matrix_out)
 
         assert np.all(new_matrix.shape == matrix_out.shape)
+
+    def test_given_matrix_when_shifting_vals_then_check_vals_are_different(self) -> None:
+        array = np.array([[1, 2], [4, 3], [2, 4]])
+
+        matrix_1 = Matrix.from_array(array)
+        matrix_2 = Matrix.from_array(array)
+
+        assert np.all(matrix_1.vals == matrix_2.vals)
+
+        matrix_1.shift_vals(0.5)
+        assert not np.all(matrix_1.vals == matrix_2.vals)

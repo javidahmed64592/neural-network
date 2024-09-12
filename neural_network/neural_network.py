@@ -4,9 +4,9 @@ import json
 
 import numpy as np
 
+from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
-from neural_network.nn.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 
 
 class NeuralNetwork:
@@ -98,12 +98,10 @@ class NeuralNetwork:
 
     def mutate(self, shift_vals: float) -> None:
         """
-        Mutate NeuralNetwork Layers by adjusting weights and biases, and potentially adding new Nodes.
+        Mutate NeuralNetwork Layers by adjusting weights and biases.
 
         Parameters:
             shift_vals (float): Factor to adjust Layer weights and biases by
-            prob_new_node (float): Probability per Layer for a new Node, range [0, 1]
-            prob_toggle_connection (float): Probability per Layer to toggle a random Node, range[0, 1]
         """
         for layer in self.layers[1:]:
             layer.mutate(shift_vals)

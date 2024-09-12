@@ -8,6 +8,7 @@ numpy = "*"
 
 [dev-packages]
 pytest = "*"
+pytest-cov = "*"
 ruff = "*"
 ipykernel = "*"
 
@@ -15,5 +16,5 @@ ipykernel = "*"
 python_version = "3.12"
 
 [scripts]
-test = "python -m pytest -vx"
+test = "python -m pytest -vx --cov=neural_network --cov-report term-missing"
 ruff = "python -m ruff check ."
