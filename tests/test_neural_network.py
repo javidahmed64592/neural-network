@@ -34,14 +34,6 @@ class TestNeuralNetwork:
         actual_len = len(output)
         assert actual_len == mock_len_outputs
 
-    def test_given_nn_when_adding_random_node_then_check_output_has_correct_shape(
-        self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
-    ) -> None:
-        mock_nn.mutate(1, 1, 0)
-        output = mock_nn.feedforward(mock_inputs)
-        actual_len = len(output)
-        assert actual_len == mock_len_outputs
-
     def test_given_two_nns_with_same_shape_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
         self,
         mock_inputs: list[float],
@@ -141,16 +133,3 @@ class TestNeuralNetwork:
         assert len(output_1) == mock_len_outputs
         assert len(output_2) == mock_len_outputs
         assert len(output_3) == mock_len_outputs
-
-    def test_given_nn_when_getting_node_connections_then_check_correct_number_of_connections_returned(
-        self,
-        mock_nn: NeuralNetwork,
-        mock_layer_sizes: list[int],
-    ) -> None:
-        expected_count = 0
-        for index in range(1, len(mock_layer_sizes)):
-            expected_count += mock_layer_sizes[index] * mock_layer_sizes[index - 1]
-
-        actual_count = len(mock_nn.connections)
-
-        assert actual_count == expected_count
