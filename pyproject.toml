@@ -26,9 +26,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff",
+    "ipykernel",
+]
+
+test = [
     "pytest",
     "pytest-cov",
-    "ipykernel",
 ]
 
 [project.urls]
