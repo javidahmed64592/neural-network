@@ -21,19 +21,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Install pipenv
-        run: |
-          pip install pipenv
       - name: Install dependencies
         run: |
-          pipenv sync --dev --system
+          python -m pip install --upgrade pip
+          pip install -e .
       - name: Test with pytest
         run: |
           python -m pytest -vx
