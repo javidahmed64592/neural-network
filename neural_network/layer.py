@@ -6,6 +6,8 @@ from neural_network.math import nn_math
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 
+rng = np.random.default_rng()
+
 
 class Layer:
     """
@@ -61,7 +63,7 @@ class Layer:
 
     @property
     def random_weight(self) -> float:
-        return np.random.uniform(low=self._weights_range[0], high=self._weights_range[1])
+        return rng.uniform(low=self._weights_range[0], high=self._weights_range[1])
 
     @property
     def bias(self) -> Matrix:

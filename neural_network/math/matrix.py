@@ -7,6 +7,8 @@ from numpy.typing import NDArray
 
 from neural_network.math.activation_functions import ActivationFunction
 
+rng = np.random.default_rng()
+
 
 class Matrix:
     """
@@ -62,8 +64,7 @@ class Matrix:
             matrix_array = np.expand_dims(matrix_array, axis=1)
             _rows, _cols = matrix_array.shape
 
-        matrix = cls(_rows, _cols, matrix_array)
-        return matrix
+        return cls(_rows, _cols, matrix_array)
 
     @classmethod
     def random_matrix(cls, rows: int, cols: int, low: float, high: float) -> Matrix:
@@ -79,9 +80,8 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with random values
         """
-        _vals = np.random.uniform(low=low, high=high, size=(rows, cols))
-        matrix = cls.from_array(_vals)
-        return matrix
+        _vals = rng.uniform(low=low, high=high, size=(rows, cols))
+        return cls.from_array(_vals)
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
@@ -96,8 +96,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Column Matrix with random values
         """
-        matrix = cls.random_matrix(rows=rows, cols=1, low=low, high=high)
-        return matrix
+        return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
 
     @staticmethod
     def add(matrix: Matrix, other_matrix: Matrix) -> Matrix:
@@ -218,9 +217,9 @@ class Matrix:
         Returns:
             new_matrix (Matrix): Mutated Matrix
         """
-        _mutation_matrix = np.random.uniform(low=0, high=1, size=matrix.shape)
+        _mutation_matrix = rng.uniform(low=0, high=1, size=matrix.shape)
         new_matrix = np.where(
-            _mutation_matrix < mutation_rate, np.random.uniform(low=random_range[0], high=random_range[1]), matrix.vals
+            _mutation_matrix < mutation_rate, rng.uniform(low=random_range[0], high=random_range[1]), matrix.vals
         )
         return Matrix.from_array(new_matrix)
 
@@ -284,5 +283,5 @@ class Matrix:
         Parameters:
             shift (float): Factor to shift values by
         """
-        _mult_array = np.random.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
+        _mult_array = rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
         self._vals = _mult_array
