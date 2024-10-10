@@ -122,7 +122,7 @@ This library uses Pytest for the unit tests.
 These tests are located in the `tests` directory.
 To run the tests:
 
-    python -m pytest -vx tests
+    python -m pytest tests -vx --cov --cov-report term-missing
 
 ## Linting and Formatting
 This library uses `ruff` for linting and formatting.
