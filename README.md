@@ -7,14 +7,16 @@ This is a neural network library in Python which can be used to feedforward arra
 Install this package using `pipenv`:
 
 ```
-pipenv install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+pip install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 ```
 
 To update the package:
 
 ```
-pipenv update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+pip update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 ```
+
+_Note: It is recommended to install this into a virtual environment._
 
 <!-- omit from toc -->
 ## Table of Contents
@@ -25,10 +27,13 @@ pipenv update -e git+https://github.com/javidahmed64592/neural-network#egg=neura
 - [Linting and Formatting](#linting-and-formatting)
 
 ## Installing Dependencies
-Install the required dependencies using [pipenv](https://github.com/pypa/pipenv):
+Install the required dependencies using `pip`:
 
-    pipenv install
-    pipenv install --dev
+    pip install -e .
+
+To install with `dev` and `test` dependencies:
+
+    pip install -e .[dev, test]
 
 ## Using the Neural Network
 For a complete example of how to create and train the neural network, see `example_training.ipynb` where it is trained on binary lists.
@@ -91,14 +96,12 @@ The neural network also has methods which can be used in neuroevolution.
 The topology of the neural network can be mutated in the following way:
 
 ```
-nn.mutate(shift_vals, prob_new_node, prob_toggle_connection)
+nn.mutate(shift_vals)
 ```
 
 where
 
 - `shift_vals`: Layer weights and biases *= random (1 - shift_vals, 1 + shift_vals)
-- `prob_new_node`: Probability per Layer for a new Node in hidden Layer, range [0, 1]
-- `prob_toggle_connection`: Probability per Layer to toggle a random Node, range[0, 1]
 
 New weights and biases can also be calculated via crossover:
 
@@ -119,7 +122,7 @@ This library uses Pytest for the unit tests.
 These tests are located in the `tests` directory.
 To run the tests:
 
-    pipenv run test
+    python -m pytest -vx tests
 
 ## Linting and Formatting
 This library uses `ruff` for linting and formatting.
