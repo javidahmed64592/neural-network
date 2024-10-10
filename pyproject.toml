@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "neural-network"
-version = "1.13.0"
+version = "1.13.1"
 description = "An artificial neural network library in Python."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -36,6 +36,14 @@ test = [
 
 [project.urls]
 repository = "https://https://github.com/javidahmed64592/neural-network"
+
+[tool.pytest.ini_options]
+addopts = [
+    "-vx",
+    "--cov",
+    "--cov-report",
+    "term-missing",
+]
 
 [tool.ruff]
 target-version = "py312"
