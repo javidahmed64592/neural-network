@@ -3,6 +3,8 @@ import numpy as np
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 
+rng = np.random.default_rng()
+
 
 class TestMatrix:
     def test_given_no_vals_when_creating_matrix_then_check_matrix_has_zero_vals(
@@ -36,7 +38,7 @@ class TestMatrix:
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
-        test_array = np.random.uniform(
+        test_array = rng.uniform(
             low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden[0])
         )
         test_matrix = Matrix.from_array(matrix_array=test_array)
@@ -49,7 +51,7 @@ class TestMatrix:
     def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_hidden: list[int]
     ) -> None:
-        test_array = np.random.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
+        test_array = rng.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (mock_len_hidden[0], 1)
