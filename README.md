@@ -91,18 +91,6 @@ nn = NeuralNetwork.from_file("/path/to/nn_model.json")
 ```
 
 ### Neuroevolution
-The neural network also has methods which can be used in neuroevolution.
-
-The topology of the neural network can be mutated in the following way:
-
-```
-nn.mutate(shift_vals)
-```
-
-where
-
-- `shift_vals`: Layer weights and biases *= random (1 - shift_vals, 1 + shift_vals)
-
 New weights and biases can also be calculated via crossover:
 
 ```
