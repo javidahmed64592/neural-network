@@ -34,6 +34,9 @@ class Matrix:
     def __add__(self, other: Matrix) -> Matrix:
         return Matrix.from_array(self.vals + other.vals)
 
+    def __sub__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals - other.vals)
+
     def __mul__(self, other: float | int) -> Matrix:
         return Matrix.from_array(self.vals * other)
 
@@ -106,21 +109,6 @@ class Matrix:
             matrix (Matrix): Column Matrix with random values
         """
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
-
-    @staticmethod
-    def subtract(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Subtract two Matrix objects.
-
-        Parameters:
-            matrix (Matrix): Matrix to use in subtraction
-            other_matrix (Matrix): Other Matrix to use in subtraction
-
-        Returns:
-            new_matrix (Matrix): Difference between both matrices
-        """
-        new_matrix = matrix.vals - other_matrix.vals
-        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def multiply_element_wise(matrix: Matrix, other_matrix: Matrix) -> Matrix:

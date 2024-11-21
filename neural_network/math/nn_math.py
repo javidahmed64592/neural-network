@@ -67,7 +67,7 @@ def calculate_error_from_expected(expected_outputs: Matrix, actual_outputs: Matr
     Returns:
         errors (Matrix): Difference between expected and actual outputs
     """
-    return Matrix.subtract(expected_outputs, actual_outputs)
+    return expected_outputs - actual_outputs
 
 
 def calculate_next_errors(weights: Matrix, calculated_errors: Matrix) -> Matrix:
