@@ -31,6 +31,9 @@ class Matrix:
     def __str__(self) -> str:
         return str(self.vals)
 
+    def __add__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals + other.vals)
+
     def __mul__(self, other: float | int) -> Matrix:
         return Matrix.from_array(self.vals * other)
 
@@ -103,21 +106,6 @@ class Matrix:
             matrix (Matrix): Column Matrix with random values
         """
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
-
-    @staticmethod
-    def add(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Add two Matrix objects.
-
-        Parameters:
-            matrix (Matrix): Matrix to use in sum
-            other_matrix (Matrix): Other Matrix to use in sum
-
-        Returns:
-            new_matrix (Matrix): Sum of both matrices
-        """
-        new_matrix = matrix.vals + other_matrix.vals
-        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def subtract(matrix: Matrix, other_matrix: Matrix) -> Matrix:

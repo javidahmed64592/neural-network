@@ -65,7 +65,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.add(matrix_1, matrix_2)
+        new_matrix = matrix_1 + matrix_2
 
         expected_vals = np.array([[0, 3], [6, -2]])
         actual_vals = new_matrix.vals

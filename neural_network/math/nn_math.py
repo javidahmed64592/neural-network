@@ -20,7 +20,7 @@ def feedforward_through_layer(
         output_vals (Matrix): Output values
     """
     output_vals = weights @ input_vals
-    output_vals = Matrix.add(output_vals, bias)
+    output_vals = output_vals + bias
     return Matrix.map(output_vals, activation)
 
 

@@ -107,8 +107,8 @@ class Layer:
             activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
         )
         delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
-        self.weights = Matrix.add(self.weights, delta)
-        self.bias = Matrix.add(self.bias, gradient)
+        self.weights = self.weights + delta
+        self.bias = self.bias + gradient
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
