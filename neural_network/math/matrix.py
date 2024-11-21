@@ -31,6 +31,12 @@ class Matrix:
     def __str__(self) -> str:
         return str(self.vals)
 
+    def __mul__(self, other: float | int) -> Matrix:
+        return Matrix.from_array(self.vals * other)
+
+    def __matmul__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals @ other.vals)
+
     @property
     def vals(self) -> NDArray:
         if self._vals is None:
@@ -126,23 +132,6 @@ class Matrix:
             new_matrix (Matrix): Difference between both matrices
         """
         new_matrix = matrix.vals - other_matrix.vals
-        return Matrix.from_array(new_matrix)
-
-    @staticmethod
-    def multiply(matrix: Matrix, val: Matrix | float) -> Matrix:
-        """
-        Multiply Matrix with scalar or Matrix.
-
-        Parameters:
-            matrix (Matrix): Matrix to to use for multiplication
-            val (Matrix | float): Matrix or scalar to use for multiplication
-
-        Returns:
-            new_matrix (Matrix): Multiplied Matrix
-        """
-        if isinstance(val, Matrix):
-            val = val.vals
-        new_matrix = matrix.vals.dot(val)
         return Matrix.from_array(new_matrix)
 
     @staticmethod

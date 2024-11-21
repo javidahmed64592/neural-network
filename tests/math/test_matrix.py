@@ -89,7 +89,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.multiply(matrix_1, matrix_2)
+        new_matrix = matrix_1 @ matrix_2
 
         expected_vals = np.array([[3, -9], [2, -11], [6, -18]])
         actual_vals = new_matrix.vals
@@ -112,7 +112,7 @@ class TestMatrix:
         multiplier = 3
 
         matrix = Matrix.from_array(array)
-        new_matrix = Matrix.multiply(matrix, multiplier)
+        new_matrix = matrix * multiplier
 
         expected_vals = array * multiplier
         actual_vals = new_matrix.vals
