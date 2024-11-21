@@ -38,8 +38,7 @@ def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: Activatio
         gradient (Matrix): Gradient values
     """
     gradient = Matrix.from_array(np.vectorize(activation.derivative)(layer_vals.vals))
-    gradient = Matrix.multiply_element_wise(gradient, errors)
-    return gradient * lr
+    return gradient * errors * lr
 
 
 def calculate_delta(layer_vals: Matrix, gradients: Matrix) -> Matrix:

@@ -37,7 +37,9 @@ class Matrix:
     def __sub__(self, other: Matrix) -> Matrix:
         return Matrix.from_array(self.vals - other.vals)
 
-    def __mul__(self, other: float | int) -> Matrix:
+    def __mul__(self, other: float | int | Matrix) -> Matrix:
+        if isinstance(other, Matrix):
+            return Matrix.from_array(self.vals * other.vals)
         return Matrix.from_array(self.vals * other)
 
     def __matmul__(self, other: Matrix) -> Matrix:
@@ -109,21 +111,6 @@ class Matrix:
             matrix (Matrix): Column Matrix with random values
         """
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
-
-    @staticmethod
-    def multiply_element_wise(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Multiply Matrix element wise with Matrix.
-
-        Parameters:
-            matrix (Matrix): Matrix to use for multiplication
-            other_matrix (Matrix): Other Matrix to use for multiplication
-
-        Returns:
-            new_matrix (Matrix): Multiplied Matrix
-        """
-        new_matrix = matrix.vals * other_matrix.vals
-        return Matrix.from_array(new_matrix)
 
     @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
