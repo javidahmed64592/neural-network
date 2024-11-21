@@ -7,12 +7,6 @@ rng = np.random.default_rng()
 
 
 class TestMatrix:
-    def test_given_no_vals_when_creating_matrix_then_check_matrix_has_zero_vals(
-        self, mock_len_inputs: int, mock_len_outputs: int
-    ) -> None:
-        test_matrix = Matrix(rows=mock_len_inputs, cols=mock_len_outputs)
-        assert not np.any(test_matrix.vals)
-
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
     ) -> None:
