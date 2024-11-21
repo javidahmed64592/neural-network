@@ -180,3 +180,5 @@ class TestMatrix:
 
         matrix_1.shift_vals(0.5)
         assert not np.all(matrix_1.vals == matrix_2.vals)
+        assert np.all(array * 0.5 <= matrix_1.vals)
+        assert np.all(matrix_1.vals <= array * 1.5)

@@ -235,5 +235,5 @@ class Matrix:
         Parameters:
             shift (float): Factor to shift values by
         """
-        _mult_array = rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
+        self._vals *= rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
         self._vals = _mult_array
