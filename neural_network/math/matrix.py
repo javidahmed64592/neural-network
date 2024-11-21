@@ -15,27 +15,31 @@ class Matrix:
     This class handles the matrix mathematics required to pass data through neural networks.
     """
 
-    def __init__(self, rows: int, cols: int, vals: NDArray | None = None) -> None:
+    def __init__(self, vals: NDArray) -> None:
         """
         Initialise Matrix with number of rows and columns, and optionally the matrix values.
 
         Parameters:
-            rows (int): Number of rows in matrix
-            cols (int): Number of columns in matrix
-            vals (NDArray | None): Matrix values if specified
+            vals (NDArray): Matrix values
         """
-        self._rows = rows
-        self._cols = cols
-        self._vals = vals
+        self.vals = vals
 
     def __str__(self) -> str:
         return str(self.vals)
 
-    @property
-    def vals(self) -> NDArray:
-        if self._vals is None:
-            self._vals = np.zeros(shape=self.shape)
-        return self._vals
+    def __add__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals + other.vals)
+
+    def __sub__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals - other.vals)
+
+    def __mul__(self, other: float | int | Matrix) -> Matrix:
+        if isinstance(other, Matrix):
+            return Matrix.from_array(self.vals * other.vals)
+        return Matrix.from_array(self.vals * other)
+
+    def __matmul__(self, other: Matrix) -> Matrix:
+        return Matrix.from_array(self.vals @ other.vals)
 
     @property
     def as_list(self) -> list[float]:
@@ -44,7 +48,7 @@ class Matrix:
 
     @property
     def shape(self) -> tuple:
-        return (self._rows, self._cols)
+        return self.vals.shape
 
     @classmethod
     def from_array(cls, matrix_array: NDArray | list[list[float]] | list[float]) -> Matrix:
@@ -58,13 +62,9 @@ class Matrix:
             matrix (Matrix): Matrix with assigned values
         """
         matrix_array = np.array(matrix_array, dtype=object)
-        try:
-            _rows, _cols = matrix_array.shape
-        except ValueError:
+        if matrix_array.ndim == 1:
             matrix_array = np.expand_dims(matrix_array, axis=1)
-            _rows, _cols = matrix_array.shape
-
-        return cls(_rows, _cols, matrix_array)
+        return cls(matrix_array)
 
     @classmethod
     def random_matrix(cls, rows: int, cols: int, low: float, high: float) -> Matrix:
@@ -80,8 +80,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with random values
         """
-        _vals = rng.uniform(low=low, high=high, size=(rows, cols))
-        return cls.from_array(_vals)
+        return cls.from_array(rng.uniform(low=low, high=high, size=(rows, cols)))
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
@@ -99,68 +98,6 @@ class Matrix:
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
 
     @staticmethod
-    def add(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Add two Matrix objects.
-
-        Parameters:
-            matrix (Matrix): Matrix to use in sum
-            other_matrix (Matrix): Other Matrix to use in sum
-
-        Returns:
-            new_matrix (Matrix): Sum of both matrices
-        """
-        new_matrix = matrix.vals + other_matrix.vals
-        return Matrix.from_array(new_matrix)
-
-    @staticmethod
-    def subtract(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Subtract two Matrix objects.
-
-        Parameters:
-            matrix (Matrix): Matrix to use in subtraction
-            other_matrix (Matrix): Other Matrix to use in subtraction
-
-        Returns:
-            new_matrix (Matrix): Difference between both matrices
-        """
-        new_matrix = matrix.vals - other_matrix.vals
-        return Matrix.from_array(new_matrix)
-
-    @staticmethod
-    def multiply(matrix: Matrix, val: Matrix | float) -> Matrix:
-        """
-        Multiply Matrix with scalar or Matrix.
-
-        Parameters:
-            matrix (Matrix): Matrix to to use for multiplication
-            val (Matrix | float): Matrix or scalar to use for multiplication
-
-        Returns:
-            new_matrix (Matrix): Multiplied Matrix
-        """
-        if isinstance(val, Matrix):
-            val = val.vals
-        new_matrix = matrix.vals.dot(val)
-        return Matrix.from_array(new_matrix)
-
-    @staticmethod
-    def multiply_element_wise(matrix: Matrix, other_matrix: Matrix) -> Matrix:
-        """
-        Multiply Matrix element wise with Matrix.
-
-        Parameters:
-            matrix (Matrix): Matrix to use for multiplication
-            other_matrix (Matrix): Other Matrix to use for multiplication
-
-        Returns:
-            new_matrix (Matrix): Multiplied Matrix
-        """
-        new_matrix = matrix.vals * other_matrix.vals
-        return Matrix.from_array(new_matrix)
-
-    @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
         """
         Return transpose of Matrix.
@@ -171,8 +108,7 @@ class Matrix:
         Returns:
             new_matrix (Matrix): Transposed Matrix
         """
-        new_matrix = matrix.vals.transpose()
-        return Matrix.from_array(new_matrix)
+        return Matrix.from_array(matrix.vals.transpose())
 
     @staticmethod
     def map(matrix: Matrix, activation: ActivationFunction) -> Matrix:
@@ -186,8 +122,7 @@ class Matrix:
         Returns:
             new_matrix (Matrix): Matrix with mapped values
         """
-        new_matrix = np.vectorize(activation.func)(matrix.vals)
-        return Matrix.from_array(new_matrix)
+        return Matrix.from_array(np.vectorize(activation.func)(matrix.vals))
 
     @staticmethod
     def average_matrix(matrix: Matrix, other_matrix: Matrix) -> Matrix:
@@ -201,8 +136,7 @@ class Matrix:
         Returns:
             new_matrix (Matrix): Average of both matrices
         """
-        new_matrix = np.average([matrix.vals, other_matrix.vals], axis=0)
-        return Matrix.from_array(new_matrix)
+        return Matrix.from_array(np.average([matrix.vals, other_matrix.vals], axis=0))
 
     @staticmethod
     def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: list[float]) -> Matrix:
@@ -283,5 +217,4 @@ class Matrix:
         Parameters:
             shift (float): Factor to shift values by
         """
-        _mult_array = rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)
-        self._vals = _mult_array
+        self.vals *= rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)

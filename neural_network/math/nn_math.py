@@ -19,8 +19,8 @@ def feedforward_through_layer(
     Returns:
         output_vals (Matrix): Output values
     """
-    output_vals = Matrix.multiply(weights, input_vals)
-    output_vals = Matrix.add(output_vals, bias)
+    output_vals = weights @ input_vals
+    output_vals = output_vals + bias
     return Matrix.map(output_vals, activation)
 
 
@@ -38,8 +38,7 @@ def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: Activatio
         gradient (Matrix): Gradient values
     """
     gradient = Matrix.from_array(np.vectorize(activation.derivative)(layer_vals.vals))
-    gradient = Matrix.multiply_element_wise(gradient, errors)
-    return Matrix.multiply(gradient, lr)
+    return gradient * errors * lr
 
 
 def calculate_delta(layer_vals: Matrix, gradients: Matrix) -> Matrix:
@@ -53,8 +52,7 @@ def calculate_delta(layer_vals: Matrix, gradients: Matrix) -> Matrix:
     Returns:
         delta (Matrix): Delta factors
     """
-    incoming_transposed = Matrix.transpose(layer_vals)
-    return Matrix.multiply(gradients, incoming_transposed)
+    return gradients @ Matrix.transpose(layer_vals)
 
 
 def calculate_error_from_expected(expected_outputs: Matrix, actual_outputs: Matrix) -> Matrix:
@@ -68,7 +66,7 @@ def calculate_error_from_expected(expected_outputs: Matrix, actual_outputs: Matr
     Returns:
         errors (Matrix): Difference between expected and actual outputs
     """
-    return Matrix.subtract(expected_outputs, actual_outputs)
+    return expected_outputs - actual_outputs
 
 
 def calculate_next_errors(weights: Matrix, calculated_errors: Matrix) -> Matrix:
@@ -82,5 +80,4 @@ def calculate_next_errors(weights: Matrix, calculated_errors: Matrix) -> Matrix:
     Returns:
         errors (Matrix): Next errors
     """
-    weights_t = Matrix.transpose(weights)
-    return Matrix.multiply(weights_t, calculated_errors)
+    return Matrix.transpose(weights) @ calculated_errors

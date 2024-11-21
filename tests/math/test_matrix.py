@@ -7,12 +7,6 @@ rng = np.random.default_rng()
 
 
 class TestMatrix:
-    def test_given_no_vals_when_creating_matrix_then_check_matrix_has_zero_vals(
-        self, mock_len_inputs: int, mock_len_outputs: int
-    ) -> None:
-        test_matrix = Matrix(rows=mock_len_inputs, cols=mock_len_outputs)
-        assert not np.any(test_matrix.vals)
-
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
     ) -> None:
@@ -65,7 +59,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.add(matrix_1, matrix_2)
+        new_matrix = matrix_1 + matrix_2
 
         expected_vals = np.array([[0, 3], [6, -2]])
         actual_vals = new_matrix.vals
@@ -77,7 +71,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.subtract(matrix_1, matrix_2)
+        new_matrix = matrix_1 - matrix_2
 
         expected_vals = np.array([[2, 1], [2, 8]])
         actual_vals = new_matrix.vals
@@ -89,7 +83,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.multiply(matrix_1, matrix_2)
+        new_matrix = matrix_1 @ matrix_2
 
         expected_vals = np.array([[3, -9], [2, -11], [6, -18]])
         actual_vals = new_matrix.vals
@@ -101,7 +95,7 @@ class TestMatrix:
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.multiply_element_wise(matrix_1, matrix_2)
+        new_matrix = matrix_1 * matrix_2
 
         expected_vals = np.array([[-1, 2], [8, -15], [6, 8]])
         actual_vals = new_matrix.vals
@@ -112,7 +106,7 @@ class TestMatrix:
         multiplier = 3
 
         matrix = Matrix.from_array(array)
-        new_matrix = Matrix.multiply(matrix, multiplier)
+        new_matrix = matrix * multiplier
 
         expected_vals = array * multiplier
         actual_vals = new_matrix.vals
@@ -180,3 +174,5 @@ class TestMatrix:
 
         matrix_1.shift_vals(0.5)
         assert not np.all(matrix_1.vals == matrix_2.vals)
+        assert np.all(array * 0.5 <= matrix_1.vals)
+        assert np.all(matrix_1.vals <= array * 1.5)
