@@ -38,6 +38,9 @@ class NeuralNetwork:
         self._hidden_layer_sizes = [layer.size for layer in self._hidden_layers]
         self._lr = lr or 0.1
 
+    def __str__(self) -> str:
+        return "NeuralNetwork:\n" + "\n".join([str(layer) for layer in self.layers])
+
     @classmethod
     def from_file(cls, filepath: str) -> NeuralNetwork:
         """
