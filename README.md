@@ -33,7 +33,7 @@ Install the required dependencies using `pip`:
 
 To install with `dev` and `test` dependencies:
 
-    pip install -e .[dev, test]
+    pip install -e .[dev,test]
 
 ## Using the Neural Network
 For a complete example of how to create and train the neural network, see `example_training.ipynb` where it is trained on binary lists.
