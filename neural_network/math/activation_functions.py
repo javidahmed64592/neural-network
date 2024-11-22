@@ -16,6 +16,9 @@ class ActivationFunction:
 
 
 class LinearActivation(ActivationFunction):
+    def __str__(self) -> str:
+        return "LinearActivation"
+
     @staticmethod
     def func(x: float) -> float:
         return x
@@ -26,6 +29,9 @@ class LinearActivation(ActivationFunction):
 
 
 class ReluActivation(ActivationFunction):
+    def __str__(self) -> str:
+        return "ReluActivation"
+
     @staticmethod
     def func(x: float) -> float:
         return max(x, 0)
@@ -36,6 +42,9 @@ class ReluActivation(ActivationFunction):
 
 
 class SigmoidActivation(ActivationFunction):
+    def __str__(self) -> str:
+        return "SigmoidActivation"
+
     @staticmethod
     def func(x: float) -> float:
         try:

@@ -41,6 +41,9 @@ class Layer:
         self._weights: Matrix = None
         self._bias: Matrix = None
 
+    def __str__(self) -> str:
+        return f"Size: {self.size} \t| Activation: {self._activation} \tWeights: {self.weights} | Bias: {self.bias}"
+
     @property
     def size(self) -> int:
         return self._size
@@ -147,6 +150,9 @@ class InputLayer(Layer):
         """
         super().__init__(size, activation, [1, 1], [0, 0])
 
+    def __str__(self) -> str:
+        return f"Input \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
+
     @property
     def num_inputs(self) -> int:
         return 1
@@ -189,6 +195,9 @@ class HiddenLayer(Layer):
         """
         super().__init__(size, activation, weights_range, bias_range)
 
+    def __str__(self) -> str:
+        return f"Hidden \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
+
 
 class OutputLayer(Layer):
     """
@@ -212,3 +221,6 @@ class OutputLayer(Layer):
             bias_range (tuple[float, float]): Range for OutputLayer bias
         """
         super().__init__(size, activation, weights_range, bias_range)
+
+    def __str__(self) -> str:
+        return f"Output \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
