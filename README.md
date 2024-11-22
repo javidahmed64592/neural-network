@@ -44,7 +44,7 @@ The neural network can be created in the following way:
 ```
 from neural_network.math.activation_functions import LinearActivation, SigmoidActivation
 from neural_network.neural_network import NeuralNetwork
-from neural_network.nn.layer import HiddenLayer, InputLayer, OutputLayer
+from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 
 
 input_layer = InputLayer(size=num_inputs, activation=LinearActivation)
