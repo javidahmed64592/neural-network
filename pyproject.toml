@@ -35,7 +35,7 @@ test = [
 ]
 
 [project.urls]
-repository = "https://https://github.com/javidahmed64592/neural-network"
+repository = "https://github.com/javidahmed64592/neural-network"
 
 [tool.pytest.ini_options]
 addopts = [
