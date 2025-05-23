@@ -14,7 +14,7 @@ def feedforward_through_layer(
         input_vals (Matrix): Values to feedforward through layer
         weights (Matrix): Layer weights
         bias (Matrix): Layer bias
-        activation (ActivationFunction): Layer activation function
+        activation (type[ActivationFunction]): Layer activation function
 
     Returns:
         output_vals (Matrix): Output values
@@ -31,7 +31,7 @@ def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: type[Acti
     Parameters:
         layer_vals (Matrix): Layer values from feedforward
         errors (Matrix): Errors from feedforward
-        activation (ActivationFunction): Layer activation function
+        activation (type[ActivationFunction]): Layer activation function
         lr (float): Learning rate
 
     Returns:

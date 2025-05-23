@@ -117,7 +117,7 @@ class Matrix:
 
         Parameters:
             matrix (Matrix): Matrix to map
-            activation (ActivationFunction): Activation function to use for mapping
+            activation (type[ActivationFunction]): Activation function to use for mapping
 
         Returns:
             new_matrix (Matrix): Matrix with mapped values
