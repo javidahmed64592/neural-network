@@ -40,7 +40,7 @@ class TestNeuralNetwork:
         mock_input_layer: InputLayer,
         mock_output_layer: OutputLayer,
         mock_len_outputs: int,
-        mock_activation: ActivationFunction,
+        mock_activation: type[ActivationFunction],
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
@@ -84,7 +84,7 @@ class TestNeuralNetwork:
         mock_input_layer: InputLayer,
         mock_output_layer: OutputLayer,
         mock_len_outputs: int,
-        mock_activation: ActivationFunction,
+        mock_activation: type[ActivationFunction],
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
