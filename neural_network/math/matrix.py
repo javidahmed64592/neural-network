@@ -139,14 +139,14 @@ class Matrix:
         return Matrix.from_array(np.average([matrix.vals, other_matrix.vals], axis=0))
 
     @staticmethod
-    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: list[float]) -> Matrix:
+    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: tuple[float, float]) -> Matrix:
         """
         Mutate Matrix with a mutation rate.
 
         Parameters:
             matrix (Matrix): Matrix to use for average
             mutation_rate (float): Probability for mutation
-            random_range (list[float]): Range for random number
+            random_range (tuple[float, float]): Range for random number
 
         Returns:
             new_matrix (Matrix): Mutated Matrix

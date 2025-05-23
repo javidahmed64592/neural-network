@@ -182,4 +182,4 @@ class NeuralNetwork:
             new_weights.append(new_weight)
             new_biases.append(new_bias)
 
-        return [new_weights, new_biases]
+        return (new_weights, new_biases)
