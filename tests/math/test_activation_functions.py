@@ -1,6 +1,25 @@
 import numpy as np
 
-from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation
+from neural_network.math.activation_functions import (
+    ActivationFunction,
+    LinearActivation,
+    ReluActivation,
+    SigmoidActivation,
+)
+
+
+class TestActivationFunction:
+    def test_given_x_when_calculating_y_then_check_calculated_correctly(self) -> None:
+        x = 5
+        expected_y = x
+        actual_y = ActivationFunction.func(x)
+        assert actual_y == expected_y
+
+    def test_given_x_when_calculating_derivative_then_check_calculated_correctly(self) -> None:
+        x = 5
+        expected_y = 1
+        actual_y = ActivationFunction.derivative(x)
+        assert actual_y == expected_y
 
 
 class TestLinearActivation:
