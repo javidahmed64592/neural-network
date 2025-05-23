@@ -106,6 +106,7 @@ select = [
     "YTT",
 ]
 ignore = [
+    "PLR0913",
     "S101"
 ]
 
