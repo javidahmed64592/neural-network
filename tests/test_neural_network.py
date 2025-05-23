@@ -1,3 +1,5 @@
+import numpy as np
+
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.neural_network import NeuralNetwork
@@ -19,6 +21,23 @@ class TestNeuralNetwork:
         expected_sizes = [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
         for index, layer in enumerate(mock_nn.layers):
             assert layer.size == expected_sizes[index]
+
+    def test_given_nn_when_mutating_then_check_nn_has_correct_layers(self, mock_nn: NeuralNetwork) -> None:
+        original_sizes = [layer.size for layer in mock_nn.layers]
+        original_weights_vals = [w.vals.copy() for w in mock_nn.weights]
+        original_biases_vals = [b.vals.copy() for b in mock_nn.bias]
+
+        mock_nn.mutate(0.5)
+
+        new_sizes = [layer.size for layer in mock_nn.layers]
+        assert new_sizes == original_sizes
+
+        assert np.array_equal(mock_nn.weights[0].vals, original_weights_vals[0])
+        assert np.array_equal(mock_nn.bias[0].vals, original_biases_vals[0])
+
+        for i in range(1, len(mock_nn.layers)):
+            assert not np.array_equal(mock_nn.weights[i].vals, original_weights_vals[i])
+            assert not np.array_equal(mock_nn.bias[i].vals, original_biases_vals[i])
 
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
