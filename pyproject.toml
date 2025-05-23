@@ -25,11 +25,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
     "ipykernel",
-]
-
-test = [
+    "ruff",
+    "mypy",
     "pytest",
     "pytest-cov",
 ]
@@ -39,7 +37,7 @@ repository = "https://https://github.com/javidahmed64592/neural-network"
 
 [tool.pytest.ini_options]
 addopts = [
-    "-vx",
+    "-vv",
     "--cov",
     "--cov-report",
     "term-missing",
@@ -78,9 +76,9 @@ exclude = [
     "venv",
 ]
 
-
 [tool.ruff.lint]
 select = [
+    "A",
     "ANN",
     "ASYNC",
     "B",
@@ -97,15 +95,19 @@ select = [
     "NPY",
     "PD",
     "PERF",
+    "PL",
     "PT",
     "RET",
     "RUF",
+    "S",
     "TRY",
     "UP",
     "W",
     "YTT",
 ]
-ignore = ["ANN101", "ANN102", "E501","E741","ISC001","N999"]
+ignore = [
+    "S101"
+]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -119,3 +121,20 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.mypy]
+warn_unused_configs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "neural_network.*",
+    "numpy.*",
+]
+ignore_missing_imports = true
