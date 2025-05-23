@@ -7,18 +7,18 @@ from neural_network.neural_network import NeuralNetwork
 
 
 @pytest.fixture
-def mock_activation() -> LinearActivation:
+def mock_activation() -> type[LinearActivation]:
     return LinearActivation
 
 
 @pytest.fixture
 def mock_weights_range() -> tuple[float, float]:
-    return [-1.0, 1.0]
+    return (-1.0, 1.0)
 
 
 @pytest.fixture
 def mock_bias_range() -> tuple[float, float]:
-    return [-1.0, 1.0]
+    return (-1.0, 1.0)
 
 
 @pytest.fixture
@@ -109,7 +109,7 @@ def mock_output_layer(
 
 
 @pytest.fixture
-def mock_input_matrix(mock_inputs: int) -> Matrix:
+def mock_input_matrix(mock_inputs: list[float]) -> Matrix:
     return Matrix.from_array(mock_inputs)
 
 
