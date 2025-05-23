@@ -113,7 +113,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(
-        self, mock_activation: ActivationFunction
+        self, mock_activation: type[ActivationFunction]
     ) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 

@@ -17,7 +17,7 @@ class Layer:
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
@@ -30,16 +30,15 @@ class Layer:
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
         """
-        self._prev_layer: Layer = None
-        self._next_layer: Layer = None
+        self._prev_layer: Layer | None = None
+        self._next_layer: Layer | None = None
+        self._weights: Matrix | None = None
+        self._bias: Matrix | None = None
 
         self._size = size
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
-
-        self._weights: Matrix = None
-        self._bias: Matrix = None
 
     def __str__(self) -> str:
         return f"Size: {self.size} \t| Activation: {self._activation} \tWeights: {self.weights} | Bias: {self.bias}"
@@ -50,6 +49,9 @@ class Layer:
 
     @property
     def num_inputs(self) -> int:
+        if self._prev_layer is None:
+            msg = "Previous layer is not set."
+            raise ValueError(msg)
         return self._prev_layer.size
 
     @property
@@ -139,7 +141,7 @@ class InputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
     ) -> None:
         """
         Initialise InputLayer object with number of nodes and activation function.
@@ -148,7 +150,7 @@ class InputLayer(Layer):
             size (int): Size of InputLayer
             activation (ActivationFunction): InputLayer activation function
         """
-        super().__init__(size, activation, [1, 1], [0, 0])
+        super().__init__(size, activation, (1.0, 1.0), (0.0, 0.0))
 
     def __str__(self) -> str:
         return f"Input \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
@@ -180,7 +182,7 @@ class HiddenLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
@@ -207,7 +209,7 @@ class OutputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:

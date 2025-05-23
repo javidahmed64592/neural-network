@@ -5,7 +5,7 @@ from neural_network.neural_network import NeuralNetwork
 
 def make_hidden_layer(
     size: int,
-    activation: ActivationFunction,
+    activation: type[ActivationFunction],
     weights_range: tuple[float, float],
     bias_range: tuple[float, float],
 ) -> HiddenLayer:

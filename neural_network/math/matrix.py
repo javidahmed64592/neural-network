@@ -111,7 +111,7 @@ class Matrix:
         return Matrix.from_array(matrix.vals.transpose())
 
     @staticmethod
-    def map(matrix: Matrix, activation: ActivationFunction) -> Matrix:
+    def map(matrix: Matrix, activation: type[ActivationFunction]) -> Matrix:
         """
         Map all values of Matrix through specified function.
 

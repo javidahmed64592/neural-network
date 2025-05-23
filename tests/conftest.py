@@ -47,14 +47,14 @@ def mock_len_outputs(mock_outputs: list[float]) -> int:
 
 
 @pytest.fixture
-def mock_input_layer(mock_len_inputs: int, mock_activation: LinearActivation) -> InputLayer:
+def mock_input_layer(mock_len_inputs: int, mock_activation: type[LinearActivation]) -> InputLayer:
     return InputLayer(mock_len_inputs, mock_activation)
 
 
 @pytest.fixture
 def mock_hidden_layer_1(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_input_layer: InputLayer,
@@ -67,7 +67,7 @@ def mock_hidden_layer_1(
 @pytest.fixture
 def mock_hidden_layer_2(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_1: HiddenLayer,
@@ -80,7 +80,7 @@ def mock_hidden_layer_2(
 @pytest.fixture
 def mock_hidden_layer_3(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_2: HiddenLayer,
@@ -93,7 +93,7 @@ def mock_hidden_layer_3(
 @pytest.fixture
 def mock_output_layer(
     mock_len_outputs: int,
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_3: HiddenLayer,
