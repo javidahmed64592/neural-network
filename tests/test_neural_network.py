@@ -63,7 +63,7 @@ class TestNeuralNetwork:
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
-        mock_nn_1 = NeuralNetwork(
+        mock_nn_1 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
                 *[
@@ -74,7 +74,7 @@ class TestNeuralNetwork:
                 mock_output_layer,
             ]
         )
-        mock_nn_2 = NeuralNetwork(
+        mock_nn_2 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
                 *[
@@ -107,7 +107,7 @@ class TestNeuralNetwork:
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
-        mock_nn_1 = NeuralNetwork(
+        mock_nn_1 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
                 *[
@@ -118,7 +118,7 @@ class TestNeuralNetwork:
                 mock_output_layer,
             ]
         )
-        mock_nn_2 = NeuralNetwork(
+        mock_nn_2 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
                 *[
@@ -129,7 +129,7 @@ class TestNeuralNetwork:
                 mock_output_layer,
             ]
         )
-        mock_nn_3 = NeuralNetwork(
+        mock_nn_3 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
                 *[

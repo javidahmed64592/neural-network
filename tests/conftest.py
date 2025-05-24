@@ -116,6 +116,6 @@ def mock_nn(
     mock_hidden_layer_3: HiddenLayer,
     mock_output_layer: OutputLayer,
 ) -> NeuralNetwork:
-    return NeuralNetwork(
+    return NeuralNetwork.from_layers(
         layers=[mock_input_layer, mock_hidden_layer_1, mock_hidden_layer_2, mock_hidden_layer_3, mock_output_layer]
     )

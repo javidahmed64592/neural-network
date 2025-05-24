@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-
-import numpy as np
+from typing import cast
 
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
+from neural_network.math.activation_functions import LinearActivation, SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 
@@ -17,8 +17,10 @@ class NeuralNetwork:
 
     def __init__(
         self,
-        layers: list[Layer],
-        lr: float | None = None,
+        input_layer: InputLayer,
+        output_layer: OutputLayer,
+        hidden_layers: list[HiddenLayer] | None = None,
+        lr: float = 0.1,
     ) -> None:
         """
         Initialise NeuralNetwork with a list of Layers and a learning rate.
@@ -27,19 +29,33 @@ class NeuralNetwork:
             layers (list[Layer]): NeuralNetwork layers
             lr (float): Learning rate for training, defaults to 0.1
         """
-        self._input_layer: InputLayer = layers[0]
-        self._hidden_layers: list[HiddenLayer] = layers[1:-1]
-        self._output_layer: OutputLayer = layers[-1]
+        self._input_layer = input_layer
+        self._output_layer = output_layer
+        self._hidden_layers = hidden_layers or []
         for index in range(1, len(self.layers)):
             self.layers[index].set_prev_layer(self.layers[index - 1])
 
         self._num_inputs = self._input_layer.size
         self._num_outputs = self._output_layer.size
         self._hidden_layer_sizes = [layer.size for layer in self._hidden_layers]
-        self._lr = lr or 0.1
+        self._lr = lr
 
     def __str__(self) -> str:
         return "NeuralNetwork:\n" + "\n".join([str(layer) for layer in self.layers])
+
+    @classmethod
+    def from_layers(cls, layers: list[InputLayer | HiddenLayer | OutputLayer], lr: float = 0.1) -> NeuralNetwork:
+        """
+        Create a NeuralNetwork from a list of layers.
+
+        Parameters:
+            layers (list[InputLayer | HiddenLayer | OutputLayer]): NeuralNetwork layers
+        """
+        input_layer = cast(InputLayer, layers[0])
+        output_layer = cast(OutputLayer, layers[-1])
+        hidden_layers = cast(list[HiddenLayer], layers[1:-1])
+
+        return cls(input_layer=input_layer, output_layer=output_layer, hidden_layers=hidden_layers, lr=lr)
 
     @classmethod
     def from_file(cls, filepath: str) -> NeuralNetwork:
@@ -51,7 +67,17 @@ class NeuralNetwork:
         """
         with open(filepath) as file:
             _data = json.load(file)
-        nn = cls(_data["num_inputs"], _data["num_outputs"], _data["hidden_layer_sizes"])
+
+        input_layer = InputLayer(size=_data["num_inputs"], activation=LinearActivation)
+        output_layer = OutputLayer(
+            size=_data["num_outputs"], activation=SigmoidActivation, weights_range=(-1, 1), bias_range=(-1, 1)
+        )
+        hidden_layers = [
+            HiddenLayer(size=size, activation=SigmoidActivation, weights_range=(-1, 1), bias_range=(-1, 1))
+            for size in _data["hidden_layer_sizes"]
+        ]
+
+        nn = cls(input_layer, output_layer, hidden_layers)
         nn.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
         nn.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
         return nn
@@ -61,12 +87,8 @@ class NeuralNetwork:
         return [self._input_layer, *self._hidden_layers, self._output_layer]
 
     @property
-    def layers_reversed(self) -> list[Layer]:
-        return self.layers[::-1]
-
-    @property
     def weights(self) -> list[Matrix]:
-        return np.array([layer.weights for layer in self.layers])
+        return [layer.weights for layer in self.layers]
 
     @weights.setter
     def weights(self, new_weights: list[Matrix]) -> None:
@@ -75,7 +97,7 @@ class NeuralNetwork:
 
     @property
     def bias(self) -> list[Matrix]:
-        return np.array([layer.bias for layer in self.layers])
+        return [layer.bias for layer in self.layers]
 
     @bias.setter
     def bias(self, new_bias: list[Matrix]) -> None:
@@ -150,8 +172,9 @@ class NeuralNetwork:
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
-            errors = calculate_next_errors(layer._next_layer.weights, errors)
-            layer.backpropagate_error(errors, self._lr)
+            if layer._next_layer is not None:
+                errors = calculate_next_errors(layer._next_layer.weights, errors)
+                layer.backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
 
