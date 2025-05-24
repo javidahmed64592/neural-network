@@ -77,7 +77,7 @@ jobs:
         run: |
           echo "Checking if versions in __init__.py and pyproject.toml match..."
           INIT_VERSION=$(python -c "import neural_network; print(neural_network.__version__)")
-          TOML_VERSION=$(python -c "import tomli; print(tomli.loads(open('pyproject.toml', 'rb').read())['project']['version'])")
+          TOML_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
           echo "Version in __init__.py: $INIT_VERSION"
           echo "Version in pyproject.toml: $TOML_VERSION"
           if [ "$INIT_VERSION" != "$TOML_VERSION" ]; then
