@@ -8,15 +8,11 @@ This is a neural network library in Python which can be used to feedforward arra
 
 Install this package using `pip`:
 
-```
-pip install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
-```
+    pip install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 
 To update the package:
 
-```
-pip update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
-```
+    pip update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 
 _Note: It is recommended to install this into a virtual environment._
 
