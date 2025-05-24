@@ -50,8 +50,7 @@ class Layer:
     @property
     def num_inputs(self) -> int:
         if self._prev_layer is None:
-            msg = "Previous layer is not set."
-            raise ValueError(msg)
+            return 1
         return self._prev_layer.size
 
     @property
@@ -154,10 +153,6 @@ class InputLayer(Layer):
 
     def __str__(self) -> str:
         return f"Input \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
-
-    @property
-    def num_inputs(self) -> int:
-        return 1
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
