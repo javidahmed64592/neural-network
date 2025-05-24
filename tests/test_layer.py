@@ -1,4 +1,7 @@
+import numpy as np
+
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
+from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
 
 
@@ -36,6 +39,23 @@ class TestLayer:
         weight_range = mock_hidden_layer_1._weights_range
         assert weight_range[0] <= random_weight <= weight_range[1]
 
+    def test_given_layers_when_setting_previous_layer_then_check_previous_layer_is_set(self) -> None:
+        input_layer = InputLayer(3, ActivationFunction)
+        hidden_layer = HiddenLayer(4, ActivationFunction, (0.0, 1.0), (0.0, 1.0))
+        hidden_layer.set_prev_layer(input_layer)
+        assert hidden_layer._prev_layer == input_layer
+
+    def test_given_layer_when_mutating_then_check_weights_and_biases_are_mutated(
+        self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int]
+    ) -> None:
+        original_weights = mock_hidden_layer_1.weights.vals.copy()
+        original_bias = mock_hidden_layer_1.bias.vals.copy()
+
+        mock_hidden_layer_1.mutate(0.5)
+
+        assert not np.array_equal(mock_hidden_layer_1.weights.vals, original_weights)
+        assert not np.array_equal(mock_hidden_layer_1.bias.vals, original_bias)
+
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int], mock_input_matrix: Matrix
     ) -> None:
@@ -44,3 +64,18 @@ class TestLayer:
         expected_output_shape = (mock_len_hidden[0], 1)
         actual_output_shape = output.shape
         assert actual_output_shape == expected_output_shape
+
+    def test_given_errors_when_backpropagating_then_check_weights_and_biases_are_updated(
+        self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int], mock_input_matrix: Matrix
+    ) -> None:
+        original_weights = mock_hidden_layer_1.weights.vals.copy()
+        original_bias = mock_hidden_layer_1.bias.vals.copy()
+
+        mock_hidden_layer_1.feedforward(mock_input_matrix)
+
+        errors = Matrix.random_matrix(mock_len_hidden[0], 1, -1, 1)
+        learning_rate = 0.1
+        mock_hidden_layer_1.backpropagate_error(errors, learning_rate)
+
+        assert not np.array_equal(mock_hidden_layer_1.weights.vals, original_weights)
+        assert not np.array_equal(mock_hidden_layer_1.bias.vals, original_bias)

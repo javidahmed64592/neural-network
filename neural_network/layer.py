@@ -100,21 +100,6 @@ class Layer:
         self.weights.shift_vals(shift_vals)
         self.bias.shift_vals(shift_vals)
 
-    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
-        """
-        Backpropagate errors during training.
-
-        Parameters:
-            errors (Matrix): Errors from next Layer
-            learning_rate (float): Learning rate
-        """
-        gradient = nn_math.calculate_gradient(
-            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
-        )
-        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
-        self.weights = self.weights + delta
-        self.bias = self.bias + gradient
-
     def feedforward(self, vals: Matrix) -> Matrix:
         """
         Feedforward values through Layer.
@@ -131,6 +116,21 @@ class Layer:
         self._layer_input = vals
         self._layer_output = output
         return output
+
+    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
+        """
+        Backpropagate errors during training.
+
+        Parameters:
+            errors (Matrix): Errors from next Layer
+            learning_rate (float): Learning rate
+        """
+        gradient = nn_math.calculate_gradient(
+            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
+        )
+        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
+        self.weights = self.weights + delta
+        self.bias = self.bias + gradient
 
 
 class InputLayer(Layer):
