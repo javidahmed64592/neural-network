@@ -11,7 +11,7 @@ class TestNNMath:
         mock_len_hidden: list[int],
         mock_weights_range: list[float],
         mock_bias_range: list[float],
-        mock_activation: LinearActivation,
+        mock_activation: type[LinearActivation],
     ) -> None:
         weights_ih = Matrix.random_matrix(
             rows=mock_len_hidden[0], cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
@@ -27,7 +27,7 @@ class TestNNMath:
         assert actual_shape == expected_shape
 
     def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(
-        self, mock_input_matrix: Matrix, mock_activation: LinearActivation
+        self, mock_input_matrix: Matrix, mock_activation: type[LinearActivation]
     ) -> None:
         errors = Matrix.from_array([0.0, 1.0, 0.5])
         lr = 0.1

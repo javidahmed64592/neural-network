@@ -25,6 +25,7 @@ _Note: It is recommended to install this into a virtual environment._
   - [Neuroevolution](#neuroevolution)
 - [Testing](#testing)
 - [Linting and Formatting](#linting-and-formatting)
+- [Type Checking](#type-checking)
 
 ## Installing Dependencies
 Install the required dependencies using `pip`:
@@ -54,7 +55,7 @@ hidden_layers = [
 ]
 output_layer = OutputLayer(size=num_outputs, activation=SigmoidActivation, weights_range=[-1, 1], bias_range=[-1, 1])
 
-nn = NeuralNetwork(layers=[input_layer, *hidden_layers, output_layer])
+nn = NeuralNetwork.from_layers(layers=[input_layer, *hidden_layers, output_layer])
 ```
 
 where
@@ -94,9 +95,9 @@ nn = NeuralNetwork.from_file("/path/to/nn_model.json")
 New weights and biases can also be calculated via crossover:
 
 ```
-nn_1 = NeuralNetwork(num_inputs, num_outputs, [i])
-nn_2 = NeuralNetwork(num_inputs, num_outputs, [j])
-nn_3 = NeuralNetwork(num_inputs, num_outputs, [k])
+nn_1 = NeuralNetwork(...)
+nn_2 = NeuralNetwork(...)
+nn_3 = NeuralNetwork(...)
 
 nn_1.weights, nn_1.bias = nn_1.crossover(nn_2, nn_3, mutation_rate)
 ```
@@ -123,3 +124,11 @@ To check the code for linting errors:
 To format the code:
 
     python -m ruff format .
+
+## Type Checking
+This library uses `mypy` for static type checking.
+This is configured in `pyproject.toml`.
+
+To check the code for type check errors:
+
+    python -m mypy .

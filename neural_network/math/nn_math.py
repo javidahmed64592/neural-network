@@ -5,7 +5,7 @@ from neural_network.math.matrix import Matrix
 
 
 def feedforward_through_layer(
-    input_vals: Matrix, weights: Matrix, bias: Matrix, activation: ActivationFunction
+    input_vals: Matrix, weights: Matrix, bias: Matrix, activation: type[ActivationFunction]
 ) -> Matrix:
     """
     Feedforward layer to next layer.
@@ -14,7 +14,7 @@ def feedforward_through_layer(
         input_vals (Matrix): Values to feedforward through layer
         weights (Matrix): Layer weights
         bias (Matrix): Layer bias
-        activation (ActivationFunction): Layer activation function
+        activation (type[ActivationFunction]): Layer activation function
 
     Returns:
         output_vals (Matrix): Output values
@@ -24,14 +24,14 @@ def feedforward_through_layer(
     return Matrix.map(output_vals, activation)
 
 
-def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: ActivationFunction, lr: float) -> Matrix:
+def calculate_gradient(layer_vals: Matrix, errors: Matrix, activation: type[ActivationFunction], lr: float) -> Matrix:
     """
     Calculate gradient for gradient descent.
 
     Parameters:
         layer_vals (Matrix): Layer values from feedforward
         errors (Matrix): Errors from feedforward
-        activation (ActivationFunction): Layer activation function
+        activation (type[ActivationFunction]): Layer activation function
         lr (float): Learning rate
 
     Returns:

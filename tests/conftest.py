@@ -7,18 +7,18 @@ from neural_network.neural_network import NeuralNetwork
 
 
 @pytest.fixture
-def mock_activation() -> LinearActivation:
+def mock_activation() -> type[LinearActivation]:
     return LinearActivation
 
 
 @pytest.fixture
 def mock_weights_range() -> tuple[float, float]:
-    return [-1.0, 1.0]
+    return (-1.0, 1.0)
 
 
 @pytest.fixture
 def mock_bias_range() -> tuple[float, float]:
-    return [-1.0, 1.0]
+    return (-1.0, 1.0)
 
 
 @pytest.fixture
@@ -47,19 +47,14 @@ def mock_len_outputs(mock_outputs: list[float]) -> int:
 
 
 @pytest.fixture
-def mock_layer_sizes(mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int) -> list[int]:
-    return [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
-
-
-@pytest.fixture
-def mock_input_layer(mock_len_inputs: int, mock_activation: LinearActivation) -> InputLayer:
+def mock_input_layer(mock_len_inputs: int, mock_activation: type[LinearActivation]) -> InputLayer:
     return InputLayer(mock_len_inputs, mock_activation)
 
 
 @pytest.fixture
 def mock_hidden_layer_1(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_input_layer: InputLayer,
@@ -72,7 +67,7 @@ def mock_hidden_layer_1(
 @pytest.fixture
 def mock_hidden_layer_2(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_1: HiddenLayer,
@@ -85,7 +80,7 @@ def mock_hidden_layer_2(
 @pytest.fixture
 def mock_hidden_layer_3(
     mock_len_hidden: list[int],
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_2: HiddenLayer,
@@ -98,7 +93,7 @@ def mock_hidden_layer_3(
 @pytest.fixture
 def mock_output_layer(
     mock_len_outputs: int,
-    mock_activation: LinearActivation,
+    mock_activation: type[LinearActivation],
     mock_weights_range: tuple[float, float],
     mock_bias_range: tuple[float, float],
     mock_hidden_layer_3: HiddenLayer,
@@ -109,7 +104,7 @@ def mock_output_layer(
 
 
 @pytest.fixture
-def mock_input_matrix(mock_inputs: int) -> Matrix:
+def mock_input_matrix(mock_inputs: list[float]) -> Matrix:
     return Matrix.from_array(mock_inputs)
 
 
@@ -121,6 +116,6 @@ def mock_nn(
     mock_hidden_layer_3: HiddenLayer,
     mock_output_layer: OutputLayer,
 ) -> NeuralNetwork:
-    return NeuralNetwork(
+    return NeuralNetwork.from_layers(
         layers=[mock_input_layer, mock_hidden_layer_1, mock_hidden_layer_2, mock_hidden_layer_3, mock_output_layer]
     )

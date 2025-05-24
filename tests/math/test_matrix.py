@@ -113,7 +113,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(
-        self, mock_activation: ActivationFunction
+        self, mock_activation: type[ActivationFunction]
     ) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 
@@ -141,7 +141,7 @@ class TestMatrix:
     def test_given_matrix_when_mutating_then_check_new_matrix_with_same_shape_returned(self) -> None:
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         mutation_rate = 0.5
-        random_range = [1.0, 4.0]
+        random_range = (1.0, 4.0)
 
         matrix_1 = Matrix.from_array(array_1)
         new_matrix = Matrix.mutated_matrix(matrix_1, mutation_rate, random_range)

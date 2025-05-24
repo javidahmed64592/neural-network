@@ -17,7 +17,7 @@ class Layer:
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
@@ -26,20 +26,19 @@ class Layer:
 
         Parameters:
             size (int): Size of Layer
-            activation (ActivationFunction): Layer activation function
+            activation (type[ActivationFunction]): Layer activation function
             weights_range (tuple[float, float]): Range for Layer weights
             bias_range (tuple[float, float]): Range for Layer bias
         """
-        self._prev_layer: Layer = None
-        self._next_layer: Layer = None
+        self._prev_layer: Layer | None = None
+        self._next_layer: Layer | None = None
+        self._weights: Matrix | None = None
+        self._bias: Matrix | None = None
 
         self._size = size
         self._activation = activation
         self._weights_range = weights_range
         self._bias_range = bias_range
-
-        self._weights: Matrix = None
-        self._bias: Matrix = None
 
     def __str__(self) -> str:
         return f"Size: {self.size} \t| Activation: {self._activation} \tWeights: {self.weights} | Bias: {self.bias}"
@@ -50,6 +49,8 @@ class Layer:
 
     @property
     def num_inputs(self) -> int:
+        if self._prev_layer is None:
+            return 1
         return self._prev_layer.size
 
     @property
@@ -98,21 +99,6 @@ class Layer:
         self.weights.shift_vals(shift_vals)
         self.bias.shift_vals(shift_vals)
 
-    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
-        """
-        Backpropagate errors during training.
-
-        Parameters:
-            errors (Matrix): Errors from next Layer
-            learning_rate (float): Learning rate
-        """
-        gradient = nn_math.calculate_gradient(
-            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
-        )
-        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
-        self.weights = self.weights + delta
-        self.bias = self.bias + gradient
-
     def feedforward(self, vals: Matrix) -> Matrix:
         """
         Feedforward values through Layer.
@@ -130,6 +116,21 @@ class Layer:
         self._layer_output = output
         return output
 
+    def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
+        """
+        Backpropagate errors during training.
+
+        Parameters:
+            errors (Matrix): Errors from next Layer
+            learning_rate (float): Learning rate
+        """
+        gradient = nn_math.calculate_gradient(
+            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
+        )
+        delta = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
+        self.weights = self.weights + delta
+        self.bias = self.bias + gradient
+
 
 class InputLayer(Layer):
     """
@@ -139,23 +140,19 @@ class InputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
     ) -> None:
         """
         Initialise InputLayer object with number of nodes and activation function.
 
         Parameters:
             size (int): Size of InputLayer
-            activation (ActivationFunction): InputLayer activation function
+            activation (type[ActivationFunction]): InputLayer activation function
         """
-        super().__init__(size, activation, [1, 1], [0, 0])
+        super().__init__(size, activation, (1.0, 1.0), (0.0, 0.0))
 
     def __str__(self) -> str:
         return f"Input \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
-
-    @property
-    def num_inputs(self) -> int:
-        return 1
 
     def feedforward(self, vals: Matrix) -> Matrix:
         """
@@ -180,7 +177,7 @@ class HiddenLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
@@ -189,7 +186,7 @@ class HiddenLayer(Layer):
 
         Parameters:
             size (int): Size of HiddenLayer
-            activation (ActivationFunction): HiddenLayer activation function
+            activation (type[ActivationFunction]): HiddenLayer activation function
             weights_range (tuple[float, float]): Range for HiddenLayer weights
             bias_range (tuple[float, float]): Range for HiddenLayer bias
         """
@@ -207,7 +204,7 @@ class OutputLayer(Layer):
     def __init__(
         self,
         size: int,
-        activation: ActivationFunction,
+        activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
@@ -216,7 +213,7 @@ class OutputLayer(Layer):
 
         Parameters:
             size (int): Size of OutputLayer
-            activation (ActivationFunction): OutputLayer activation function
+            activation (type[ActivationFunction]): OutputLayer activation function
             weights_range (tuple[float, float]): Range for OutputLayer weights
             bias_range (tuple[float, float]): Range for OutputLayer bias
         """

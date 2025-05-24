@@ -8,11 +8,11 @@ class ActivationFunction:
 
     @staticmethod
     def func(x: float) -> float:
-        pass
+        return x
 
     @staticmethod
     def derivative(x: float) -> float:
-        pass
+        return 1
 
 
 class LinearActivation(ActivationFunction):
@@ -47,11 +47,7 @@ class SigmoidActivation(ActivationFunction):
 
     @staticmethod
     def func(x: float) -> float:
-        try:
-            y = 1 / (1 + np.exp(-x))
-        except RuntimeWarning:
-            return 1.0
-        return y
+        return float(1 / (1 + np.exp(-x)))
 
     @staticmethod
     def derivative(x: float) -> float:
