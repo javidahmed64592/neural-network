@@ -66,10 +66,6 @@ class Layer:
         self._weights = new_weights
 
     @property
-    def random_weight(self) -> float:
-        return rng.uniform(low=self._weights_range[0], high=self._weights_range[1])
-
-    @property
     def bias(self) -> Matrix:
         if not self._bias:
             self._bias = Matrix.random_column(self._size, self._bias_range[0], self._bias_range[1])
