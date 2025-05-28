@@ -209,12 +209,3 @@ class Matrix:
         )
         new_matrix = np.where(avg_matrix == 0, padded_o.vals, avg_matrix)[: out_shape[0], : out_shape[1]]
         return Matrix.from_array(new_matrix)
-
-    def shift_vals(self, shift: float) -> None:
-        """
-        Adjust Matrix values by multiplying with some percentage.
-
-        Parameters:
-            shift (float): Factor to shift values by
-        """
-        self.vals *= rng.uniform(low=(1 - shift), high=(1 + shift), size=self.shape)

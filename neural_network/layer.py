@@ -89,16 +89,6 @@ class Layer:
         self._prev_layer = prev_layer
         prev_layer._next_layer = self
 
-    def mutate(self, shift_vals: float) -> None:
-        """
-        Mutate Layer weights and biases.
-
-        Parameters:
-            shift_vals (float): Factor to adjust Layer weights and biases by
-        """
-        self.weights.shift_vals(shift_vals)
-        self.bias.shift_vals(shift_vals)
-
     def feedforward(self, vals: Matrix) -> Matrix:
         """
         Feedforward values through Layer.

@@ -46,17 +46,6 @@ class TestLayer:
         hidden_layer.set_prev_layer(input_layer)
         assert hidden_layer._prev_layer == input_layer
 
-    def test_given_layer_when_mutating_then_check_weights_and_biases_are_mutated(
-        self, mock_hidden_layer_1: HiddenLayer
-    ) -> None:
-        original_weights = mock_hidden_layer_1.weights.vals.copy()
-        original_bias = mock_hidden_layer_1.bias.vals.copy()
-
-        mock_hidden_layer_1.mutate(0.5)
-
-        assert not np.array_equal(mock_hidden_layer_1.weights.vals, original_weights)
-        assert not np.array_equal(mock_hidden_layer_1.bias.vals, original_bias)
-
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int], mock_input_matrix: Matrix
     ) -> None:
