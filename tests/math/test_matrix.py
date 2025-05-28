@@ -150,29 +150,3 @@ class TestMatrix:
         actual_shape = new_matrix.shape
         assert np.all(actual_shape == expected_shape)
         assert not np.all(matrix_1.vals == new_matrix.vals)
-
-    def test_given_matrices_when_mixing_then_check_output_has_correct_shape(self) -> None:
-        array_in_1 = np.array([[1, 2], [4, 3], [2, 4]])
-        array_in_2 = np.array([[-1, 1], [2, -5], [3, 2], [3, 1]])
-        array_out = np.array([[-1, 1, 2], [2, -5, 3], [3, 2, 1]])
-
-        matrix_in_1 = Matrix.from_array(array_in_1)
-        matrix_in_2 = Matrix.from_array(array_in_2)
-        matrix_out = Matrix.from_array(array_out)
-
-        new_matrix = Matrix.mix_matrices(matrix_in_1, matrix_in_2, matrix_out)
-
-        assert np.all(new_matrix.shape == matrix_out.shape)
-
-    def test_given_matrix_when_shifting_vals_then_check_vals_are_different(self) -> None:
-        array = np.array([[1, 2], [4, 3], [2, 4]])
-
-        matrix_1 = Matrix.from_array(array)
-        matrix_2 = Matrix.from_array(array)
-
-        assert np.all(matrix_1.vals == matrix_2.vals)
-
-        matrix_1.shift_vals(0.5)
-        assert not np.all(matrix_1.vals == matrix_2.vals)
-        assert np.all(array * 0.5 <= matrix_1.vals)
-        assert np.all(matrix_1.vals <= array * 1.5)

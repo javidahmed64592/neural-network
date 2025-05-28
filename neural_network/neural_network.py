@@ -121,16 +121,6 @@ class NeuralNetwork:
         with open(filepath, "w") as file:
             json.dump(_data, file)
 
-    def mutate(self, shift_vals: float) -> None:
-        """
-        Mutate NeuralNetwork Layers by adjusting weights and biases.
-
-        Parameters:
-            shift_vals (float): Factor to adjust Layer weights and biases by
-        """
-        for layer in self.layers[1:]:
-            layer.mutate(shift_vals)
-
     def feedforward(self, inputs: list[float]) -> list[float]:
         """
         Feedforward a list of inputs.
@@ -197,9 +187,9 @@ class NeuralNetwork:
         new_biases = []
 
         for index, layer in enumerate(self.layers[1:]):
-            new_weight = Matrix.mix_matrices(nn.weights[index], other_nn.weights[index], self.weights[index])
+            new_weight = Matrix.average_matrix(nn.weights[index], other_nn.weights[index])
             new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
-            new_bias = Matrix.mix_matrices(nn.bias[index], other_nn.bias[index], self.bias[index])
+            new_bias = Matrix.average_matrix(nn.bias[index], other_nn.bias[index])
             new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)
 
             new_weights.append(new_weight)
