@@ -99,14 +99,14 @@ class Matrix:
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
 
     @staticmethod
-    def _uniform(low: float, high: float, size: tuple[float, float] | None = None) -> NDArray:
+    def _uniform(low: float, high: float, size: tuple[int, int] | int | None = None) -> NDArray:
         """
         Create an array of random values in specified range.
 
         Parameters:
             low (float): Lower boundary for random number
             high (float): Upper boundary for random number
-            size (tuple[float, float] | None): Shape of the array to create
+            size (tuple[int, int] | int | None): Shape of the array to create
 
         Returns:
             NDArray: Array with random values
@@ -144,9 +144,7 @@ class Matrix:
     def crossover(
         matrix: Matrix,
         other_matrix: Matrix,
-        mutation_rate: float,
-        random_range: tuple[float, float],
-        crossover_func: Callable | None = None,
+        crossover_func: Callable,
     ) -> Matrix:
         """
         Crossover two Matrix objects by mixing their values.
@@ -154,23 +152,12 @@ class Matrix:
         Parameters:
             matrix (Matrix): Matrix to use for average
             other_matrix (Matrix): Other Matrix to use for average
-            mutation_rate (float): Percentage of values to be randomised
-            random_range (tuple[float, float]): Range of random values to use for mutation
-            crossover_func (Callable | None): Custom function for crossover operations.
+            crossover_func (Callable): Custom function for crossover operations.
                 Should accept (element, other_element, roll) and return a float.
 
         Returns:
             new_matrix (Matrix): New Matrix with mixed values
         """
-
-        def _default_crossover(element: float, other_element: float, roll: float) -> float:
-            if roll < mutation_rate:
-                return Matrix._uniform(low=random_range[0], high=random_range[1])
-            if roll < (0.5 + (mutation_rate / 2)):
-                return element
-            return other_element
-
-        crossover_func = crossover_func or _default_crossover
         vectorized_crossover = np.vectorize(crossover_func)
         crossover_rolls = Matrix._uniform(low=0, high=1, size=matrix.shape)
         new_matrix = vectorized_crossover(matrix.vals, other_matrix.vals, crossover_rolls)

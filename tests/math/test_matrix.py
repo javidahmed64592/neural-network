@@ -124,26 +124,6 @@ class TestMatrix:
         actual_vals = new_matrix.vals
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_has_correct_shape(
-        self, mock_weights_range: list[float]
-    ) -> None:
-        array_1 = np.array([[1, 2], [4, 3]])
-        array_2 = np.array([[-1, 1], [2, -5]])
-
-        matrix_1 = Matrix.from_array(array_1)
-        matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.crossover(
-            matrix=matrix_1,
-            other_matrix=matrix_2,
-            mutation_rate=0.5,
-            random_range=(mock_weights_range[0], mock_weights_range[1]),
-        )
-
-        expected_shape = matrix_1.shape
-        actual_shape = new_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape, strict=False):
-            assert actual == expected
-
     def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_correctly_calculated(
         self, mock_weights_range: list[float]
     ) -> None:
@@ -164,8 +144,6 @@ class TestMatrix:
             new_matrix = Matrix.crossover(
                 matrix=matrix_1,
                 other_matrix=matrix_2,
-                mutation_rate=0.5,
-                random_range=(mock_weights_range[0], mock_weights_range[1]),
                 crossover_func=_mock_crossover_func,
             )
 

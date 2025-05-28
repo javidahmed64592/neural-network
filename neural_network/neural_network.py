@@ -169,12 +169,11 @@ class NeuralNetwork:
 
         return output_errors.as_list
 
+    @staticmethod
     def crossover(
-        self,
         nn: NeuralNetwork,
         other_nn: NeuralNetwork,
-        mutation_rate: float,
-        crossover_func: Callable | None = None,
+        crossover_func: Callable,
     ) -> tuple[list[Matrix], list[Matrix]]:
         """
         Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
@@ -183,8 +182,7 @@ class NeuralNetwork:
         Parameters:
             nn (NeuralNetwork): Neural Network to use for average weights and biases
             other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
-            mutation_rate (float): Percentage of weights and biases to be randomised
-            crossover_func (Callable | None): Custom function for crossover operations.
+            crossover_func (Callable): Custom function for crossover operations.
                 Should accept (element, other_element, roll) and return a float.
 
         Returns:
@@ -193,19 +191,15 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index in range(len(self.layers[1:])):
+        for index in range(len(nn.layers[1:])):
             new_weight = Matrix.crossover(
                 nn.weights[index],
                 other_nn.weights[index],
-                mutation_rate,
-                self.layers[index]._weights_range,
                 crossover_func,
             )
             new_bias = Matrix.crossover(
                 nn.bias[index],
                 other_nn.bias[index],
-                mutation_rate,
-                self.layers[index]._bias_range,
                 crossover_func,
             )
 
