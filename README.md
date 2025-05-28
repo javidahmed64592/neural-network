@@ -106,9 +106,14 @@ def crossover_func(element: float, other_element: float, roll: float) -> float:
 
 nn_1 = NeuralNetwork(...)
 nn_2 = NeuralNetwork(...)
+nn_3 = NeuralNetwork(...)
 
-nn_1.weights, nn_1.bias = NeuralNetwork.crossover(nn_1, nn_2, crossover_func)
-nn_2.weights, nn_2.bias = NeuralNetwork.crossover(nn_1, nn_2, crossover_func)
+nn_3.weights, nn_3.bias = NeuralNetwork.crossover(
+    nn=nn_1,
+    other_nn=nn_2,
+    weights_crossover_func=crossover_func,
+    bias_crossover_func=crossover_func
+)
 ```
 
 ## Testing
