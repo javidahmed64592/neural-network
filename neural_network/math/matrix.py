@@ -125,34 +125,30 @@ class Matrix:
         return Matrix.from_array(np.vectorize(activation.func)(matrix.vals))
 
     @staticmethod
-    def average_matrix(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+    def crossover(
+        matrix: Matrix, other_matrix: Matrix, mutation_rate: float, random_range: tuple[float, float]
+    ) -> Matrix:
         """
-        Get average of two Matrix objects.
+        Crossover two Matrix objects by mixing their values.
 
         Parameters:
             matrix (Matrix): Matrix to use for average
             other_matrix (Matrix): Other Matrix to use for average
+            mutation_rate (float): Percentage of values to be randomised
+            random_range (tuple[float, float]): Range of random values to use for mutation
 
         Returns:
-            new_matrix (Matrix): Average of both matrices
+            new_matrix (Matrix): New Matrix with mixed values
         """
-        return Matrix.from_array(np.average([matrix.vals, other_matrix.vals], axis=0))
 
-    @staticmethod
-    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: tuple[float, float]) -> Matrix:
-        """
-        Mutate Matrix with a mutation rate.
+        def _crossover(roll: float, parent_a_chromosome: float, parent_b_chromosome: float) -> float:
+            if roll < mutation_rate:
+                return rng.uniform(low=random_range[0], high=random_range[1])
+            if roll < (0.5 + (mutation_rate / 2)):
+                return parent_a_chromosome
+            return parent_b_chromosome
 
-        Parameters:
-            matrix (Matrix): Matrix to use for average
-            mutation_rate (float): Probability for mutation
-            random_range (tuple[float, float]): Range for random number
-
-        Returns:
-            new_matrix (Matrix): Mutated Matrix
-        """
-        _mutation_matrix = rng.uniform(low=0, high=1, size=matrix.shape)
-        new_matrix = np.where(
-            _mutation_matrix < mutation_rate, rng.uniform(low=random_range[0], high=random_range[1]), matrix.vals
-        )
+        vectorized_crossover = np.vectorize(_crossover)
+        crossover_rolls = rng.uniform(low=0, high=1, size=matrix.shape)
+        new_matrix = vectorized_crossover(crossover_rolls, matrix.vals, other_matrix.vals)
         return Matrix.from_array(new_matrix)

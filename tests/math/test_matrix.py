@@ -124,29 +124,22 @@ class TestMatrix:
         actual_vals = new_matrix.vals
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_calculating_average_matrix_then_check_new_matrix_correctly_calculated(
-        self,
+    def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_has_correct_shape(
+        self, mock_weights_range: list[float]
     ) -> None:
-        array_1 = np.array([[1, 2], [4, 3], [2, 4]])
-        array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
+        array_1 = np.array([[1, 2], [4, 3]])
+        array_2 = np.array([[-1, 1], [2, -5]])
 
         matrix_1 = Matrix.from_array(array_1)
         matrix_2 = Matrix.from_array(array_2)
-        new_matrix = Matrix.average_matrix(matrix_1, matrix_2)
-
-        expected_vals = np.array([[0, 1.5], [3, -1], [2.5, 3]])
-        actual_vals = new_matrix.vals
-        assert np.all(actual_vals == expected_vals)
-
-    def test_given_matrix_when_mutating_then_check_new_matrix_with_same_shape_returned(self) -> None:
-        array_1 = np.array([[1, 2], [4, 3], [2, 4]])
-        mutation_rate = 0.5
-        random_range = (1.0, 4.0)
-
-        matrix_1 = Matrix.from_array(array_1)
-        new_matrix = Matrix.mutated_matrix(matrix_1, mutation_rate, random_range)
+        new_matrix = Matrix.crossover(
+            matrix=matrix_1,
+            other_matrix=matrix_2,
+            mutation_rate=0.5,
+            random_range=(mock_weights_range[0], mock_weights_range[1]),
+        )
 
         expected_shape = matrix_1.shape
         actual_shape = new_matrix.shape
-        assert np.all(actual_shape == expected_shape)
-        assert not np.all(matrix_1.vals == new_matrix.vals)
+        for actual, expected in zip(actual_shape, expected_shape, strict=False):
+            assert actual == expected
