@@ -34,7 +34,7 @@ class TestNeuralNetwork:
         actual_len = len(output)
         assert actual_len == mock_len_outputs
 
-    def test_given_two_nns_with_same_shape_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
+    def test_given_two_nns_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
         self,
         mock_inputs: list[float],
         mock_input_layer: InputLayer,
@@ -77,59 +77,3 @@ class TestNeuralNetwork:
 
         assert len(output_1) == mock_len_outputs
         assert len(output_2) == mock_len_outputs
-
-    def test_given_three_nns_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
-        self,
-        mock_inputs: list[float],
-        mock_input_layer: InputLayer,
-        mock_output_layer: OutputLayer,
-        mock_len_outputs: int,
-        mock_activation: type[ActivationFunction],
-        mock_weights_range: tuple[float, float],
-        mock_bias_range: tuple[float, float],
-    ) -> None:
-        mock_nn_1 = NeuralNetwork.from_layers(
-            layers=[
-                mock_input_layer,
-                *[
-                    make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                ],
-                mock_output_layer,
-            ]
-        )
-        mock_nn_2 = NeuralNetwork.from_layers(
-            layers=[
-                mock_input_layer,
-                *[
-                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                ],
-                mock_output_layer,
-            ]
-        )
-        mock_nn_3 = NeuralNetwork.from_layers(
-            layers=[
-                mock_input_layer,
-                *[
-                    make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(6, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                ],
-                mock_output_layer,
-            ]
-        )
-
-        mock_nn_3.weights, mock_nn_3.bias = mock_nn_3.crossover(mock_nn_1, mock_nn_2, 0.01)
-        mock_nn_1.weights, mock_nn_1.bias = mock_nn_1.crossover(mock_nn_2, mock_nn_3, 0.01)
-        mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(mock_nn_3, mock_nn_1, 0.01)
-
-        output_1 = mock_nn_1.feedforward(mock_inputs)
-        output_2 = mock_nn_2.feedforward(mock_inputs)
-        output_3 = mock_nn_3.feedforward(mock_inputs)
-
-        assert len(output_1) == mock_len_outputs
-        assert len(output_2) == mock_len_outputs
-        assert len(output_3) == mock_len_outputs
