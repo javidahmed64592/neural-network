@@ -186,11 +186,13 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers[1:]):
+        for index in range(len(self.layers[1:])):
             new_weight = Matrix.crossover(
-                nn.weights[index], other_nn.weights[index], mutation_rate, layer._weights_range
+                nn.weights[index], other_nn.weights[index], mutation_rate, self.layers[index]._weights_range
             )
-            new_bias = Matrix.crossover(nn.bias[index], other_nn.bias[index], mutation_rate, layer._bias_range)
+            new_bias = Matrix.crossover(
+                nn.bias[index], other_nn.bias[index], mutation_rate, self.layers[index]._bias_range
+            )
 
             new_weights.append(new_weight)
             new_biases.append(new_bias)
