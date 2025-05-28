@@ -99,16 +99,17 @@ nn = NeuralNetwork.from_file("/path/to/nn_model.json")
 New weights and biases can also be calculated via crossover:
 
 ```python
+def crossover_func(element: float, other_element: float, roll: float) -> float:
+    if roll < mutation_rate:
+        return element
+    return other_element
+
 nn_1 = NeuralNetwork(...)
 nn_2 = NeuralNetwork(...)
-nn_3 = NeuralNetwork(...)
 
-nn_1.weights, nn_1.bias = nn_1.crossover(nn_2, nn_3, mutation_rate)
+nn_1.weights, nn_1.bias = NeuralNetwork.crossover(nn_1, nn_2, crossover_func)
+nn_2.weights, nn_2.bias = NeuralNetwork.crossover(nn_1, nn_2, crossover_func)
 ```
-
-where
-
-- `mutation_rate`: Percentage of weights and biases to be randomised
 
 ## Testing
 This library uses Pytest for the unit tests.

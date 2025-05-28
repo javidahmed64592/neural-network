@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from typing import cast
 
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
@@ -168,8 +169,11 @@ class NeuralNetwork:
 
         return output_errors.as_list
 
+    @staticmethod
     def crossover(
-        self, nn: NeuralNetwork, other_nn: NeuralNetwork, mutation_rate: float
+        nn: NeuralNetwork,
+        other_nn: NeuralNetwork,
+        crossover_func: Callable,
     ) -> tuple[list[Matrix], list[Matrix]]:
         """
         Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
@@ -178,7 +182,8 @@ class NeuralNetwork:
         Parameters:
             nn (NeuralNetwork): Neural Network to use for average weights and biases
             other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
-            mutation_rate (float): Percentage of weights and biases to be randomised
+            crossover_func (Callable): Custom function for crossover operations.
+                Should accept (element, other_element, roll) and return a float.
 
         Returns:
             new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
@@ -186,11 +191,17 @@ class NeuralNetwork:
         new_weights = []
         new_biases = []
 
-        for index, layer in enumerate(self.layers[1:]):
-            new_weight = Matrix.average_matrix(nn.weights[index], other_nn.weights[index])
-            new_weight = Matrix.mutated_matrix(new_weight, mutation_rate, layer._weights_range)
-            new_bias = Matrix.average_matrix(nn.bias[index], other_nn.bias[index])
-            new_bias = Matrix.mutated_matrix(new_bias, mutation_rate, layer._bias_range)
+        for index in range(len(nn.layers[1:])):
+            new_weight = Matrix.crossover(
+                nn.weights[index],
+                other_nn.weights[index],
+                crossover_func,
+            )
+            new_bias = Matrix.crossover(
+                nn.bias[index],
+                other_nn.bias[index],
+                crossover_func,
+            )
 
             new_weights.append(new_weight)
             new_biases.append(new_bias)

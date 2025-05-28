@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import cast
 
 import numpy as np
@@ -80,7 +81,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with random values
         """
-        return cls.from_array(rng.uniform(low=low, high=high, size=(rows, cols)))
+        return cls.from_array(cls._uniform(low=low, high=high, size=(rows, cols)))
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
@@ -96,6 +97,21 @@ class Matrix:
             matrix (Matrix): Column Matrix with random values
         """
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
+
+    @staticmethod
+    def _uniform(low: float, high: float, size: tuple[int, int] | int | None = None) -> NDArray:
+        """
+        Create an array of random values in specified range.
+
+        Parameters:
+            low (float): Lower boundary for random number
+            high (float): Upper boundary for random number
+            size (tuple[int, int] | int | None): Shape of the array to create
+
+        Returns:
+            NDArray: Array with random values
+        """
+        return rng.uniform(low=low, high=high, size=size)
 
     @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
@@ -125,34 +141,24 @@ class Matrix:
         return Matrix.from_array(np.vectorize(activation.func)(matrix.vals))
 
     @staticmethod
-    def average_matrix(matrix: Matrix, other_matrix: Matrix) -> Matrix:
+    def crossover(
+        matrix: Matrix,
+        other_matrix: Matrix,
+        crossover_func: Callable,
+    ) -> Matrix:
         """
-        Get average of two Matrix objects.
+        Crossover two Matrix objects by mixing their values.
 
         Parameters:
             matrix (Matrix): Matrix to use for average
             other_matrix (Matrix): Other Matrix to use for average
+            crossover_func (Callable): Custom function for crossover operations.
+                Should accept (element, other_element, roll) and return a float.
 
         Returns:
-            new_matrix (Matrix): Average of both matrices
+            new_matrix (Matrix): New Matrix with mixed values
         """
-        return Matrix.from_array(np.average([matrix.vals, other_matrix.vals], axis=0))
-
-    @staticmethod
-    def mutated_matrix(matrix: Matrix, mutation_rate: float, random_range: tuple[float, float]) -> Matrix:
-        """
-        Mutate Matrix with a mutation rate.
-
-        Parameters:
-            matrix (Matrix): Matrix to use for average
-            mutation_rate (float): Probability for mutation
-            random_range (tuple[float, float]): Range for random number
-
-        Returns:
-            new_matrix (Matrix): Mutated Matrix
-        """
-        _mutation_matrix = rng.uniform(low=0, high=1, size=matrix.shape)
-        new_matrix = np.where(
-            _mutation_matrix < mutation_rate, rng.uniform(low=random_range[0], high=random_range[1]), matrix.vals
-        )
+        vectorized_crossover = np.vectorize(crossover_func)
+        crossover_rolls = Matrix._uniform(low=0, high=1, size=matrix.shape)
+        new_matrix = vectorized_crossover(matrix.vals, other_matrix.vals, crossover_rolls)
         return Matrix.from_array(new_matrix)

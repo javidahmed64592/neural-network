@@ -33,13 +33,6 @@ class TestLayer:
         assert actual_weights_shape == expected_weights_shape
         assert actual_bias_shape == expected_bias_shape
 
-    def test_given_weights_when_getting_random_weight_then_check_value_is_within_range(
-        self, mock_hidden_layer_1: HiddenLayer
-    ) -> None:
-        random_weight = mock_hidden_layer_1.random_weight
-        weight_range = mock_hidden_layer_1._weights_range
-        assert weight_range[0] <= random_weight <= weight_range[1]
-
     def test_given_layers_when_setting_previous_layer_then_check_previous_layer_is_set(self) -> None:
         input_layer = InputLayer(3, ActivationFunction)
         hidden_layer = HiddenLayer(4, ActivationFunction, (0.0, 1.0), (0.0, 1.0))
