@@ -190,10 +190,11 @@ class NeuralNetwork:
         Returns:
             new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
         """
-        new_weights = []
-        new_biases = []
+        new_weights = [nn.weights[0]]
+        new_biases = [nn.bias[0]]
 
-        for index in range(len(nn.layers[1:])):
+        for i in range(len(nn.layers) - 1):
+            index = i + 1
             new_weight = Matrix.crossover(
                 nn.weights[index],
                 other_nn.weights[index],

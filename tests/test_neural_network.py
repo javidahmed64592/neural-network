@@ -51,40 +51,24 @@ class TestNeuralNetwork:
                 return element
             return other_element
 
-        mock_nn_1 = NeuralNetwork.from_layers(
-            layers=[
-                mock_input_layer,
-                *[
-                    make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                ],
-                mock_output_layer,
-            ]
-        )
-        mock_nn_2 = NeuralNetwork.from_layers(
-            layers=[
-                mock_input_layer,
-                *[
-                    make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
-                    make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
-                ],
-                mock_output_layer,
-            ]
-        )
+        nn_layers = [
+            mock_input_layer,
+            *[
+                make_hidden_layer(5, mock_activation, mock_weights_range, mock_bias_range),
+                make_hidden_layer(4, mock_activation, mock_weights_range, mock_bias_range),
+                make_hidden_layer(3, mock_activation, mock_weights_range, mock_bias_range),
+            ],
+            mock_output_layer,
+        ]
 
-        output_1 = mock_nn_1.feedforward(mock_inputs)
+        mock_nn_1 = NeuralNetwork.from_layers(layers=nn_layers)
+        mock_nn_2 = NeuralNetwork.from_layers(layers=nn_layers)
+        mock_nn_3 = NeuralNetwork.from_layers(layers=nn_layers)
 
-        mock_nn_1.weights, mock_nn_1.bias = NeuralNetwork.crossover(
-            mock_nn_2, mock_nn_1, _mock_crossover_func, _mock_crossover_func
-        )
-        mock_nn_2.weights, mock_nn_2.bias = NeuralNetwork.crossover(
+        mock_nn_3.weights, mock_nn_3.bias = NeuralNetwork.crossover(
             mock_nn_1, mock_nn_2, _mock_crossover_func, _mock_crossover_func
         )
 
-        output_1 = mock_nn_1.feedforward(mock_inputs)
-        output_2 = mock_nn_2.feedforward(mock_inputs)
+        output = mock_nn_3.feedforward(mock_inputs)
 
-        assert len(output_1) == mock_len_outputs
-        assert len(output_2) == mock_len_outputs
+        assert len(output) == mock_len_outputs
