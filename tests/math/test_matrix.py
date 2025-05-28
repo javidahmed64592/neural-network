@@ -1,9 +1,9 @@
+from unittest.mock import patch
+
 import numpy as np
 
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-
-rng = np.random.default_rng()
 
 
 class TestMatrix:
@@ -32,7 +32,7 @@ class TestMatrix:
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
-        test_array = rng.uniform(
+        test_array = Matrix._uniform(
             low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden[0])
         )
         test_matrix = Matrix.from_array(matrix_array=test_array)
@@ -45,7 +45,7 @@ class TestMatrix:
     def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_hidden: list[int]
     ) -> None:
-        test_array = rng.uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
+        test_array = Matrix._uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (mock_len_hidden[0], 1)
@@ -143,3 +143,32 @@ class TestMatrix:
         actual_shape = new_matrix.shape
         for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
+
+    def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_correctly_calculated(
+        self, mock_weights_range: list[float]
+    ) -> None:
+        mutation_rate = 0.5
+
+        def _mock_crossover_func(element: float, other_element: float, roll: float) -> float:
+            if roll < mutation_rate:
+                return element
+            return other_element
+
+        array_1 = np.array([[1, 2], [4, 3]])
+        array_2 = np.array([[-1, 1], [2, -5]])
+        roll_array = np.array([[0.1, 0.6], [0.4, 0.8]])
+
+        with patch("neural_network.math.matrix.Matrix._uniform", return_value=roll_array):
+            matrix_1 = Matrix.from_array(array_1)
+            matrix_2 = Matrix.from_array(array_2)
+            new_matrix = Matrix.crossover(
+                matrix=matrix_1,
+                other_matrix=matrix_2,
+                mutation_rate=0.5,
+                random_range=(mock_weights_range[0], mock_weights_range[1]),
+                crossover_func=_mock_crossover_func,
+            )
+
+        expected_vals = np.array([[1, 1], [4, -5]])
+        actual_vals = new_matrix.vals
+        assert np.all(actual_vals == expected_vals)

@@ -44,6 +44,13 @@ class TestNeuralNetwork:
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
+        mutation_rate = 0.05
+
+        def _mock_crossover_func(element: float, other_element: float, roll: float) -> float:
+            if roll < mutation_rate:
+                return element
+            return other_element
+
         mock_nn_1 = NeuralNetwork.from_layers(
             layers=[
                 mock_input_layer,
@@ -69,8 +76,10 @@ class TestNeuralNetwork:
 
         output_1 = mock_nn_1.feedforward(mock_inputs)
 
-        mock_nn_1.weights, mock_nn_1.bias = mock_nn_1.crossover(mock_nn_2, mock_nn_1, 0.01)
-        mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(mock_nn_1, mock_nn_2, 0.01)
+        mock_nn_1.weights, mock_nn_1.bias = mock_nn_1.crossover(mock_nn_2, mock_nn_1, mutation_rate)
+        mock_nn_2.weights, mock_nn_2.bias = mock_nn_2.crossover(
+            mock_nn_1, mock_nn_2, mutation_rate, _mock_crossover_func
+        )
 
         output_1 = mock_nn_1.feedforward(mock_inputs)
         output_2 = mock_nn_2.feedforward(mock_inputs)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import cast
 
 import numpy as np
@@ -80,7 +81,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with random values
         """
-        return cls.from_array(rng.uniform(low=low, high=high, size=(rows, cols)))
+        return cls.from_array(cls._uniform(low=low, high=high, size=(rows, cols)))
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
@@ -96,6 +97,21 @@ class Matrix:
             matrix (Matrix): Column Matrix with random values
         """
         return cls.random_matrix(rows=rows, cols=1, low=low, high=high)
+
+    @staticmethod
+    def _uniform(low: float, high: float, size: tuple[float, float] | None = None) -> NDArray:
+        """
+        Create an array of random values in specified range.
+
+        Parameters:
+            low (float): Lower boundary for random number
+            high (float): Upper boundary for random number
+            size (tuple[float, float] | None): Shape of the array to create
+
+        Returns:
+            NDArray: Array with random values
+        """
+        return rng.uniform(low=low, high=high, size=size)
 
     @staticmethod
     def transpose(matrix: Matrix) -> Matrix:
@@ -126,7 +142,11 @@ class Matrix:
 
     @staticmethod
     def crossover(
-        matrix: Matrix, other_matrix: Matrix, mutation_rate: float, random_range: tuple[float, float]
+        matrix: Matrix,
+        other_matrix: Matrix,
+        mutation_rate: float,
+        random_range: tuple[float, float],
+        crossover_func: Callable | None = None,
     ) -> Matrix:
         """
         Crossover two Matrix objects by mixing their values.
@@ -136,19 +156,22 @@ class Matrix:
             other_matrix (Matrix): Other Matrix to use for average
             mutation_rate (float): Percentage of values to be randomised
             random_range (tuple[float, float]): Range of random values to use for mutation
+            crossover_func (Callable | None): Custom function for crossover operations.
+                Should accept (element, other_element, roll) and return a float.
 
         Returns:
             new_matrix (Matrix): New Matrix with mixed values
         """
 
-        def _crossover(roll: float, parent_a_chromosome: float, parent_b_chromosome: float) -> float:
+        def _default_crossover(element: float, other_element: float, roll: float) -> float:
             if roll < mutation_rate:
-                return rng.uniform(low=random_range[0], high=random_range[1])
+                return Matrix._uniform(low=random_range[0], high=random_range[1])
             if roll < (0.5 + (mutation_rate / 2)):
-                return parent_a_chromosome
-            return parent_b_chromosome
+                return element
+            return other_element
 
-        vectorized_crossover = np.vectorize(_crossover)
-        crossover_rolls = rng.uniform(low=0, high=1, size=matrix.shape)
-        new_matrix = vectorized_crossover(crossover_rolls, matrix.vals, other_matrix.vals)
+        crossover_func = crossover_func or _default_crossover
+        vectorized_crossover = np.vectorize(crossover_func)
+        crossover_rolls = Matrix._uniform(low=0, high=1, size=matrix.shape)
+        new_matrix = vectorized_crossover(matrix.vals, other_matrix.vals, crossover_rolls)
         return Matrix.from_array(new_matrix)

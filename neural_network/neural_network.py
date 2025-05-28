@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from typing import cast
 
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
@@ -169,7 +170,11 @@ class NeuralNetwork:
         return output_errors.as_list
 
     def crossover(
-        self, nn: NeuralNetwork, other_nn: NeuralNetwork, mutation_rate: float
+        self,
+        nn: NeuralNetwork,
+        other_nn: NeuralNetwork,
+        mutation_rate: float,
+        crossover_func: Callable | None = None,
     ) -> tuple[list[Matrix], list[Matrix]]:
         """
         Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
@@ -179,6 +184,8 @@ class NeuralNetwork:
             nn (NeuralNetwork): Neural Network to use for average weights and biases
             other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
             mutation_rate (float): Percentage of weights and biases to be randomised
+            crossover_func (Callable | None): Custom function for crossover operations.
+                Should accept (element, other_element, roll) and return a float.
 
         Returns:
             new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
@@ -188,10 +195,18 @@ class NeuralNetwork:
 
         for index in range(len(self.layers[1:])):
             new_weight = Matrix.crossover(
-                nn.weights[index], other_nn.weights[index], mutation_rate, self.layers[index]._weights_range
+                nn.weights[index],
+                other_nn.weights[index],
+                mutation_rate,
+                self.layers[index]._weights_range,
+                crossover_func,
             )
             new_bias = Matrix.crossover(
-                nn.bias[index], other_nn.bias[index], mutation_rate, self.layers[index]._bias_range
+                nn.bias[index],
+                other_nn.bias[index],
+                mutation_rate,
+                self.layers[index]._bias_range,
+                crossover_func,
             )
 
             new_weights.append(new_weight)
