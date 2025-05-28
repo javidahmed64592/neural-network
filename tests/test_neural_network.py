@@ -76,8 +76,12 @@ class TestNeuralNetwork:
 
         output_1 = mock_nn_1.feedforward(mock_inputs)
 
-        mock_nn_1.weights, mock_nn_1.bias = NeuralNetwork.crossover(mock_nn_2, mock_nn_1, _mock_crossover_func)
-        mock_nn_2.weights, mock_nn_2.bias = NeuralNetwork.crossover(mock_nn_1, mock_nn_2, _mock_crossover_func)
+        mock_nn_1.weights, mock_nn_1.bias = NeuralNetwork.crossover(
+            mock_nn_2, mock_nn_1, _mock_crossover_func, _mock_crossover_func
+        )
+        mock_nn_2.weights, mock_nn_2.bias = NeuralNetwork.crossover(
+            mock_nn_1, mock_nn_2, _mock_crossover_func, _mock_crossover_func
+        )
 
         output_1 = mock_nn_1.feedforward(mock_inputs)
         output_2 = mock_nn_2.feedforward(mock_inputs)

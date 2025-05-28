@@ -173,7 +173,8 @@ class NeuralNetwork:
     def crossover(
         nn: NeuralNetwork,
         other_nn: NeuralNetwork,
-        crossover_func: Callable,
+        weights_crossover_func: Callable,
+        bias_crossover_func: Callable,
     ) -> tuple[list[Matrix], list[Matrix]]:
         """
         Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
@@ -182,8 +183,9 @@ class NeuralNetwork:
         Parameters:
             nn (NeuralNetwork): Neural Network to use for average weights and biases
             other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
-            crossover_func (Callable): Custom function for crossover operations.
-                Should accept (element, other_element, roll) and return a float.
+            weights_crossover_func (Callable): Custom function for crossover operations for layer weights
+            bias_crossover_func (Callable): Custom function for crossover operations for layer biases
+                Should accept (element, other_element, roll) and return a float
 
         Returns:
             new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
@@ -195,12 +197,12 @@ class NeuralNetwork:
             new_weight = Matrix.crossover(
                 nn.weights[index],
                 other_nn.weights[index],
-                crossover_func,
+                weights_crossover_func,
             )
             new_bias = Matrix.crossover(
                 nn.bias[index],
                 other_nn.bias[index],
-                crossover_func,
+                bias_crossover_func,
             )
 
             new_weights.append(new_weight)
