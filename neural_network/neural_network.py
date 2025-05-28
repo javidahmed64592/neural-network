@@ -45,12 +45,12 @@ class NeuralNetwork:
         return "NeuralNetwork:\n" + "\n".join([str(layer) for layer in self.layers])
 
     @classmethod
-    def from_layers(cls, layers: list[InputLayer | HiddenLayer | OutputLayer], lr: float = 0.1) -> NeuralNetwork:
+    def from_layers(cls, layers: list[Layer], lr: float = 0.1) -> NeuralNetwork:
         """
         Create a NeuralNetwork from a list of layers.
 
         Parameters:
-            layers (list[InputLayer | HiddenLayer | OutputLayer]): NeuralNetwork layers
+            layers (list[Layer]): NeuralNetwork layers
         """
         input_layer = cast(InputLayer, layers[0])
         output_layer = cast(OutputLayer, layers[-1])
