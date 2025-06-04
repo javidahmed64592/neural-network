@@ -163,8 +163,8 @@ class NeuralNetwork:
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
-            if layer._next_layer is not None:
-                errors = calculate_next_errors(layer._next_layer.weights, errors)
+            if next_layer := layer._next_layer:
+                errors = calculate_next_errors(next_layer.weights, errors)
                 layer.backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
@@ -188,13 +188,12 @@ class NeuralNetwork:
 
         fitness_error = fitness - prev_fitness
         errors = vals * fitness_error
-
         self._output_layer.backpropagate_error(errors, self._lr)
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
-            if layer._next_layer is not None:
-                errors = calculate_next_errors(layer._next_layer.weights, errors)
+            if next_layer := layer._next_layer:
+                errors = calculate_next_errors(next_layer.weights, errors)
                 layer.backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
