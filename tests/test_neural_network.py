@@ -30,8 +30,15 @@ class TestNeuralNetwork:
     def test_given_inputs_and_outputs_when_training_then_check_error_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_outputs: list[float], mock_len_outputs: int
     ) -> None:
-        output = mock_nn.train(mock_inputs, mock_outputs)
-        actual_len = len(output)
+        output_errors = mock_nn.train(mock_inputs, mock_outputs)
+        actual_len = len(output_errors)
+        assert actual_len == mock_len_outputs
+
+    def given_inputs_and_fitnesses_when_training_then_check_error_has_correct_shape(
+        self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
+    ) -> None:
+        output_errors = mock_nn.train_with_fitness(mock_inputs, 1, 0.8)
+        actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
 
     def test_given_two_nns_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
