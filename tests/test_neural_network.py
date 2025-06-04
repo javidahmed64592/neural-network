@@ -41,6 +41,42 @@ class TestNeuralNetwork:
         actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
 
+    def test_given_training_data_when_running_supervised_training_then_check_feedforward_maintains_shape(
+        self,
+        mock_nn: NeuralNetwork,
+        mock_training_inputs: list[list[float]],
+        mock_training_outputs: list[list[float]],
+        mock_len_outputs: int,
+    ) -> None:
+        initial_weights = [layer.weights.vals.copy() for layer in mock_nn.layers[1:]]
+
+        mock_nn.run_supervised_training(mock_training_inputs, mock_training_outputs, epochs=2)
+
+        final_weights = [layer.weights.vals for layer in mock_nn.layers[1:]]
+        for initial, final in zip(initial_weights, final_weights, strict=True):
+            assert not (initial == final).all()
+
+        output = mock_nn.feedforward(mock_training_inputs[0])
+        assert len(output) == mock_len_outputs
+
+    def test_given_fitness_data_when_running_fitness_training_then_check_feedforward_maintains_shape(
+        self,
+        mock_nn: NeuralNetwork,
+        mock_training_inputs: list[list[float]],
+        mock_fitnesses: list[float],
+        mock_len_outputs: int,
+    ) -> None:
+        initial_weights = [layer.weights.vals.copy() for layer in mock_nn.layers[1:]]
+
+        mock_nn.run_fitness_training(mock_training_inputs, mock_fitnesses, epochs=2, alpha=0.2)
+
+        final_weights = [layer.weights.vals for layer in mock_nn.layers[1:]]
+        for initial, final in zip(initial_weights, final_weights, strict=True):
+            assert not (initial == final).all()
+
+        output = mock_nn.feedforward(mock_training_inputs[0])
+        assert len(output) == mock_len_outputs
+
     def test_given_two_nns_when_performing_crossover_then_check_feedforward_maintains_correct_shape(
         self,
         mock_inputs: list[float],
