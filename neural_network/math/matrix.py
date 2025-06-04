@@ -62,7 +62,7 @@ class Matrix:
         Returns:
             matrix (Matrix): Matrix with assigned values
         """
-        matrix_array = np.array(matrix_array, dtype=object)
+        matrix_array = np.array(matrix_array, dtype=np.float64)
         if matrix_array.ndim == 1:
             matrix_array = np.expand_dims(matrix_array, axis=1)
         return cls(matrix_array)
