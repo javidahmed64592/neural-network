@@ -34,7 +34,7 @@ class TestNeuralNetwork:
         actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
 
-    def given_inputs_and_fitnesses_when_training_then_check_error_has_correct_shape(
+    def test_given_inputs_and_fitnesses_when_training_then_check_error_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
     ) -> None:
         output_errors = mock_nn.train_with_fitness(mock_inputs, 1, 0.8)
