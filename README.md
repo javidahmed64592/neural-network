@@ -39,7 +39,7 @@ To install with `dev` dependencies:
     pip install -e .[dev]
 
 ## Using the Neural Network
-For a complete example of how to create and train the neural network, see `example_training.ipynb` where it is trained on binary lists.
+For a complete example of how to create and train the neural network, see the example notebooks in the `examples` directory.
 
 ### Creating a Neural Network
 The neural network can be created in the following way:
