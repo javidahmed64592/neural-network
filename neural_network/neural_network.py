@@ -163,11 +163,87 @@ class NeuralNetwork:
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
-            if layer._next_layer is not None:
-                errors = calculate_next_errors(layer._next_layer.weights, errors)
+            if next_layer := layer._next_layer:
+                errors = calculate_next_errors(next_layer.weights, errors)
                 layer.backpropagate_error(errors, self._lr)
 
         return output_errors.as_list
+
+    def train_with_fitness(self, inputs: list[float], fitness: float, prev_fitness: float) -> list[float]:
+        """
+        Train the neural network using fitness values.
+
+        Parameters:
+            inputs (list[float]): List of input values
+            fitness (float): Fitness value for the current generation
+            prev_fitness (float): Fitness value for the previous generation
+
+        Returns:
+            output_errors (list[float]): List of output errors
+        """
+        vals = Matrix.from_array(inputs)
+
+        for layer in self.layers:
+            vals = layer.feedforward(vals)
+
+        fitness_error = fitness - prev_fitness
+        errors = vals * fitness_error
+        self._output_layer.backpropagate_error(errors, self._lr)
+        output_errors = Matrix.transpose(errors)
+
+        for layer in self._hidden_layers[::-1]:
+            if next_layer := layer._next_layer:
+                errors = calculate_next_errors(next_layer.weights, errors)
+                layer.backpropagate_error(errors, self._lr)
+
+        return output_errors.as_list
+
+    def run_supervised_training(
+        self,
+        inputs: list[list[float]],
+        expected_outputs: list[list[float]],
+        epochs: int = 1,
+    ) -> None:
+        """
+        Train the neural network using supervised learning.
+
+        Parameters:
+            inputs (list[list[float]]): List of input values
+            expected_outputs (list[list[float]]): List of expected output values
+            epochs (int): Number of training epochs, defaults to 1
+        """
+        for _ in range(epochs):
+            for input_data, expected_output in zip(inputs, expected_outputs, strict=False):
+                self.train(input_data, expected_output)
+
+    def run_fitness_training(
+        self,
+        inputs: list[list[float]],
+        fitnesses: list[float],
+        epochs: int = 1,
+        alpha: float = 0.1,
+    ) -> None:
+        """
+        Train the neural network using fitness values.
+
+        Parameters:
+            inputs (list[list[float]]): List of input values
+            fitnesses (list[float]): List of fitness values for each input
+            epochs (int): Number of training epochs, defaults to 1
+            alpha (float): Smoothing factor for fitness values, defaults to 0.1
+        """
+        prev_fitness = 0.0
+
+        for _ in range(epochs):
+            for i in range(len(inputs)):
+                fitness = fitnesses[i]
+                smoothed_fitness = prev_fitness * (1 - alpha) + fitness * alpha
+
+                if fitness > prev_fitness:
+                    smoothed_fitness += 0.05
+
+                self.train_with_fitness(inputs[i], smoothed_fitness, prev_fitness)
+                prev_fitness = smoothed_fitness
 
     @staticmethod
     def crossover(

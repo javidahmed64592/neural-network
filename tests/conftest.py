@@ -119,3 +119,18 @@ def mock_nn(
     return NeuralNetwork.from_layers(
         layers=[mock_input_layer, mock_hidden_layer_1, mock_hidden_layer_2, mock_hidden_layer_3, mock_output_layer]
     )
+
+
+@pytest.fixture
+def mock_training_inputs() -> list[list[float]]:
+    return [[1.0, 0.5, 0.7], [0.8, 0.3, 0.9], [0.2, 0.6, 0.4]]
+
+
+@pytest.fixture
+def mock_training_outputs() -> list[list[float]]:
+    return [[0.0, 1.0], [1.0, 0.0], [0.5, 0.5]]
+
+
+@pytest.fixture
+def mock_fitnesses() -> list[float]:
+    return [0.8, 0.6, 0.9]
