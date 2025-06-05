@@ -65,4 +65,4 @@ class TanhActivation(ActivationFunction):
     @staticmethod
     def derivative(x: float) -> float:
         t = np.tanh(x)
-        return 1 - t * t
+        return float(1 - t * t)
