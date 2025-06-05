@@ -5,6 +5,7 @@ from neural_network.math.activation_functions import (
     LinearActivation,
     ReluActivation,
     SigmoidActivation,
+    TanhActivation,
 )
 
 
@@ -72,3 +73,18 @@ class TestSigmoidActivation:
         expected_y = x * (1 - x)
         actual_y = SigmoidActivation.derivative(x)
         assert actual_y == expected_y
+
+
+class TestTanhActivation:
+    def test_given_x_when_calculating_y_then_check_calculated_correctly(self) -> None:
+        x = 1.5
+        expected_y = np.tanh(x)
+        actual_y = TanhActivation.func(x)
+        assert np.isclose(actual_y, expected_y)
+
+    def test_given_x_when_calculating_derivative_then_check_calculated_correctly(self) -> None:
+        x = 1.5
+        t = np.tanh(x)
+        expected_y = 1 - t * t
+        actual_y = TanhActivation.derivative(x)
+        assert np.isclose(actual_y, expected_y)

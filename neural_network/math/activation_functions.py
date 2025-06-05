@@ -52,3 +52,17 @@ class SigmoidActivation(ActivationFunction):
     @staticmethod
     def derivative(x: float) -> float:
         return x * (1 - x)
+
+
+class TanhActivation(ActivationFunction):
+    def __str__(self) -> str:
+        return "TanhActivation"
+
+    @staticmethod
+    def func(x: float) -> float:
+        return float(np.tanh(x))
+
+    @staticmethod
+    def derivative(x: float) -> float:
+        t = np.tanh(x)
+        return float(1 - t * t)
