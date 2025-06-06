@@ -1,0 +1,22 @@
+syntax = "proto3";
+option optimize_for = LITE_RUNTIME;
+package NeuralNetwork;
+
+message NeuralNetworkConfig {
+    int32 num_inputs = 1;
+    repeated int32 hidden_layer_sizes = 2;
+    int32 num_outputs = 3;
+    ActivationFunction input_activation = 4;
+    optional ActivationFunction hidden_activation = 5;
+    ActivationFunction output_activation = 6;
+    repeated float weights = 7;
+    repeated float biases = 8;
+    float learning_rate = 9;
+}
+
+enum ActivationFunction {
+    LINEAR = 0;
+    RELU = 1;
+    SIGMOID = 2;
+    TANH = 3;
+}
