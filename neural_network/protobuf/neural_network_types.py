@@ -32,3 +32,43 @@ class ActivationFunctionEnum(IntEnum):
     def to_protobuf(enum_value: ActivationFunctionEnum) -> ActivationFunctionData:
         """Maps an ActivationFunctionEnum value to Protobuf ActivationFunction."""
         return ActivationFunctionData.Value(enum_value.name)  # type: ignore
+
+
+@dataclass
+class MatrixDataType:
+    """Data class to hold genetic algorithm configuration."""
+
+    data: list[float]
+    rows: int
+    cols: int
+
+    @classmethod
+    def from_protobuf(cls, matrix_data: MatrixData) -> MatrixDataType:
+        """Creates a MatrixDataType instance from Protobuf."""
+        return cls(
+            data=list(matrix_data.data),
+            rows=matrix_data.rows,
+            cols=matrix_data.cols,
+        )
+
+    @staticmethod
+    def to_protobuf(matrix_data: MatrixDataType) -> MatrixData:
+        """Converts MatrixDataType to Protobuf."""
+        return MatrixData(
+            data=matrix_data.data,
+            rows=matrix_data.rows,
+            cols=matrix_data.cols,
+        )
+
+    @classmethod
+    def from_bytes(cls, matrix_data: bytes) -> MatrixDataType:
+        """Creates a MatrixDataType instance from Protobuf bytes."""
+        matrix = MatrixData()
+        matrix.ParseFromString(matrix_data)
+        return cls.from_protobuf(matrix)
+
+    @staticmethod
+    def to_bytes(matrix_data: MatrixDataType) -> bytes:
+        """Converts MatrixDataType to Protobuf bytes."""
+        matrix = MatrixDataType.to_protobuf(matrix_data)
+        return matrix.SerializeToString()
