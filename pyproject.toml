@@ -37,6 +37,9 @@ dev = [
 [project.urls]
 repository = "https://github.com/javidahmed64592/neural-network"
 
+[project.scripts]
+compile-protobuf = "neural_network.protobuf.compile_protobuf:main"
+
 [tool.setuptools.packages.find]
 include = ["neural_network*"]
 exclude = ["protobuf*"]
