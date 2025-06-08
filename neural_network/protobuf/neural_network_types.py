@@ -47,7 +47,7 @@ class ActivationFunctionEnum(IntEnum):
     @staticmethod
     def to_protobuf(enum_value: ActivationFunctionEnum) -> ActivationFunctionData:
         """Maps an ActivationFunctionEnum value to Protobuf ActivationFunction."""
-        return ActivationFunctionData.Value(enum_value.name)  # type: ignore
+        return ActivationFunctionData.Value(enum_value.name)  # type: ignore[no-any-return]
 
 
 @dataclass
@@ -87,7 +87,7 @@ class MatrixDataType:
     def to_bytes(matrix_data: MatrixDataType) -> bytes:
         """Converts MatrixDataType to Protobuf bytes."""
         matrix = MatrixDataType.to_protobuf(matrix_data)
-        return matrix.SerializeToString()
+        return matrix.SerializeToString()  # type: ignore[no-any-return]
 
 
 @dataclass
@@ -129,8 +129,8 @@ class NeuralNetworkDataType:
             input_activation=ActivationFunctionEnum.to_protobuf(config_data.input_activation),
             hidden_activation=ActivationFunctionEnum.to_protobuf(config_data.hidden_activation),
             output_activation=ActivationFunctionEnum.to_protobuf(config_data.output_activation),
-            weights=config_data.weights,
-            biases=config_data.biases,
+            weights=[MatrixDataType.to_protobuf(weight) for weight in config_data.weights],
+            biases=[MatrixDataType.to_protobuf(bias) for bias in config_data.biases],
             learning_rate=config_data.learning_rate,
         )
 
@@ -145,4 +145,4 @@ class NeuralNetworkDataType:
     def to_bytes(config_data: NeuralNetworkDataType) -> bytes:
         """Converts NeuralNetworkDataType to Protobuf bytes."""
         config = NeuralNetworkDataType.to_protobuf(config_data)
-        return config.SerializeToString()
+        return config.SerializeToString()  # type: ignore[no-any-return]

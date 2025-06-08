@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import json
 from collections.abc import Callable
 from typing import cast
 
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
-from neural_network.math.activation_functions import LinearActivation, SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, NeuralNetworkDataType
@@ -106,44 +104,42 @@ class NeuralNetwork:
             num_inputs=nn._num_inputs,
             hidden_layer_sizes=nn._hidden_layer_sizes,
             num_outputs=nn._num_outputs,
-            input_activation=ActivationFunctionEnum.to_protobuf(
-                ActivationFunctionEnum.from_class(nn._input_layer._activation)
-            ),
-            hidden_activation=ActivationFunctionEnum.to_protobuf(
-                ActivationFunctionEnum.from_class(nn._hidden_layers[0]._activation)
-            ),
-            output_activation=ActivationFunctionEnum.to_protobuf(
-                ActivationFunctionEnum.from_class(nn._output_layer._activation)
-            ),
+            input_activation=ActivationFunctionEnum.from_class(nn._input_layer._activation),
+            hidden_activation=ActivationFunctionEnum.from_class(nn._hidden_layers[0]._activation),
+            output_activation=ActivationFunctionEnum.from_class(nn._output_layer._activation),
             weights=[Matrix.to_protobuf(weights) for weights in nn.weights],
             biases=[Matrix.to_protobuf(bias) for bias in nn.bias],
             learning_rate=nn._lr,
         )
 
     @classmethod
-    def from_file(cls, filepath: str) -> NeuralNetwork:
+    def load_from_file(cls, file_path: str) -> NeuralNetwork:
         """
-        Load neural network layer with weights and biases from JSON file.
+        Load a NeuralNetwork from a file.
 
         Parameters:
-            filepath (str): Path to file with neural network data
+            file_path (str): Path to the file containing the neural network data
+
+        Returns:
+            nn (NeuralNetwork): Loaded neural network instance
         """
-        with open(filepath) as file:
-            _data = json.load(file)
+        with open(file_path, "rb") as file:
+            data = file.read()
+        nn_data = NeuralNetworkDataType.from_bytes(data)
+        return cls.from_protobuf(nn_data)
 
-        input_layer = InputLayer(size=_data["num_inputs"], activation=LinearActivation)
-        output_layer = OutputLayer(
-            size=_data["num_outputs"], activation=SigmoidActivation, weights_range=(-1, 1), bias_range=(-1, 1)
-        )
-        hidden_layers = [
-            HiddenLayer(size=size, activation=SigmoidActivation, weights_range=(-1, 1), bias_range=(-1, 1))
-            for size in _data["hidden_layer_sizes"]
-        ]
+    @staticmethod
+    def save_to_file(nn: NeuralNetwork, file_path: str) -> None:
+        """
+        Save a NeuralNetwork to a file.
 
-        nn = cls(input_layer, output_layer, hidden_layers)
-        nn.weights = [Matrix.from_array(weights) for weights in _data["weights"]]
-        nn.bias = [Matrix.from_array(bias) for bias in _data["bias"]]
-        return nn
+        Parameters:
+            nn (NeuralNetwork): Neural network instance to save
+            file_path (str): Path to the file where the neural network data will be saved
+        """
+        nn_data = NeuralNetwork.to_protobuf(nn)
+        with open(file_path, "wb") as file:
+            file.write(NeuralNetworkDataType.to_bytes(nn_data))
 
     @property
     def layers(self) -> list[Layer]:
@@ -166,23 +162,6 @@ class NeuralNetwork:
     def bias(self, new_bias: list[Matrix]) -> None:
         for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
-
-    def save(self, filepath: str) -> None:
-        """
-        Save neural network layer weights and biases to JSON file.
-
-        Parameters:
-            filepath (str): Path to file with weights and biases
-        """
-        _data = {
-            "num_inputs": self._num_inputs,
-            "num_outputs": self._num_outputs,
-            "hidden_layer_sizes": self._hidden_layer_sizes,
-            "weights": [weights.vals.tolist() for weights in self.weights],
-            "bias": [bias.vals.tolist() for bias in self.bias],
-        }
-        with open(filepath, "w") as file:
-            json.dump(_data, file)
 
     def feedforward(self, inputs: list[float]) -> list[float]:
         """
