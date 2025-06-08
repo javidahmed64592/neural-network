@@ -31,7 +31,9 @@ class TestActivationFunctionEnum:
 class TestMatrixDataType:
     @pytest.fixture
     def matrix_data(self) -> MatrixData:
-        return MatrixDataType(data=[1.0, 2.0, 3.0], rows=1, cols=3)
+        rows = 1
+        cols = 3
+        return MatrixData(data=rng.uniform(-1, 1, rows * cols).tolist(), rows=rows, cols=cols)
 
     @pytest.fixture
     def matrix_data_type(self, matrix_data: MatrixData) -> MatrixDataType:
@@ -107,19 +109,17 @@ class TestNeuralNetworkDataType:
             MatrixDataType(data=output_bias_array.flatten().tolist(), rows=test_num_outputs, cols=1)
         )
 
-        nn_data = NeuralNetworkData(
+        return NeuralNetworkData(
             num_inputs=test_num_inputs,
             hidden_layer_sizes=test_hidden_layer_sizes,
             num_outputs=test_num_outputs,
             input_activation=test_input_activation,
             hidden_activation=test_hidden_activation,
             output_activation=test_output_activation,
+            weights=[input_weights_matrix_data, hidden_weights_matrix_data, output_weights_matrix_data],
+            biases=[input_bias_matrix_data, hidden_bias_matrix_data, output_bias_matrix_data],
             learning_rate=test_learning_rate,
         )
-
-        nn_data.weights.extend([input_weights_matrix_data, hidden_weights_matrix_data, output_weights_matrix_data])
-        nn_data.biases.extend([input_bias_matrix_data, hidden_bias_matrix_data, output_bias_matrix_data])
-        return nn_data
 
     @pytest.fixture
     def neural_network_data_type(self, neural_network_data: NeuralNetworkData) -> NeuralNetworkDataType:
