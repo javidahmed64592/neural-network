@@ -15,6 +15,12 @@ class TestActivationFunctionEnum:
         assert ActivationFunctionEnum.SIGMOID.get_class() == SigmoidActivation
         assert ActivationFunctionEnum.TANH.get_class() == TanhActivation
 
+    def test_from_class(self) -> None:
+        assert ActivationFunctionEnum.from_class(LinearActivation) == ActivationFunctionEnum.LINEAR
+        assert ActivationFunctionEnum.from_class(ReluActivation) == ActivationFunctionEnum.RELU
+        assert ActivationFunctionEnum.from_class(SigmoidActivation) == ActivationFunctionEnum.SIGMOID
+        assert ActivationFunctionEnum.from_class(TanhActivation) == ActivationFunctionEnum.TANH
+
     def test_from_protobuf(self) -> None:
         assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.LINEAR) == ActivationFunctionEnum.LINEAR
         assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.RELU) == ActivationFunctionEnum.RELU

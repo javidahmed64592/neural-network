@@ -3,7 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
-from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
+from neural_network.math.activation_functions import (
+    ActivationFunction,
+    LinearActivation,
+    ReluActivation,
+    SigmoidActivation,
+    TanhActivation,
+)
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import ActivationFunctionData, MatrixData, NeuralNetworkData
 
 
@@ -13,15 +19,25 @@ class ActivationFunctionEnum(IntEnum):
     SIGMOID = 2
     TANH = 3
 
-    def get_class(self) -> type:
-        """Returns the corresponding activation function class."""
-        _map: dict[ActivationFunctionEnum, type] = {
+    @property
+    def map(self) -> dict[ActivationFunctionEnum, type[ActivationFunction]]:
+        """Maps the enum to the corresponding activation function."""
+        return {
             ActivationFunctionEnum.LINEAR: LinearActivation,
             ActivationFunctionEnum.RELU: ReluActivation,
             ActivationFunctionEnum.SIGMOID: SigmoidActivation,
             ActivationFunctionEnum.TANH: TanhActivation,
         }
-        return _map[self]
+
+    def get_class(self) -> type:
+        """Returns the corresponding activation function class."""
+        return self.map[self]
+
+    @classmethod
+    def from_class(cls, activation_function: type[ActivationFunction]) -> ActivationFunctionEnum:
+        """Maps an ActivationFunction class to ActivationFunctionEnum."""
+        reverse_map = {v: k for k, v in cls.LINEAR.map.items()}
+        return reverse_map[activation_function]
 
     @classmethod
     def from_protobuf(cls, proto_enum_value: ActivationFunctionData) -> ActivationFunctionEnum:
