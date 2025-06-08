@@ -8,6 +8,7 @@ from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.activation_functions import LinearActivation, SigmoidActivation
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
+from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, NeuralNetworkDataType
 
 
 class NeuralNetwork:
@@ -57,6 +58,67 @@ class NeuralNetwork:
         hidden_layers = cast(list[HiddenLayer], layers[1:-1])
 
         return cls(input_layer=input_layer, output_layer=output_layer, hidden_layers=hidden_layers, lr=lr)
+
+    @classmethod
+    def from_protobuf(cls, nn_data: NeuralNetworkDataType) -> NeuralNetwork:
+        """
+        Create a NeuralNetwork from Protobuf data.
+
+        Parameters:
+            nn_data (NeuralNetworkDataType): Neural network data from Protobuf
+        """
+        input_layer = InputLayer(
+            size=nn_data.num_inputs, activation=ActivationFunctionEnum(nn_data.input_activation).get_class()
+        )
+        output_layer = OutputLayer(
+            size=nn_data.num_outputs,
+            activation=ActivationFunctionEnum(nn_data.output_activation).get_class(),
+            weights_range=(-1, 1),
+            bias_range=(-1, 1),
+        )
+        hidden_layers = [
+            HiddenLayer(
+                size=size,
+                activation=ActivationFunctionEnum(nn_data.hidden_activation).get_class(),
+                weights_range=(-1, 1),
+                bias_range=(-1, 1),
+            )
+            for size in nn_data.hidden_layer_sizes
+        ]
+
+        nn = cls(input_layer, output_layer, hidden_layers)
+        nn.weights = [Matrix.from_protobuf(weights) for weights in nn_data.weights]
+        nn.bias = [Matrix.from_protobuf(bias) for bias in nn_data.biases]
+        return nn
+
+    @staticmethod
+    def to_protobuf(nn: NeuralNetwork) -> NeuralNetworkDataType:
+        """
+        Convert a NeuralNetwork instance to Protobuf data.
+
+        Parameters:
+            nn (NeuralNetwork): Neural network instance
+
+        Returns:
+            nn_data (NeuralNetworkDataType): Protobuf data containing neural network information
+        """
+        return NeuralNetworkDataType(
+            num_inputs=nn._num_inputs,
+            hidden_layer_sizes=nn._hidden_layer_sizes,
+            num_outputs=nn._num_outputs,
+            input_activation=ActivationFunctionEnum.to_protobuf(
+                ActivationFunctionEnum.from_class(nn._input_layer._activation)
+            ),
+            hidden_activation=ActivationFunctionEnum.to_protobuf(
+                ActivationFunctionEnum.from_class(nn._hidden_layers[0]._activation)
+            ),
+            output_activation=ActivationFunctionEnum.to_protobuf(
+                ActivationFunctionEnum.from_class(nn._output_layer._activation)
+            ),
+            weights=[Matrix.to_protobuf(weights) for weights in nn.weights],
+            biases=[Matrix.to_protobuf(bias) for bias in nn.bias],
+            learning_rate=nn._lr,
+        )
 
     @classmethod
     def from_file(cls, filepath: str) -> NeuralNetwork:

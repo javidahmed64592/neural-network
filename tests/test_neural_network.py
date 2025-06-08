@@ -1,6 +1,7 @@
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.neural_network import NeuralNetwork
+from neural_network.protobuf.neural_network_types import ActivationFunctionEnum
 
 
 def make_hidden_layer(
@@ -13,6 +14,31 @@ def make_hidden_layer(
 
 
 class TestNeuralNetwork:
+    def test_to_protobuf(self, mock_nn: NeuralNetwork) -> None:
+        nn_data = NeuralNetwork.to_protobuf(mock_nn)
+        assert nn_data.num_inputs == mock_nn._num_inputs
+        assert nn_data.hidden_layer_sizes == mock_nn._hidden_layer_sizes
+        assert nn_data.num_outputs == mock_nn._num_outputs
+        assert nn_data.input_activation == ActivationFunctionEnum.from_class(mock_nn._input_layer._activation)
+        assert nn_data.hidden_activation == ActivationFunctionEnum.from_class(mock_nn._hidden_layers[0]._activation)
+        assert nn_data.output_activation == ActivationFunctionEnum.from_class(mock_nn._output_layer._activation)
+        assert len(nn_data.weights) == len(mock_nn.weights)
+        assert len(nn_data.biases) == len(mock_nn.bias)
+        assert nn_data.learning_rate == mock_nn._lr
+
+    def test_from_protobuf(self, mock_nn: NeuralNetwork) -> None:
+        nn_data = NeuralNetwork.to_protobuf(mock_nn)
+        new_nn = NeuralNetwork.from_protobuf(nn_data)
+        assert new_nn._num_inputs == mock_nn._num_inputs
+        assert new_nn._hidden_layer_sizes == mock_nn._hidden_layer_sizes
+        assert new_nn._num_outputs == mock_nn._num_outputs
+        assert new_nn._input_layer._activation == mock_nn._input_layer._activation
+        assert new_nn._hidden_layers[0]._activation == mock_nn._hidden_layers[0]._activation
+        assert new_nn._output_layer._activation == mock_nn._output_layer._activation
+        assert len(new_nn.weights) == len(mock_nn.weights)
+        assert len(new_nn.bias) == len(mock_nn.bias)
+        assert new_nn._lr == mock_nn._lr
+
     def test_given_nn_when_creating_layers_then_check_nn_has_correct_layers(
         self, mock_nn: NeuralNetwork, mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int
     ) -> None:
