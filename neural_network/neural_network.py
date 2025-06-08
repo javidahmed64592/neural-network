@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import cast
 
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
@@ -129,15 +130,17 @@ class NeuralNetwork:
         return cls.from_protobuf(nn_data)
 
     @staticmethod
-    def save_to_file(nn: NeuralNetwork, file_path: str) -> None:
+    def save_to_file(nn: NeuralNetwork, filename: str, directory: Path) -> None:
         """
         Save a NeuralNetwork to a file.
 
         Parameters:
             nn (NeuralNetwork): Neural network instance to save
-            file_path (str): Path to the file where the neural network data will be saved
+            filename (str): Name of the file where the neural network data will be saved
+            directory (Path): Directory where the file will be saved
         """
         nn_data = NeuralNetwork.to_protobuf(nn)
+        file_path = directory / f"{filename}.pb"
         with open(file_path, "wb") as file:
             file.write(NeuralNetworkDataType.to_bytes(nn_data))
 

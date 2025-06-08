@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import mock_open, patch
 
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
@@ -59,9 +60,12 @@ class TestNeuralNetwork:
 
     def test_save_to_file(self, mock_nn: NeuralNetwork) -> None:
         nn_data = NeuralNetwork.to_protobuf(mock_nn)
+        mock_folder = Path("mock_folder_path")
+        mock_filename = "mock_nn"
+
         with patch("builtins.open", mock_open()) as mock_file:
-            NeuralNetwork.save_to_file(mock_nn, "mock_file_path")
-            mock_file.assert_called_once_with("mock_file_path", "wb")
+            NeuralNetwork.save_to_file(mock_nn, mock_filename, mock_folder)
+            mock_file.assert_called_once_with(mock_folder / f"{mock_filename}.pb", "wb")
             mock_file().write.assert_called_once_with(NeuralNetworkDataType.to_protobuf(nn_data).SerializeToString())
 
     def test_given_nn_when_creating_layers_then_check_nn_has_correct_layers(
