@@ -6,36 +6,44 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "neural-network"
-version = "1.15.1"
+version = "1.15.2"
 description = "An artificial neural network library in Python."
 readme = "README.md"
 requires-python = ">=3.12"
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
 authors = [
     { name = "Javid Ahmed", email = "javidahmed@icloud.com" }
 ]
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "numpy",
+    "pydantic"
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ipykernel",
-    "matplotlib",
     "ruff",
     "mypy",
     "pytest",
     "pytest-cov",
     "tomli",
+    "grpcio-tools",
+    "ipykernel",
+    "matplotlib"
 ]
 
 [project.urls]
 repository = "https://github.com/javidahmed64592/neural-network"
+
+[project.scripts]
+compile-protobuf = "neural_network.protobuf.compile_protobuf:main"
+
+[tool.setuptools.packages.find]
+include = ["neural_network*"]
+exclude = ["protobuf*"]
 
 [tool.pytest.ini_options]
 addopts = [
@@ -76,6 +84,10 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
+]
+
+extend-exclude = [
+    "neural_network/protobuf/compiled",
 ]
 
 [tool.ruff.lint]
@@ -139,5 +151,6 @@ pretty = true
 module = [
     "neural_network.*",
     "numpy.*",
+    "google.*"
 ]
 ignore_missing_imports = true

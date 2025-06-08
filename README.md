@@ -23,7 +23,8 @@ _Note: It is recommended to install this into a virtual environment._
   - [Creating a Neural Network](#creating-a-neural-network)
   - [Training a Neural Network](#training-a-neural-network)
   - [Saving and Loading Models](#saving-and-loading-models)
-  - [Neuroevolution](#neuroevolution)
+- [Protobuf Classes](#protobuf-classes)
+- [Neuroevolution](#neuroevolution)
 - [Testing](#testing)
 - [Linting and Formatting](#linting-and-formatting)
 - [Type Checking](#type-checking)
@@ -83,19 +84,33 @@ errors = nn.train(inputs, expected_outputs)
 ```
 
 ### Saving and Loading Models
-The neural network weights and biases can be saved to a `json` file:
+The neural network weights and biases can be saved to a Protobuf file (`.pb`):
 
 ```python
-nn.save("/path/to/nn_model.json")
+from pathlib import Path
+
+directory = Path("models")
+filename = "neural_network_data.pb"
+NeuralNetwork.save_to_file(nn, filename, directory)
 ```
 
-To load a neural network from a file:
+To load a neural network from a Protobuf file:
 
 ```python
-nn = NeuralNetwork.from_file("/path/to/nn_model.json")
+loaded_nn = NeuralNetwork.load_from_file(filepath)
 ```
 
-### Neuroevolution
+## Protobuf Classes
+
+This library supports saving and loading neural network models using [Protocol Buffers (Protobuf)](https://developers.google.com/protocol-buffers). The Protobuf schema is defined in [`protobuf/NeuralNetwork.proto`](protobuf/NeuralNetwork.proto) and compiled Python classes are used for serialization.
+
+- **Saving a model:** The `NeuralNetwork.save_to_file()` method serializes the model to a `.pb` file using Protobuf.
+- **Loading a model:** The `NeuralNetwork.load_from_file()` method deserializes a `.pb` file back into a neural network instance.
+- **Protobuf schema:** The schema defines messages for activation functions, matrices, and the neural network structure.
+
+This enables efficient, language-agnostic storage and transfer of neural network models.
+
+## Neuroevolution
 New weights and biases can also be calculated via crossover:
 
 ```python
