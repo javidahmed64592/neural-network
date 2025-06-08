@@ -45,7 +45,7 @@ class NeuralNetworkData(_message.Message):
     input_activation: ActivationFunctionData
     hidden_activation: ActivationFunctionData
     output_activation: ActivationFunctionData
-    weights: MatrixData
-    biases: MatrixData
+    weights: _containers.RepeatedCompositeFieldContainer[MatrixData]
+    biases: _containers.RepeatedCompositeFieldContainer[MatrixData]
     learning_rate: float
-    def __init__(self, num_inputs: _Optional[int] = ..., hidden_layer_sizes: _Optional[_Iterable[int]] = ..., num_outputs: _Optional[int] = ..., input_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., hidden_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., output_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., weights: _Optional[_Union[MatrixData, _Mapping]] = ..., biases: _Optional[_Union[MatrixData, _Mapping]] = ..., learning_rate: _Optional[float] = ...) -> None: ...
+    def __init__(self, num_inputs: _Optional[int] = ..., hidden_layer_sizes: _Optional[_Iterable[int]] = ..., num_outputs: _Optional[int] = ..., input_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., hidden_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., output_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., weights: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., biases: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., learning_rate: _Optional[float] = ...) -> None: ...

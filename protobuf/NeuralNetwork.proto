@@ -22,7 +22,7 @@ message NeuralNetworkData {
     ActivationFunctionData input_activation = 4;
     optional ActivationFunctionData hidden_activation = 5;
     ActivationFunctionData output_activation = 6;
-    MatrixData weights = 7;
-    MatrixData biases = 8;
+    repeated MatrixData weights = 7;
+    repeated MatrixData biases = 8;
     float learning_rate = 9;
 }
