@@ -22,7 +22,7 @@ def compile_protobuf() -> bool:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     if not (proto_files := list(PROTO_DIR.glob("*.proto"))):
-        logger.warning("No .proto files found in the protobuf directory.")
+        logger.warning("No .proto files found in the Protobuf directory.")
         return False
 
     logger.info("Generating Protobuf files...")
