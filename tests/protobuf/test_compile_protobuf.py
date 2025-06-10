@@ -1,4 +1,4 @@
-"""Unit tests for the src/neural_network/protobuf/compile_protobuf.py module."""
+"""Unit tests for the neural_network/protobuf/compile_protobuf.py module."""
 
 import sys
 from collections.abc import Generator

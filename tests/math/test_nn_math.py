@@ -1,9 +1,13 @@
+"""Unit tests for the neural_network.math.nn_math.py module."""
+
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
 
 
 class TestNNMath:
+    """Test cases for neural network math utility functions."""
+
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self,
         mock_input_matrix: Matrix,
@@ -13,6 +17,7 @@ class TestNNMath:
         mock_bias_range: list[float],
         mock_activation: type[LinearActivation],
     ) -> None:
+        """Test feedforward through a layer produces output of correct shape."""
         weights_ih = Matrix.random_matrix(
             rows=mock_len_hidden[0], cols=len(mock_inputs), low=mock_weights_range[0], high=mock_weights_range[1]
         )
@@ -29,6 +34,7 @@ class TestNNMath:
     def test_given_errors_when_calculating_gradient_then_check_gradient_has_correct_shape(
         self, mock_input_matrix: Matrix, mock_activation: type[LinearActivation]
     ) -> None:
+        """Test gradient calculation produces output of correct shape."""
         errors = Matrix.from_array([0.0, 1.0, 0.5])
         lr = 0.1
 
@@ -41,6 +47,7 @@ class TestNNMath:
     def test_given_gradients_when_calculating_delta_then_check_delta_has_correct_shape(
         self, mock_input_matrix: Matrix
     ) -> None:
+        """Test delta calculation produces output of correct shape."""
         gradient = Matrix.from_array([0.0, 1.0, 0.2])
 
         delta = nn_math.calculate_delta(mock_input_matrix, gradient)
@@ -50,6 +57,7 @@ class TestNNMath:
         assert actual_shape == expected_shape
 
     def test_given_errors_when_backpropagating_then_check_errors_have_correct_shape(self) -> None:
+        """Test error backpropagation produces output of correct shape."""
         weights = Matrix.random_matrix(2, 2, -1, 1)
         errors = Matrix.from_array([0.0, 1.0])
 

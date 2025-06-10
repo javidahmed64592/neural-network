@@ -1,3 +1,5 @@
+"""Unit tests for the neural_network/neural_network.py module."""
+
 from pathlib import Path
 from unittest.mock import mock_open, patch
 
@@ -13,11 +15,15 @@ def make_hidden_layer(
     weights_range: tuple[float, float],
     bias_range: tuple[float, float],
 ) -> HiddenLayer:
+    """Create a HiddenLayer for testing."""
     return HiddenLayer(size, activation, weights_range, bias_range)
 
 
 class TestNeuralNetwork:
+    """Test cases for the NeuralNetwork class."""
+
     def test_to_protobuf(self, mock_nn: NeuralNetwork) -> None:
+        """Test converting a neural network to protobuf format."""
         nn_data = NeuralNetwork.to_protobuf(mock_nn)
         assert nn_data.num_inputs == mock_nn._num_inputs
         assert nn_data.hidden_layer_sizes == mock_nn._hidden_layer_sizes
@@ -30,6 +36,7 @@ class TestNeuralNetwork:
         assert nn_data.learning_rate == mock_nn._lr
 
     def test_from_protobuf(self, mock_nn: NeuralNetwork) -> None:
+        """Test creating a neural network from protobuf format."""
         nn_data = NeuralNetwork.to_protobuf(mock_nn)
         new_nn = NeuralNetwork.from_protobuf(nn_data)
         assert new_nn._num_inputs == mock_nn._num_inputs
@@ -43,6 +50,7 @@ class TestNeuralNetwork:
         assert new_nn._lr == mock_nn._lr
 
     def test_load_from_file(self, mock_nn: NeuralNetwork) -> None:
+        """Test loading a neural network from a file."""
         nn_data = NeuralNetwork.to_protobuf(mock_nn)
         with patch(
             "builtins.open", mock_open(read_data=NeuralNetworkDataType.to_protobuf(nn_data).SerializeToString())
@@ -59,6 +67,7 @@ class TestNeuralNetwork:
             assert loaded_nn._lr == mock_nn._lr
 
     def test_save_to_file(self, mock_nn: NeuralNetwork) -> None:
+        """Test saving a neural network to a file."""
         nn_data = NeuralNetwork.to_protobuf(mock_nn)
         mock_folder = Path("mock_folder_path")
         mock_filename = "mock_nn"
@@ -71,6 +80,7 @@ class TestNeuralNetwork:
     def test_given_nn_when_creating_layers_then_check_nn_has_correct_layers(
         self, mock_nn: NeuralNetwork, mock_len_inputs: int, mock_len_hidden: list[int], mock_len_outputs: int
     ) -> None:
+        """Test that the neural network has correct layers after creation."""
         expected_sizes = [mock_len_inputs, *mock_len_hidden, mock_len_outputs]
         for index, layer in enumerate(mock_nn.layers):
             assert layer.size == expected_sizes[index]
@@ -78,6 +88,7 @@ class TestNeuralNetwork:
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
     ) -> None:
+        """Test feedforward produces output of correct shape."""
         output = mock_nn.feedforward(mock_inputs)
         actual_len = len(output)
         assert actual_len == mock_len_outputs
@@ -85,6 +96,7 @@ class TestNeuralNetwork:
     def test_given_inputs_and_outputs_when_training_then_check_error_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_outputs: list[float], mock_len_outputs: int
     ) -> None:
+        """Test training produces error of correct shape."""
         output_errors = mock_nn.train(mock_inputs, mock_outputs)
         actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
@@ -92,6 +104,7 @@ class TestNeuralNetwork:
     def test_given_inputs_and_fitnesses_when_training_then_check_error_has_correct_shape(
         self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
     ) -> None:
+        """Test training with fitness produces error of correct shape."""
         output_errors = mock_nn.train_with_fitness(mock_inputs, 1, 0.8)
         actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
@@ -103,6 +116,7 @@ class TestNeuralNetwork:
         mock_training_outputs: list[list[float]],
         mock_len_outputs: int,
     ) -> None:
+        """Test supervised training updates weights and maintains output shape."""
         initial_weights = [layer.weights.vals.copy() for layer in mock_nn.layers[1:]]
 
         mock_nn.run_supervised_training(mock_training_inputs, mock_training_outputs, epochs=2)
@@ -121,6 +135,7 @@ class TestNeuralNetwork:
         mock_fitnesses: list[float],
         mock_len_outputs: int,
     ) -> None:
+        """Test fitness-based training updates weights and maintains output shape."""
         initial_weights = [layer.weights.vals.copy() for layer in mock_nn.layers[1:]]
 
         mock_nn.run_fitness_training(mock_training_inputs, mock_fitnesses, epochs=2, alpha=0.2)
@@ -142,6 +157,7 @@ class TestNeuralNetwork:
         mock_weights_range: tuple[float, float],
         mock_bias_range: tuple[float, float],
     ) -> None:
+        """Test crossover between two neural networks maintains correct output shape."""
         mutation_rate = 0.05
 
         def _mock_crossover_func(element: float, other_element: float, roll: float) -> float:

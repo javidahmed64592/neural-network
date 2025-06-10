@@ -1,3 +1,5 @@
+"""Unit tests for the neural_network.math.matrix.py module."""
+
 from unittest.mock import patch
 
 import numpy as np
@@ -9,7 +11,10 @@ from neural_network.protobuf.neural_network_types import MatrixDataType
 
 
 class TestMatrix:
+    """Test cases for the Matrix class."""
+
     def test_given_protobuf_message_when_creating_matrix_then_check_has_correct_vals(self) -> None:
+        """Test creating a Matrix from a protobuf message."""
         test_vals = [1.0, 2.0, 3.0]
         test_rows = 1
         test_cols = 3
@@ -24,6 +29,7 @@ class TestMatrix:
     def test_given_matrix_when_converting_to_protobuf_then_check_has_correct_vals(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
+        """Test converting a Matrix to a protobuf message."""
         test_matrix = Matrix.random_matrix(
             rows=mock_len_inputs, cols=mock_len_hidden[0], low=mock_weights_range[0], high=mock_weights_range[1]
         )
@@ -36,6 +42,7 @@ class TestMatrix:
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
     ) -> None:
+        """Test creating a random Matrix with a given shape."""
         test_matrix = Matrix.random_matrix(
             rows=mock_len_inputs, cols=mock_len_outputs, low=mock_weights_range[0], high=mock_weights_range[1]
         )
@@ -48,6 +55,7 @@ class TestMatrix:
     def test_given_shape_when_creating_random_column_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int
     ) -> None:
+        """Test creating a random column Matrix with a given shape."""
         test_matrix = Matrix.random_column(rows=mock_len_inputs, low=mock_weights_range[0], high=mock_weights_range[1])
 
         expected_shape = (mock_len_inputs, 1)
@@ -58,6 +66,7 @@ class TestMatrix:
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
+        """Test creating a Matrix from a 2D array."""
         test_array = Matrix._uniform(
             low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden[0])
         )
@@ -71,6 +80,7 @@ class TestMatrix:
     def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_hidden: list[int]
     ) -> None:
+        """Test creating a Matrix from a 1D array."""
         test_array = Matrix._uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
         test_matrix = Matrix.from_array(matrix_array=test_array)
 
@@ -80,6 +90,7 @@ class TestMatrix:
             assert actual == expected
 
     def test_given_two_matrices_when_adding_then_check_new_matrix_correctly_calculated(self) -> None:
+        """Test element-wise addition of two matrices."""
         array_1 = np.array([[1, 2], [4, 3]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -92,6 +103,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_two_matrices_when_subtracting_then_check_new_matrix_correctly_calculated(self) -> None:
+        """Test element-wise subtraction of two matrices."""
         array_1 = np.array([[1, 2], [4, 3]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -104,6 +116,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_two_matrices_when_multiplying_then_check_new_matrix_correctly_calculated(self) -> None:
+        """Test matrix multiplication of two matrices."""
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         array_2 = np.array([[-1, 1], [2, -5]])
 
@@ -116,6 +129,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_two_matrices_when_multiplying_element_wise_then_check_new_matrix_correctly_calculated(self) -> None:
+        """Test element-wise multiplication of two matrices."""
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
         array_2 = np.array([[-1, 1], [2, -5], [3, 2]])
 
@@ -128,6 +142,7 @@ class TestMatrix:
         assert np.all(actual_vals == expected_vals)
 
     def test_given_matrix_and_scalar_when_multiplying_then_check_new_matrix_correctly_calculated(self) -> None:
+        """Test scalar multiplication of a matrix."""
         array = np.array([[1, 2], [4, 3], [2, 4]])
         multiplier = 3
 
@@ -141,6 +156,7 @@ class TestMatrix:
     def test_given_matrix_when_mapping_then_check_new_matrix_correctly_calculated(
         self, mock_activation: type[ActivationFunction]
     ) -> None:
+        """Test mapping a function over a matrix."""
         array_1 = np.array([[1, 2], [4, 3], [2, 4]])
 
         matrix_1 = Matrix.from_array(array_1)
@@ -153,6 +169,7 @@ class TestMatrix:
     def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_correctly_calculated(
         self, mock_weights_range: list[float]
     ) -> None:
+        """Test crossover operation between two matrices."""
         mutation_rate = 0.5
 
         def _mock_crossover_func(element: float, other_element: float, roll: float) -> float:
