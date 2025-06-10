@@ -1,3 +1,5 @@
+"""Utility for compiling .proto files into Python classes for the websocket server and clients."""
+
 import logging
 import subprocess
 import sys
@@ -12,8 +14,11 @@ OUT_DIR = PROJECT_ROOT / "neural_network" / "protobuf" / "compiled"
 
 
 def compile_protobuf() -> bool:
-    """Compile protobuf files to Python classes."""
+    """Compile Protobuf files to Python classes.
 
+    :return bool:
+        True if compilation succeeded, False otherwise.
+    """
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     if not (proto_files := list(PROTO_DIR.glob("*.proto"))):
@@ -38,11 +43,11 @@ def compile_protobuf() -> bool:
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=PROJECT_ROOT, check=False)  # noqa: S603
 
         if result.returncode != 0:
-            logger.error("Error during protobuf compilation:")
+            logger.error("Error during Protobuf compilation:")
             logger.error(result.stderr)
             return False
     except Exception:
-        logger.exception("Error during protobuf compilation")
+        logger.exception("Error during Protobuf compilation")
         return False
     else:
         logger.info("Protobuf generation complete!")
@@ -51,4 +56,5 @@ def compile_protobuf() -> bool:
 
 
 def main() -> None:
+    """Entry point for compiling Protobuf files from the command line."""
     sys.exit(0 if compile_protobuf() else 1)
