@@ -5,8 +5,19 @@ import pytest
 
 from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
 from neural_network.math.matrix import Matrix
-from neural_network.protobuf.compiled.NeuralNetwork_pb2 import ActivationFunctionData, MatrixData, NeuralNetworkData
-from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, MatrixDataType, NeuralNetworkDataType
+from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
+from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
+    ActivationFunctionData,
+    MatrixData,
+    NeuralNetworkData,
+    OptimizationAlgorithm,
+)
+from neural_network.protobuf.neural_network_types import (
+    ActivationFunctionEnum,
+    MatrixDataType,
+    NeuralNetworkDataType,
+    OptimizationAlgorithmEnum,
+)
 
 rng = np.random.default_rng()
 
@@ -105,6 +116,30 @@ class TestMatrixDataType:
         assert result.data == pytest.approx(matrix_data_type.data)
         assert result.rows == matrix_data_type.rows
         assert result.cols == matrix_data_type.cols
+
+
+class TestOptimizationAlgorithmEnum:
+    """Test cases for OptimizationAlgorithmEnum conversions."""
+
+    def test_get_class(self) -> None:
+        """Test getting the optimization algorithm class from enum."""
+        assert OptimizationAlgorithmEnum.SGD.get_class() == SGDOptimizer
+        assert OptimizationAlgorithmEnum.ADAM.get_class() == AdamOptimizer
+
+    def test_from_class(self) -> None:
+        """Test getting the enum from optimization algorithm class."""
+        assert OptimizationAlgorithmEnum.from_class(SGDOptimizer) == OptimizationAlgorithmEnum.SGD
+        assert OptimizationAlgorithmEnum.from_class(AdamOptimizer) == OptimizationAlgorithmEnum.ADAM
+
+    def test_from_protobuf(self) -> None:
+        """Test getting the enum from protobuf value."""
+        assert OptimizationAlgorithmEnum.from_protobuf(OptimizationAlgorithm.SGD) == OptimizationAlgorithmEnum.SGD
+        assert OptimizationAlgorithmEnum.from_protobuf(OptimizationAlgorithm.ADAM) == OptimizationAlgorithmEnum.ADAM
+
+    def test_to_protobuf(self) -> None:
+        """Test converting enum to protobuf value."""
+        assert OptimizationAlgorithmEnum.to_protobuf(OptimizationAlgorithmEnum.SGD) == OptimizationAlgorithm.SGD
+        assert OptimizationAlgorithmEnum.to_protobuf(OptimizationAlgorithmEnum.ADAM) == OptimizationAlgorithm.ADAM
 
 
 class TestNeuralNetworkDataType:

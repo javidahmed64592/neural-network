@@ -15,10 +15,12 @@ from neural_network.math.activation_functions import (
     TanhActivation,
 )
 from neural_network.math.matrix import Matrix
+from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     MatrixData,
     NeuralNetworkData,
+    OptimizationAlgorithm,
 )
 
 
@@ -176,6 +178,68 @@ class MatrixDataType:
         """
         matrix_array = np.array(matrix_data.data, dtype=np.float64).reshape((matrix_data.rows, matrix_data.cols))
         return Matrix.from_array(matrix_array)
+
+
+class OptimizationAlgorithmEnum(IntEnum):
+    """Enum for supported activation functions."""
+
+    SGD = 0
+    ADAM = 1
+
+    @property
+    def map(self) -> dict[OptimizationAlgorithmEnum, type[Optimizer]]:
+        """Return a mapping from enum to optimizer class.
+
+        :return dict[OptimizationAlgorithmEnum, type[Optimizer]]:
+            Mapping from enum to optimizer class.
+        """
+        return {
+            OptimizationAlgorithmEnum.SGD: SGDOptimizer,
+            OptimizationAlgorithmEnum.ADAM: AdamOptimizer,
+        }
+
+    def get_class(self) -> type[Optimizer]:
+        """Return the corresponding optimizer class.
+
+        :return type[Optimizer]:
+            The optimizer class.
+        """
+        return self.map[self]
+
+    @classmethod
+    def from_class(cls, optimizer: type[Optimizer]) -> OptimizationAlgorithmEnum:
+        """Return the enum value for a given optimizer class.
+
+        :param type[Optimizer] optimizer:
+            The optimizer class.
+        :return OptimizationAlgorithmEnum:
+            The corresponding enum value.
+        """
+        reverse_map = {v: k for k, v in cls.SGD.map.items()}
+        return reverse_map[optimizer]
+
+    @classmethod
+    def from_protobuf(cls, proto_enum_value: OptimizationAlgorithm) -> OptimizationAlgorithmEnum:
+        """Return the enum value from a Protobuf OptimizationAlgorithmEnum value.
+
+        :param OptimizationAlgorithmEnum proto_enum_value:
+            The Protobuf enum value.
+        :return OptimizationAlgorithmEnum:
+            The corresponding enum value.
+        """
+        return cls(proto_enum_value)
+
+    @staticmethod
+    def to_protobuf(enum_value: OptimizationAlgorithmEnum) -> OptimizationAlgorithm:
+        """Return the Protobuf OptimizationAlgorithm from an enum value.
+
+        :param OptimizationAlgorithmEnum enum_value:
+            The enum value.
+        :return OptimizationAlgorithm:
+            The Protobuf enum value.
+        """
+        return OptimizationAlgorithm.Value(enum_value.name)  # type: ignore[no-any-return]
+
 
 @dataclass
 class NeuralNetworkDataType:
