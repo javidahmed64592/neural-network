@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network.protobuf.neural_network_types.py module."""
+"""Unit tests for the neural_network.protobuf.neural_network_types module."""
 
 import numpy as np
 import pytest

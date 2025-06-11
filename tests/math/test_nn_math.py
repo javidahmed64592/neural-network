@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network.math.nn_math.py module."""
+"""Unit tests for the neural_network.math.nn_math module."""
 
 from neural_network.math import nn_math
 from neural_network.math.activation_functions import LinearActivation

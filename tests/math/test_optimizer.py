@@ -1,5 +1,5 @@
 # mypy: disable-error-code=unreachable
-"""Unit tests for the neural_network/math/optimizer.py module."""
+"""Unit tests for the neural_network.math.optimizer module."""
 
 import numpy as np
 import pytest

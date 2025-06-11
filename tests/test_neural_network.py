@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network/neural_network.py module."""
+"""Unit tests for the neural_network.neural_network module."""
 
 from pathlib import Path
 from unittest.mock import mock_open, patch

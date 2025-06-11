@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network/layer.py module."""
+"""Unit tests for the neural_network.layer module."""
 
 import numpy as np
 

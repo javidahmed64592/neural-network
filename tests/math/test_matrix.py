@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network.math.matrix.py module."""
+"""Unit tests for the neural_network.math.matrix module."""
 
 from unittest.mock import patch
 
