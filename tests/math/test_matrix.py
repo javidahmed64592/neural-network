@@ -25,6 +25,8 @@ class TestMatrix:
 
         assert actual_vals == test_vals
         assert test_matrix.shape == (test_rows, test_cols)
+        assert test_matrix.rows == test_rows
+        assert test_matrix.cols == test_cols
 
     def test_given_matrix_when_converting_to_protobuf_then_check_has_correct_vals(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
@@ -36,8 +38,8 @@ class TestMatrix:
         matrix_data = Matrix.to_protobuf(test_matrix)
 
         assert matrix_data.data == pytest.approx(test_matrix.vals.flatten().tolist())
-        assert matrix_data.rows == mock_len_inputs
-        assert matrix_data.cols == mock_len_hidden[0]
+        assert matrix_data.rows == test_matrix.rows
+        assert matrix_data.cols == test_matrix.cols
 
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
@@ -67,24 +69,11 @@ class TestMatrix:
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
     ) -> None:
         """Test creating a Matrix from a 2D array."""
-        test_array = Matrix._uniform(
-            low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_inputs, mock_len_hidden[0])
+        test_matrix = Matrix.random_matrix(
+            rows=mock_len_inputs, cols=mock_len_hidden[0], low=mock_weights_range[0], high=mock_weights_range[1]
         )
-        test_matrix = Matrix.from_array(matrix_array=test_array)
 
         expected_shape = (mock_len_inputs, mock_len_hidden[0])
-        actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape, strict=False):
-            assert actual == expected
-
-    def test_given_1d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
-        self, mock_weights_range: list[float], mock_len_hidden: list[int]
-    ) -> None:
-        """Test creating a Matrix from a 1D array."""
-        test_array = Matrix._uniform(low=mock_weights_range[0], high=mock_weights_range[1], size=(mock_len_hidden[0]))
-        test_matrix = Matrix.from_array(matrix_array=test_array)
-
-        expected_shape = (mock_len_hidden[0], 1)
         actual_shape = test_matrix.shape
         for actual, expected in zip(actual_shape, expected_shape, strict=False):
             assert actual == expected
@@ -181,7 +170,8 @@ class TestMatrix:
         array_2 = np.array([[-1, 1], [2, -5]])
         roll_array = np.array([[0.1, 0.6], [0.4, 0.8]])
 
-        with patch("neural_network.math.matrix.Matrix._uniform", return_value=roll_array):
+        with patch("neural_network.math.matrix.rng") as mock_rng:
+            mock_rng.uniform.return_value = roll_array
             matrix_1 = Matrix.from_array(array_1)
             matrix_2 = Matrix.from_array(array_2)
             new_matrix = Matrix.crossover(
