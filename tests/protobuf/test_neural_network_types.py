@@ -11,12 +11,14 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     MatrixData,
     NeuralNetworkData,
     OptimizationAlgorithm,
+    OptimizerData,
 )
 from neural_network.protobuf.neural_network_types import (
     ActivationFunctionEnum,
     MatrixDataType,
     NeuralNetworkDataType,
     OptimizationAlgorithmEnum,
+    OptimizerDataType,
 )
 
 rng = np.random.default_rng()
@@ -140,6 +142,67 @@ class TestOptimizationAlgorithmEnum:
         """Test converting enum to protobuf value."""
         assert OptimizationAlgorithmEnum.to_protobuf(OptimizationAlgorithmEnum.SGD) == OptimizationAlgorithm.SGD
         assert OptimizationAlgorithmEnum.to_protobuf(OptimizationAlgorithmEnum.ADAM) == OptimizationAlgorithm.ADAM
+
+
+class TestOptimizerDataType:
+    """Test cases for OptimizerDataType conversions."""
+
+    @pytest.fixture
+    def optimizer_data(self) -> OptimizerData:
+        """Fixture for an OptimizerData protobuf message."""
+        return OptimizerData(
+            algorithm=OptimizationAlgorithm.SGD,
+            learning_rate=0.01,
+            beta1=0.9,
+            beta2=0.999,
+            epsilon=1e-8,
+        )
+
+    @pytest.fixture
+    def optimizer_data_type(self, optimizer_data: OptimizerData) -> OptimizerDataType:
+        """Fixture for an OptimizerDataType instance."""
+        return OptimizerDataType(
+            algorithm=OptimizationAlgorithmEnum.from_protobuf(optimizer_data.algorithm),
+            learning_rate=optimizer_data.learning_rate,
+            beta1=optimizer_data.beta1,
+            beta2=optimizer_data.beta2,
+            epsilon=optimizer_data.epsilon,
+        )
+
+    def test_from_protobuf(self, optimizer_data: OptimizerData) -> None:
+        """Test creating OptimizerDataType from protobuf message."""
+        optimizer_data_type = OptimizerDataType.from_protobuf(optimizer_data)
+
+        assert optimizer_data_type.algorithm == OptimizationAlgorithmEnum.from_protobuf(optimizer_data.algorithm)
+        assert optimizer_data_type.learning_rate == optimizer_data.learning_rate
+        assert optimizer_data_type.beta1 == optimizer_data.beta1
+        assert optimizer_data_type.beta2 == optimizer_data.beta2
+        assert optimizer_data_type.epsilon == optimizer_data.epsilon
+
+    def test_to_protobuf(self, optimizer_data_type: OptimizerDataType) -> None:
+        """Test converting OptimizerDataType to protobuf message."""
+        protobuf_data = OptimizerDataType.to_protobuf(optimizer_data_type)
+
+        assert protobuf_data.algorithm == OptimizationAlgorithmEnum.to_protobuf(optimizer_data_type.algorithm)
+        assert protobuf_data.learning_rate == optimizer_data_type.learning_rate
+        assert protobuf_data.beta1 == optimizer_data_type.beta1
+        assert protobuf_data.beta2 == optimizer_data_type.beta2
+        assert protobuf_data.epsilon == optimizer_data_type.epsilon
+
+    def test_from_bytes(self, optimizer_data_type: OptimizerDataType) -> None:
+        """Test deserializing OptimizerDataType from bytes."""
+        msg_bytes = OptimizerDataType.to_bytes(optimizer_data_type)
+        result = OptimizerDataType.from_bytes(msg_bytes)
+
+        assert result.algorithm == optimizer_data_type.algorithm
+        assert result.learning_rate == optimizer_data_type.learning_rate
+        assert result.beta1 == optimizer_data_type.beta1
+        assert result.beta2 == optimizer_data_type.beta2
+        assert result.epsilon == optimizer_data_type.epsilon
+
+    def test_to_bytes(self, optimizer_data_type: OptimizerDataType) -> None:
+        """Test serializing OptimizerDataType to bytes."""
+        assert isinstance(OptimizerDataType.to_bytes(optimizer_data_type), bytes)
 
 
 class TestNeuralNetworkDataType:

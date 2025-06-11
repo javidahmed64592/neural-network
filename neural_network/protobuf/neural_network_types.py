@@ -21,6 +21,7 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     MatrixData,
     NeuralNetworkData,
     OptimizationAlgorithm,
+    OptimizerData,
 )
 
 
@@ -239,6 +240,76 @@ class OptimizationAlgorithmEnum(IntEnum):
             The Protobuf enum value.
         """
         return OptimizationAlgorithm.Value(enum_value.name)  # type: ignore[no-any-return]
+
+
+@dataclass
+class OptimizerDataType:
+    """Data class to hold optimizer data."""
+
+    algorithm: OptimizationAlgorithmEnum
+    learning_rate: float
+    beta1: float = 0.9
+    beta2: float = 0.999
+    epsilon: float = 1e-8
+
+    @classmethod
+    def from_protobuf(cls, optimizer_data: OptimizerData) -> OptimizerDataType:
+        """Create a OptimizerDataType instance from Protobuf.
+
+        :param OptimizerData optimizer_data:
+            The Protobuf OptimizerData message.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        return cls(
+            algorithm=OptimizationAlgorithmEnum.from_protobuf(optimizer_data.algorithm),
+            learning_rate=optimizer_data.learning_rate,
+            beta1=optimizer_data.beta1,
+            beta2=optimizer_data.beta2,
+            epsilon=optimizer_data.epsilon,
+        )
+
+    @staticmethod
+    def to_protobuf(optimizer_data: OptimizerDataType) -> OptimizerData:
+        """Convert OptimizerDataType to Protobuf.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return OptimizerData:
+            The corresponding Protobuf OptimizerData message.
+        """
+        return OptimizerData(
+            algorithm=OptimizationAlgorithmEnum.to_protobuf(optimizer_data.algorithm),
+            learning_rate=optimizer_data.learning_rate,
+            beta1=optimizer_data.beta1,
+            beta2=optimizer_data.beta2,
+            epsilon=optimizer_data.epsilon,
+        )
+
+    @classmethod
+    def from_bytes(cls, optimizer_data: bytes) -> OptimizerDataType:
+        """Create a OptimizerDataType instance from Protobuf bytes.
+
+        :param bytes optimizer_data:
+            The Protobuf-serialized OptimizerData bytes.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        optimizer = OptimizerData()
+        optimizer.ParseFromString(optimizer_data)
+        return cls.from_protobuf(optimizer)
+
+    @staticmethod
+    def to_bytes(optimizer_data: OptimizerDataType) -> bytes:
+        """Convert OptimizerDataType to Protobuf bytes.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return bytes:
+            The Protobuf-serialized OptimizerData bytes.
+        """
+        optimizer = OptimizerDataType.to_protobuf(optimizer_data)
+        return optimizer.SerializeToString()  # type: ignore[no-any-return]
 
 
 @dataclass
