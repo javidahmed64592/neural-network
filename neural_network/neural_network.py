@@ -1,3 +1,5 @@
+"""Neural network class for feedforward and training operations."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -11,10 +13,7 @@ from neural_network.protobuf.neural_network_types import ActivationFunctionEnum,
 
 
 class NeuralNetwork:
-    """
-    This class can be used to create a NeuralNetwork with specified layer sizes. This neural network can feedforward a
-    list of inputs, and be trained through backpropagation of errors.
-    """
+    """Class representing a feedforward neural network with training and serialization capabilities."""
 
     def __init__(
         self,
@@ -23,12 +22,16 @@ class NeuralNetwork:
         hidden_layers: list[HiddenLayer] | None = None,
         lr: float = 0.1,
     ) -> None:
-        """
-        Initialise NeuralNetwork with a list of Layers and a learning rate.
+        """Initialise NeuralNetwork with a list of Layers and a learning rate.
 
-        Parameters:
-            layers (list[Layer]): NeuralNetwork layers
-            lr (float): Learning rate for training, defaults to 0.1
+        :param InputLayer input_layer:
+            Input layer of the neural network.
+        :param OutputLayer output_layer:
+            Output layer of the neural network.
+        :param list[HiddenLayer] | None hidden_layers:
+            List of hidden layers (optional).
+        :param float lr:
+            Learning rate for training (default 0.1).
         """
         self._input_layer = input_layer
         self._output_layer = output_layer
@@ -42,15 +45,23 @@ class NeuralNetwork:
         self._lr = lr
 
     def __str__(self) -> str:
+        """Return a string representation of the NeuralNetwork.
+
+        :return str:
+            String describing the neural network and its layers.
+        """
         return "NeuralNetwork:\n" + "\n".join([str(layer) for layer in self.layers])
 
     @classmethod
     def from_layers(cls, layers: list[Layer], lr: float = 0.1) -> NeuralNetwork:
-        """
-        Create a NeuralNetwork from a list of layers.
+        """Create a NeuralNetwork from a list of layers.
 
-        Parameters:
-            layers (list[Layer]): NeuralNetwork layers
+        :param list[Layer] layers:
+            List of layers for the neural network.
+        :param float lr:
+            Learning rate for training (default 0.1).
+        :return NeuralNetwork:
+            NeuralNetwork instance.
         """
         input_layer = cast(InputLayer, layers[0])
         output_layer = cast(OutputLayer, layers[-1])
@@ -60,11 +71,12 @@ class NeuralNetwork:
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkDataType) -> NeuralNetwork:
-        """
-        Create a NeuralNetwork from Protobuf data.
+        """Create a NeuralNetwork from Protobuf data.
 
-        Parameters:
-            nn_data (NeuralNetworkDataType): Neural network data from Protobuf
+        :param NeuralNetworkDataType nn_data:
+            Neural network data from Protobuf.
+        :return NeuralNetwork:
+            NeuralNetwork instance.
         """
         input_layer = InputLayer(
             size=nn_data.num_inputs, activation=ActivationFunctionEnum(nn_data.input_activation).get_class()
@@ -92,14 +104,12 @@ class NeuralNetwork:
 
     @staticmethod
     def to_protobuf(nn: NeuralNetwork) -> NeuralNetworkDataType:
-        """
-        Convert a NeuralNetwork instance to Protobuf data.
+        """Convert a NeuralNetwork instance to Protobuf data.
 
-        Parameters:
-            nn (NeuralNetwork): Neural network instance
-
-        Returns:
-            nn_data (NeuralNetworkDataType): Protobuf data containing neural network information
+        :param NeuralNetwork nn:
+            Neural network instance.
+        :return NeuralNetworkDataType:
+            Protobuf data containing neural network information.
         """
         return NeuralNetworkDataType(
             num_inputs=nn._num_inputs,
@@ -115,14 +125,12 @@ class NeuralNetwork:
 
     @classmethod
     def load_from_file(cls, file_path: str) -> NeuralNetwork:
-        """
-        Load a NeuralNetwork from a file.
+        """Load a NeuralNetwork from a file.
 
-        Parameters:
-            file_path (str): Path to the file containing the neural network data
-
-        Returns:
-            nn (NeuralNetwork): Loaded neural network instance
+        :param str file_path:
+            Path to the file containing the neural network data.
+        :return NeuralNetwork:
+            Loaded neural network instance.
         """
         with open(file_path, "rb") as file:
             data = file.read()
@@ -131,13 +139,14 @@ class NeuralNetwork:
 
     @staticmethod
     def save_to_file(nn: NeuralNetwork, filename: str, directory: Path) -> None:
-        """
-        Save a NeuralNetwork to a file.
+        """Save a NeuralNetwork to a file.
 
-        Parameters:
-            nn (NeuralNetwork): Neural network instance to save
-            filename (str): Name of the file where the neural network data will be saved
-            directory (Path): Directory where the file will be saved
+        :param NeuralNetwork nn:
+            Neural network instance to save.
+        :param str filename:
+            Name of the file where the neural network data will be saved.
+        :param Path directory:
+            Directory where the file will be saved.
         """
         nn_data = NeuralNetwork.to_protobuf(nn)
         file_path = directory / f"{filename}.pb"
@@ -146,35 +155,58 @@ class NeuralNetwork:
 
     @property
     def layers(self) -> list[Layer]:
+        """Return the list of layers in the neural network.
+
+        :return list[Layer]:
+            List of all layers (input, hidden, output).
+        """
         return [self._input_layer, *self._hidden_layers, self._output_layer]
 
     @property
     def weights(self) -> list[Matrix]:
+        """Return the list of weights matrices for all layers.
+
+        :return list[Matrix]:
+            List of weights matrices.
+        """
         return [layer.weights for layer in self.layers]
 
     @weights.setter
     def weights(self, new_weights: list[Matrix]) -> None:
+        """Set the weights matrices for all layers.
+
+        :param list[Matrix] new_weights:
+            List of new weights matrices.
+        """
         for layer, weights in zip(self.layers, new_weights, strict=False):
             layer.weights = weights
 
     @property
     def bias(self) -> list[Matrix]:
+        """Return the list of bias matrices for all layers.
+
+        :return list[Matrix]:
+            List of bias matrices.
+        """
         return [layer.bias for layer in self.layers]
 
     @bias.setter
     def bias(self, new_bias: list[Matrix]) -> None:
+        """Set the bias matrices for all layers.
+
+        :param list[Matrix] new_bias:
+            List of new bias matrices.
+        """
         for layer, bias in zip(self.layers, new_bias, strict=False):
             layer.bias = bias
 
     def feedforward(self, inputs: list[float]) -> list[float]:
-        """
-        Feedforward a list of inputs.
+        """Feedforward a list of input values through the network.
 
-        Parameters:
-            inputs (list[float]): List of input values
-
-        Returns:
-            output (list[float]): List of outputs
+        :param list[float] inputs:
+            List of input values.
+        :return list[float]:
+            List of output values.
         """
         vals = self._input_layer.feedforward(Matrix.from_array(inputs))
 
@@ -186,15 +218,14 @@ class NeuralNetwork:
         return output.as_list
 
     def train(self, inputs: list[float], expected_outputs: list[float]) -> list[float]:
-        """
-        Train NeuralNetwork using a list of input values and expected output values and backpropagate errors.
+        """Train the neural network using input and expected output values, and backpropagate errors.
 
-        Parameters:
-            inputs (list[float]): List of input values
-            expected_outputs (list[float]): List of output values
-
-        Returns:
-            output_errors (list[float]): List of output errors
+        :param list[float] inputs:
+            List of input values.
+        :param list[float] expected_outputs:
+            List of expected output values.
+        :return list[float]:
+            List of output errors.
         """
         vals = Matrix.from_array(inputs)
 
@@ -214,16 +245,16 @@ class NeuralNetwork:
         return output_errors.as_list
 
     def train_with_fitness(self, inputs: list[float], fitness: float, prev_fitness: float) -> list[float]:
-        """
-        Train the neural network using fitness values.
+        """Train the neural network using fitness values.
 
-        Parameters:
-            inputs (list[float]): List of input values
-            fitness (float): Fitness value for the current generation
-            prev_fitness (float): Fitness value for the previous generation
-
-        Returns:
-            output_errors (list[float]): List of output errors
+        :param list[float] inputs:
+            List of input values.
+        :param float fitness:
+            Fitness value for the current generation.
+        :param float prev_fitness:
+            Fitness value for the previous generation.
+        :return list[float]:
+            List of output errors.
         """
         vals = Matrix.from_array(inputs)
 
@@ -248,13 +279,14 @@ class NeuralNetwork:
         expected_outputs: list[list[float]],
         epochs: int = 1,
     ) -> None:
-        """
-        Train the neural network using supervised learning.
+        """Train the neural network using supervised learning.
 
-        Parameters:
-            inputs (list[list[float]]): List of input values
-            expected_outputs (list[list[float]]): List of expected output values
-            epochs (int): Number of training epochs, defaults to 1
+        :param list[list[float]] inputs:
+            List of input value lists.
+        :param list[list[float]] expected_outputs:
+            List of expected output value lists.
+        :param int epochs:
+            Number of training epochs (default 1).
         """
         for _ in range(epochs):
             for input_data, expected_output in zip(inputs, expected_outputs, strict=False):
@@ -267,14 +299,16 @@ class NeuralNetwork:
         epochs: int = 1,
         alpha: float = 0.1,
     ) -> None:
-        """
-        Train the neural network using fitness values.
+        """Train the neural network using fitness values.
 
-        Parameters:
-            inputs (list[list[float]]): List of input values
-            fitnesses (list[float]): List of fitness values for each input
-            epochs (int): Number of training epochs, defaults to 1
-            alpha (float): Smoothing factor for fitness values, defaults to 0.1
+        :param list[list[float]] inputs:
+            List of input value lists.
+        :param list[float] fitnesses:
+            List of fitness values for each input.
+        :param int epochs:
+            Number of training epochs (default 1).
+        :param float alpha:
+            Smoothing factor for fitness values (default 0.1).
         """
         prev_fitness = 0.0
 
@@ -296,19 +330,18 @@ class NeuralNetwork:
         weights_crossover_func: Callable,
         bias_crossover_func: Callable,
     ) -> tuple[list[Matrix], list[Matrix]]:
-        """
-        Crossover two Neural Networks by mixing their weights and biases, matching the topology of the instance of this
-        class.
+        """Crossover two neural networks by mixing their weights and biases, matching the topology of the first network.
 
-        Parameters:
-            nn (NeuralNetwork): Neural Network to use for average weights and biases
-            other_nn (NeuralNetwork): Other Neural Network to use for average weights and biases
-            weights_crossover_func (Callable): Custom function for crossover operations for layer weights
-            bias_crossover_func (Callable): Custom function for crossover operations for layer biases
-                Should accept (element, other_element, roll) and return a float
-
-        Returns:
-            new_weights, new_biases (tuple[list[Matrix], list[Matrix]]): New Layer weights and biases
+        :param NeuralNetwork nn:
+            First neural network for crossover.
+        :param NeuralNetwork other_nn:
+            Second neural network for crossover.
+        :param Callable weights_crossover_func:
+            Function for crossover operations on layer weights.
+        :param Callable bias_crossover_func:
+            Function for crossover operations on layer biases.
+        :return tuple[list[Matrix], list[Matrix]]:
+            New layer weights and biases.
         """
         new_weights = [nn.weights[0]]
         new_biases = [nn.bias[0]]

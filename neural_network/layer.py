@@ -1,3 +1,5 @@
+"""Layer classes for neural network architecture."""
+
 from __future__ import annotations
 
 from neural_network.math import nn_math
@@ -6,9 +8,7 @@ from neural_network.math.matrix import Matrix
 
 
 class Layer:
-    """
-    This class creates a NeuralNetwork Layer and has weights, biases, and activation function.
-    """
+    """Class representing a neural network layer with weights, biases, and activation function."""
 
     def __init__(
         self,
@@ -17,14 +17,16 @@ class Layer:
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
-        """
-        Initialise Layer object with number of nodes, activation function, weights range and bias range.
+        """Initialise Layer object with number of nodes, activation function, weights range and bias range.
 
-        Parameters:
-            size (int): Size of Layer
-            activation (type[ActivationFunction]): Layer activation function
-            weights_range (tuple[float, float]): Range for Layer weights
-            bias_range (tuple[float, float]): Range for Layer bias
+        :param int size:
+            Number of nodes in the layer.
+        :param type[ActivationFunction] activation:
+            Activation function class for the layer.
+        :param tuple[float, float] weights_range:
+            Range for initializing layer weights.
+        :param tuple[float, float] bias_range:
+            Range for initializing layer biases.
         """
         self._prev_layer: Layer | None = None
         self._next_layer: Layer | None = None
@@ -37,20 +39,40 @@ class Layer:
         self._bias_range = bias_range
 
     def __str__(self) -> str:
+        """Return a string representation of the Layer.
+
+        :return str:
+            String describing the layer.
+        """
         return f"Size: {self.size} \t| Activation: {self._activation} \tWeights: {self.weights} | Bias: {self.bias}"
 
     @property
     def size(self) -> int:
+        """Return the size of the layer.
+
+        :return int:
+            Number of nodes in the layer.
+        """
         return self._size
 
     @property
     def num_inputs(self) -> int:
+        """Return the number of inputs to the layer.
+
+        :return int:
+            Number of inputs (size of previous layer or 1 if none).
+        """
         if self._prev_layer is None:
             return 1
         return self._prev_layer.size
 
     @property
     def weights(self) -> Matrix:
+        """Return the weights matrix for the layer, initializing if necessary.
+
+        :return Matrix:
+            Weights matrix.
+        """
         if not self._weights:
             self._weights = Matrix.random_matrix(
                 self._size, self.num_inputs, self._weights_range[0], self._weights_range[1]
@@ -59,37 +81,49 @@ class Layer:
 
     @weights.setter
     def weights(self, new_weights: Matrix) -> None:
+        """Set the weights matrix for the layer.
+
+        :param Matrix new_weights:
+            New weights matrix.
+        """
         self._weights = new_weights
 
     @property
     def bias(self) -> Matrix:
+        """Return the bias matrix for the layer, initializing if necessary.
+
+        :return Matrix:
+            Bias matrix.
+        """
         if not self._bias:
             self._bias = Matrix.random_column(self._size, self._bias_range[0], self._bias_range[1])
         return self._bias
 
     @bias.setter
     def bias(self, new_bias: Matrix) -> None:
+        """Set the bias matrix for the layer.
+
+        :param Matrix new_bias:
+            New bias matrix.
+        """
         self._bias = new_bias
 
     def set_prev_layer(self, prev_layer: Layer) -> None:
-        """
-        Connect Layer with previous Layer.
+        """Connect this layer to the previous layer.
 
-        Parameters:
-            prev_layer (Layer): Layer preceding this one
+        :param Layer prev_layer:
+            Layer preceding this one.
         """
         self._prev_layer = prev_layer
         prev_layer._next_layer = self
 
     def feedforward(self, vals: Matrix) -> Matrix:
-        """
-        Feedforward values through Layer.
+        """Feedforward values through the layer.
 
-        Parameters:
-            vals (Matrix): Values to feedforward through Layer
-
-        Returns:
-            output (Matrix): Layer output from inputs
+        :param Matrix vals:
+            Input values to feedforward.
+        :return Matrix:
+            Output values from the layer.
         """
         output = nn_math.feedforward_through_layer(
             input_vals=vals, weights=self.weights, bias=self.bias, activation=self._activation
@@ -99,12 +133,12 @@ class Layer:
         return output
 
     def backpropagate_error(self, errors: Matrix, learning_rate: float) -> None:
-        """
-        Backpropagate errors during training.
+        """Backpropagate errors during training.
 
-        Parameters:
-            errors (Matrix): Errors from next Layer
-            learning_rate (float): Learning rate
+        :param Matrix errors:
+            Errors from the next layer.
+        :param float learning_rate:
+            Learning rate for updating weights and biases.
         """
         gradient = nn_math.calculate_gradient(
             activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=learning_rate
@@ -115,36 +149,37 @@ class Layer:
 
 
 class InputLayer(Layer):
-    """
-    An input Layer in the NeuralNetwork.
-    """
+    """Input layer for a neural network."""
 
     def __init__(
         self,
         size: int,
         activation: type[ActivationFunction],
     ) -> None:
-        """
-        Initialise InputLayer object with number of nodes and activation function.
+        """Initialise InputLayer object with number of nodes and activation function.
 
-        Parameters:
-            size (int): Size of InputLayer
-            activation (type[ActivationFunction]): InputLayer activation function
+        :param int size:
+            Number of input nodes.
+        :param type[ActivationFunction] activation:
+            Activation function class for the input layer.
         """
         super().__init__(size, activation, (1.0, 1.0), (0.0, 0.0))
 
     def __str__(self) -> str:
+        """Return a string representation of the InputLayer.
+
+        :return str:
+            String describing the input layer.
+        """
         return f"Input \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
 
     def feedforward(self, vals: Matrix) -> Matrix:
-        """
-        Set InputLayer values.
+        """Set input values for the InputLayer.
 
-        Parameters:
-            vals (Matrix): Input values
-
-        Returns:
-            output (Matrix): Layer output from inputs
+        :param Matrix vals:
+            Input values.
+        :return Matrix:
+            Output values (same as input).
         """
         self._layer_input = vals
         self._layer_output = vals
@@ -152,9 +187,7 @@ class InputLayer(Layer):
 
 
 class HiddenLayer(Layer):
-    """
-    A hidden Layer in the NeuralNetwork.
-    """
+    """Hidden layer for a neural network."""
 
     def __init__(
         self,
@@ -163,25 +196,30 @@ class HiddenLayer(Layer):
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
-        """
-        Initialise HiddenLayer object with number of nodes, activation function, weights range and bias range.
+        """Initialize HiddenLayer object.
 
-        Parameters:
-            size (int): Size of HiddenLayer
-            activation (type[ActivationFunction]): HiddenLayer activation function
-            weights_range (tuple[float, float]): Range for HiddenLayer weights
-            bias_range (tuple[float, float]): Range for HiddenLayer bias
+        :param int size:
+            Number of nodes in the hidden layer.
+        :param type[ActivationFunction] activation:
+            Activation function class for the hidden layer.
+        :param tuple[float, float] weights_range:
+            Range for initializing hidden layer weights.
+        :param tuple[float, float] bias_range:
+            Range for initializing hidden layer biases.
         """
         super().__init__(size, activation, weights_range, bias_range)
 
     def __str__(self) -> str:
+        """Return a string representation of the HiddenLayer.
+
+        :return str:
+            String describing the hidden layer.
+        """
         return f"Hidden \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
 
 
 class OutputLayer(Layer):
-    """
-    An output Layer in the NeuralNetwork.
-    """
+    """Output layer for a neural network."""
 
     def __init__(
         self,
@@ -190,16 +228,23 @@ class OutputLayer(Layer):
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
     ) -> None:
-        """
-        Initialise OutputLayer object with number of nodes, activation function, weights range and bias range.
+        """Initialise OutputLayer object with number of nodes, activation function, weights range and bias range.
 
-        Parameters:
-            size (int): Size of OutputLayer
-            activation (type[ActivationFunction]): OutputLayer activation function
-            weights_range (tuple[float, float]): Range for OutputLayer weights
-            bias_range (tuple[float, float]): Range for OutputLayer bias
+        :param int size:
+            Number of output nodes.
+        :param type[ActivationFunction] activation:
+            Activation function class for the output layer.
+        :param tuple[float, float] weights_range:
+            Range for initializing output layer weights.
+        :param tuple[float, float] bias_range:
+            Range for initializing output layer biases.
         """
         super().__init__(size, activation, weights_range, bias_range)
 
     def __str__(self) -> str:
+        """Return a string representation of the OutputLayer.
+
+        :return str:
+            String describing the output layer.
+        """
         return f"Output \t| Size: {self.size} \t| Activation: {self._activation().__str__()}"
