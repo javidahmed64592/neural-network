@@ -15,6 +15,19 @@ message MatrixData {
     int32 cols = 3;
 }
 
+enum OptimizationAlgorithm {
+    SGD = 0; // Stochastic Gradient Descent
+    ADAM = 1; // Adaptive Moment Estimation
+}
+
+message OptimizerData {
+    OptimizationAlgorithm algorithm = 1;
+    float learning_rate = 2;
+    optional float beta1 = 3; // For ADAM
+    optional float beta2 = 4; // For ADAM
+    optional float epsilon = 5; // For ADAM
+}
+
 message NeuralNetworkData {
     int32 num_inputs = 1;
     repeated int32 hidden_layer_sizes = 2;
@@ -24,5 +37,5 @@ message NeuralNetworkData {
     ActivationFunctionData output_activation = 6;
     repeated MatrixData weights = 7;
     repeated MatrixData biases = 8;
-    float learning_rate = 9;
+    optional OptimizerData optimizer = 9;
 }
