@@ -311,6 +311,48 @@ class OptimizerDataType:
         optimizer = OptimizerDataType.to_protobuf(optimizer_data)
         return optimizer.SerializeToString()  # type: ignore[no-any-return]
 
+    @classmethod
+    def from_optimizer(cls, optimizer: Optimizer) -> OptimizerDataType:
+        """Create a OptimizerDataType instance from an Optimizer.
+
+        :param Optimizer optimizer:
+            The Optimizer instance.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        if isinstance(optimizer, AdamOptimizer):
+            cls(
+                algorithm=OptimizationAlgorithmEnum.from_class(optimizer.__class__),
+                learning_rate=optimizer.learning_rate,
+                beta1=optimizer.beta1,
+                beta2=optimizer.beta2,
+                epsilon=optimizer.epsilon,
+            )
+
+        return cls(
+            algorithm=OptimizationAlgorithmEnum.from_class(optimizer.__class__),
+            learning_rate=optimizer.learning_rate,
+        )
+
+    @staticmethod
+    def to_optimizer(optimizer_data: OptimizerDataType) -> Optimizer:
+        """Convert OptimizerDataType to an Optimizer.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return Optimizer:
+            The corresponding Optimizer instance.
+        """
+        optimizer_class = OptimizationAlgorithmEnum.get_class(optimizer_data.algorithm)
+        if optimizer_class == SGDOptimizer:
+            return optimizer_class(learning_rate=optimizer_data.learning_rate)
+        return optimizer_class(
+            learning_rate=optimizer_data.learning_rate,
+            beta1=optimizer_data.beta1,
+            beta2=optimizer_data.beta2,
+            epsilon=optimizer_data.epsilon,
+        )
+
 
 @dataclass
 class NeuralNetworkDataType:
@@ -324,7 +366,7 @@ class NeuralNetworkDataType:
     output_activation: ActivationFunctionEnum
     weights: list[MatrixDataType]
     biases: list[MatrixDataType]
-    learning_rate: float
+    optimizer: OptimizerDataType | None = None
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkData) -> NeuralNetworkDataType:
@@ -344,7 +386,7 @@ class NeuralNetworkDataType:
             output_activation=ActivationFunctionEnum.from_protobuf(nn_data.output_activation),
             weights=nn_data.weights,
             biases=nn_data.biases,
-            learning_rate=nn_data.learning_rate,
+            optimizer=OptimizerDataType.from_protobuf(nn_data.optimizer),
         )
 
     @staticmethod
@@ -365,7 +407,7 @@ class NeuralNetworkDataType:
             output_activation=ActivationFunctionEnum.to_protobuf(config_data.output_activation),
             weights=[MatrixDataType.to_protobuf(weight) for weight in config_data.weights],
             biases=[MatrixDataType.to_protobuf(bias) for bias in config_data.biases],
-            learning_rate=config_data.learning_rate,
+            optimizer=OptimizerDataType.to_protobuf(config_data.optimizer),
         )
 
     @classmethod

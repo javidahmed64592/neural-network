@@ -5,7 +5,7 @@ import pytest
 
 from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
 from neural_network.math.matrix import Matrix
-from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
+from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     MatrixData,
@@ -204,6 +204,27 @@ class TestOptimizerDataType:
         """Test serializing OptimizerDataType to bytes."""
         assert isinstance(OptimizerDataType.to_bytes(optimizer_data_type), bytes)
 
+    def test_from_optimizer(self) -> None:
+        """Test creating OptimizerDataType from Optimizer."""
+        optimizer = SGDOptimizer()
+        result = OptimizerDataType.from_optimizer(optimizer)
+        assert result.algorithm == OptimizationAlgorithmEnum.SGD
+        assert result.learning_rate == optimizer.learning_rate
+
+        optimizer = AdamOptimizer()
+        result = OptimizerDataType.from_optimizer(optimizer)
+        assert result.algorithm == OptimizationAlgorithmEnum.ADAM
+        assert result.learning_rate == optimizer.learning_rate
+        assert result.beta1 == optimizer.beta1
+        assert result.beta2 == optimizer.beta2
+        assert result.epsilon == optimizer.epsilon
+
+    def test_to_optimizer(self, optimizer_data_type: OptimizerDataType) -> None:
+        """Test converting OptimizerDataType to Optimizer."""
+        result = OptimizerDataType.to_optimizer(optimizer_data_type)
+        assert isinstance(result, Optimizer)
+        assert result.learning_rate == optimizer_data_type.learning_rate
+
 
 class TestNeuralNetworkDataType:
     """Test cases for NeuralNetworkDataType conversions."""
@@ -220,6 +241,7 @@ class TestNeuralNetworkDataType:
         test_weights_range = (-1, 1)
         test_bias_range = (-1, 1)
         test_learning_rate = 0.01
+        test_optimization_algorithm = OptimizationAlgorithm.SGD
 
         input_weights_array = rng.uniform(*test_weights_range, (test_num_inputs, 1))
         input_weights_matrix_data = MatrixDataType.to_protobuf(
@@ -252,6 +274,13 @@ class TestNeuralNetworkDataType:
             MatrixDataType(data=output_bias_array.flatten().tolist(), rows=test_num_outputs, cols=1)
         )
 
+        optimizer_class = OptimizationAlgorithmEnum.get_class(
+            OptimizationAlgorithmEnum.from_protobuf(test_optimization_algorithm)
+        )
+        optimizer = OptimizerDataType.to_protobuf(
+            OptimizerDataType.from_optimizer(optimizer_class(learning_rate=test_learning_rate))
+        )
+
         return NeuralNetworkData(
             num_inputs=test_num_inputs,
             hidden_layer_sizes=test_hidden_layer_sizes,
@@ -261,7 +290,7 @@ class TestNeuralNetworkDataType:
             output_activation=test_output_activation,
             weights=[input_weights_matrix_data, hidden_weights_matrix_data, output_weights_matrix_data],
             biases=[input_bias_matrix_data, hidden_bias_matrix_data, output_bias_matrix_data],
-            learning_rate=test_learning_rate,
+            optimizer=optimizer,
         )
 
     @pytest.fixture
@@ -274,9 +303,9 @@ class TestNeuralNetworkDataType:
             input_activation=ActivationFunctionEnum.from_protobuf(neural_network_data.input_activation),
             hidden_activation=ActivationFunctionEnum.from_protobuf(neural_network_data.hidden_activation),
             output_activation=ActivationFunctionEnum.from_protobuf(neural_network_data.output_activation),
-            learning_rate=neural_network_data.learning_rate,
             weights=neural_network_data.weights,
             biases=neural_network_data.biases,
+            optimizer=OptimizerDataType.from_protobuf(neural_network_data.optimizer),
         )
 
     def test_from_protobuf(self, neural_network_data: NeuralNetworkData) -> None:
@@ -289,9 +318,13 @@ class TestNeuralNetworkDataType:
         assert neural_network_data_type.input_activation == neural_network_data.input_activation
         assert neural_network_data_type.hidden_activation == neural_network_data.hidden_activation
         assert neural_network_data_type.output_activation == neural_network_data.output_activation
-        assert neural_network_data_type.learning_rate == neural_network_data.learning_rate
         assert neural_network_data_type.weights == neural_network_data.weights
         assert neural_network_data_type.biases == neural_network_data.biases
+        assert neural_network_data_type.optimizer.algorithm == neural_network_data.optimizer.algorithm
+        assert neural_network_data_type.optimizer.learning_rate == neural_network_data.optimizer.learning_rate
+        assert neural_network_data_type.optimizer.beta1 == neural_network_data.optimizer.beta1
+        assert neural_network_data_type.optimizer.beta2 == neural_network_data.optimizer.beta2
+        assert neural_network_data_type.optimizer.epsilon == neural_network_data.optimizer.epsilon
 
     def test_to_protobuf(self, neural_network_data_type: NeuralNetworkDataType) -> None:
         """Test converting NeuralNetworkDataType to protobuf message."""
@@ -303,9 +336,13 @@ class TestNeuralNetworkDataType:
         assert protobuf_data.input_activation == neural_network_data_type.input_activation
         assert protobuf_data.hidden_activation == neural_network_data_type.hidden_activation
         assert protobuf_data.output_activation == neural_network_data_type.output_activation
-        assert protobuf_data.learning_rate == neural_network_data_type.learning_rate
         assert protobuf_data.weights == neural_network_data_type.weights
         assert protobuf_data.biases == neural_network_data_type.biases
+        assert protobuf_data.optimizer.algorithm == neural_network_data_type.optimizer.algorithm
+        assert protobuf_data.optimizer.learning_rate == neural_network_data_type.optimizer.learning_rate
+        assert protobuf_data.optimizer.beta1 == neural_network_data_type.optimizer.beta1
+        assert protobuf_data.optimizer.beta2 == neural_network_data_type.optimizer.beta2
+        assert protobuf_data.optimizer.epsilon == neural_network_data_type.optimizer.epsilon
 
     def test_from_bytes(self, neural_network_data_type: NeuralNetworkDataType) -> None:
         """Test deserializing NeuralNetworkDataType from bytes."""
@@ -320,7 +357,11 @@ class TestNeuralNetworkDataType:
         assert result.output_activation == neural_network_data_type.output_activation
         assert result.weights == pytest.approx(neural_network_data_type.weights)
         assert result.biases == pytest.approx(neural_network_data_type.biases)
-        assert result.learning_rate == neural_network_data_type.learning_rate
+        assert result.optimizer.algorithm == neural_network_data_type.optimizer.algorithm
+        assert result.optimizer.learning_rate == neural_network_data_type.optimizer.learning_rate
+        assert result.optimizer.beta1 == neural_network_data_type.optimizer.beta1
+        assert result.optimizer.beta2 == neural_network_data_type.optimizer.beta2
+        assert result.optimizer.epsilon == neural_network_data_type.optimizer.epsilon
 
     def test_to_bytes(self, neural_network_data_type: NeuralNetworkDataType) -> None:
         """Test serializing NeuralNetworkDataType to bytes."""
