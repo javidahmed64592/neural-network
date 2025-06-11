@@ -66,8 +66,7 @@ class TestLayer:
         mock_hidden_layer_1.feedforward(mock_input_matrix)
 
         errors = Matrix.random_matrix(mock_len_hidden[0], 1, -1, 1)
-        learning_rate = 0.1
-        mock_hidden_layer_1.backpropagate_error(errors, learning_rate)
+        mock_hidden_layer_1.backpropagate_error(errors)
 
         assert not np.array_equal(mock_hidden_layer_1.weights.vals, original_weights)
         assert not np.array_equal(mock_hidden_layer_1.bias.vals, original_bias)
