@@ -9,6 +9,7 @@ from typing import cast
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
+from neural_network.math.optimizer import Optimizer, SGDOptimizer
 from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, NeuralNetworkDataType
 
 
@@ -21,6 +22,7 @@ class NeuralNetwork:
         output_layer: OutputLayer,
         hidden_layers: list[HiddenLayer] | None = None,
         lr: float = 0.1,
+        optimizer: type[Optimizer] | None = None,
     ) -> None:
         """Initialise NeuralNetwork with a list of Layers and a learning rate.
 
@@ -32,6 +34,8 @@ class NeuralNetwork:
             List of hidden layers (optional).
         :param float lr:
             Learning rate for training (default 0.1).
+        :param type[Optimizer] | None optimizer:
+            Optimizer class for training (defaults to SGD). Each layer gets its own instance.
         """
         self._input_layer = input_layer
         self._output_layer = output_layer
@@ -39,10 +43,15 @@ class NeuralNetwork:
         for index in range(1, len(self.layers)):
             self.layers[index].set_prev_layer(self.layers[index - 1])
 
+        self._lr = lr
+        optimizer_class: type[Optimizer] = optimizer or SGDOptimizer
+
+        for layer in self.layers:
+            layer._optimizer = optimizer_class(learning_rate=self._lr)
+
         self._num_inputs = self._input_layer.size
         self._num_outputs = self._output_layer.size
         self._hidden_layer_sizes = [layer.size for layer in self._hidden_layers]
-        self._lr = lr
 
     def __str__(self) -> str:
         """Return a string representation of the NeuralNetwork.
@@ -231,16 +240,15 @@ class NeuralNetwork:
 
         for layer in self.layers:
             vals = layer.feedforward(vals)
-
-        expected_output_matrix = Matrix.from_array(expected_outputs)
+            expected_output_matrix = Matrix.from_array(expected_outputs)
         errors = calculate_error_from_expected(expected_output_matrix, vals)
-        self._output_layer.backpropagate_error(errors, self._lr)
+        self._output_layer.backpropagate_error(errors)
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
             if next_layer := layer._next_layer:
                 errors = calculate_next_errors(next_layer.weights, errors)
-                layer.backpropagate_error(errors, self._lr)
+                layer.backpropagate_error(errors)
 
         return output_errors.as_list
 
@@ -263,13 +271,14 @@ class NeuralNetwork:
 
         fitness_error = fitness - prev_fitness
         errors = vals * fitness_error
-        self._output_layer.backpropagate_error(errors, self._lr)
+
+        self._output_layer.backpropagate_error(errors)
         output_errors = Matrix.transpose(errors)
 
         for layer in self._hidden_layers[::-1]:
             if next_layer := layer._next_layer:
                 errors = calculate_next_errors(next_layer.weights, errors)
-                layer.backpropagate_error(errors, self._lr)
+                layer.backpropagate_error(errors)
 
         return output_errors.as_list
 
