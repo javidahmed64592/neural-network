@@ -144,7 +144,7 @@ class AdamOptimizer(Optimizer):
             Updated weights.
         """
         # Initialize moments if not present
-        if self._weight_m is None:
+        if self._weight_m is None or self._weight_v is None:
             self._weight_m = Matrix.zeros(weights.rows, weights.cols)
             self._weight_v = Matrix.zeros(weights.rows, weights.cols)
 
@@ -179,7 +179,7 @@ class AdamOptimizer(Optimizer):
             Updated bias.
         """
         # Initialize moments if not present
-        if self._bias_m is None:
+        if self._bias_m is None or self._bias_v is None:
             self._bias_m = Matrix.zeros(bias.rows, bias.cols)
             self._bias_v = Matrix.zeros(bias.rows, bias.cols)
 

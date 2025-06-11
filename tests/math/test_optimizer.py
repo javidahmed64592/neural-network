@@ -1,3 +1,4 @@
+# mypy: disable-error-code=unreachable
 """Unit tests for the neural_network/math/optimizer.py module."""
 
 import numpy as np
@@ -70,8 +71,8 @@ class TestAdamOptimizer:
 
         # After update, moments should be initialized
         assert isinstance(adam_optimizer._weight_m, Matrix)
-        assert isinstance(adam_optimizer._weight_v, Matrix)
         assert adam_optimizer._weight_m.shape == weights.shape
+        assert isinstance(adam_optimizer._weight_v, Matrix)
         assert adam_optimizer._weight_v.shape == weights.shape
 
     def test_given_adam_optimizer_when_multiple_weight_updates_then_moments_accumulate(
@@ -82,12 +83,16 @@ class TestAdamOptimizer:
         gradients1 = Matrix.from_array([[0.1, 0.2]])
         gradients2 = Matrix.from_array([[0.3, 0.4]])  # First update
         weights1 = adam_optimizer.update_weights(weights, gradients1)
+        assert adam_optimizer._weight_m is not None
+        assert adam_optimizer._weight_v is not None
         m1 = adam_optimizer._weight_m.vals.copy()
         v1 = adam_optimizer._weight_v.vals.copy()
         adam_optimizer.step()
 
         # Second update
         weights2 = adam_optimizer.update_weights(weights1, gradients2)
+        assert adam_optimizer._weight_m is not None
+        assert adam_optimizer._weight_v is not None
         m2 = adam_optimizer._weight_m.vals.copy()
         v2 = adam_optimizer._weight_v.vals.copy()
         adam_optimizer.step()
@@ -115,8 +120,8 @@ class TestAdamOptimizer:
 
         # After update, bias moments should be initialized
         assert isinstance(adam_optimizer._bias_m, Matrix)
-        assert isinstance(adam_optimizer._bias_v, Matrix)
         assert adam_optimizer._bias_m.shape == bias.shape
+        assert isinstance(adam_optimizer._bias_v, Matrix)
         assert adam_optimizer._bias_v.shape == bias.shape
 
     def test_given_adam_optimizer_when_step_called_then_timestep_increments(
