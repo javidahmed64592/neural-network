@@ -87,14 +87,25 @@ class TestMatrixDataType:
         assert matrix_data.rows == matrix_data_type.rows
         assert matrix_data.cols == matrix_data_type.cols
 
-    def test_to_bytes(self, matrix_data_type: MatrixDataType) -> None:
-        """Test serializing MatrixDataType to bytes."""
-        assert isinstance(MatrixDataType.to_bytes(matrix_data_type), bytes)
-
     def test_from_bytes(self, matrix_data_type: MatrixDataType) -> None:
         """Test deserializing MatrixDataType from bytes."""
         msg_bytes = MatrixDataType.to_bytes(matrix_data_type)
         result = MatrixDataType.from_bytes(msg_bytes)
+
+        assert result.data == pytest.approx(matrix_data_type.data)
+        assert result.rows == matrix_data_type.rows
+        assert result.cols == matrix_data_type.cols
+
+    def test_to_bytes(self, matrix_data_type: MatrixDataType) -> None:
+        """Test serializing MatrixDataType to bytes."""
+        assert isinstance(MatrixDataType.to_bytes(matrix_data_type), bytes)
+
+    def test_from_matrix(self, matrix_data_type: MatrixDataType) -> None:
+        """Test creating MatrixDataType from Matrix."""
+        matrix = Matrix.from_array(
+            np.array(matrix_data_type.data).reshape((matrix_data_type.rows, matrix_data_type.cols))
+        )
+        result = MatrixDataType.from_matrix(matrix)
 
         assert result.data == pytest.approx(matrix_data_type.data)
         assert result.rows == matrix_data_type.rows
@@ -107,17 +118,6 @@ class TestMatrixDataType:
         assert isinstance(matrix, Matrix)
         assert matrix.vals.shape == (matrix_data_type.rows, matrix_data_type.cols)
         assert np.allclose(matrix.vals.flatten(), matrix_data_type.data)
-
-    def test_from_matrix(self, matrix_data_type: MatrixDataType) -> None:
-        """Test creating MatrixDataType from Matrix."""
-        matrix = Matrix.from_array(
-            np.array(matrix_data_type.data).reshape((matrix_data_type.rows, matrix_data_type.cols))
-        )
-        result = MatrixDataType.from_matrix(matrix)
-
-        assert result.data == pytest.approx(matrix_data_type.data)
-        assert result.rows == matrix_data_type.rows
-        assert result.cols == matrix_data_type.cols
 
 
 class TestOptimizationAlgorithmEnum:
@@ -307,10 +307,6 @@ class TestNeuralNetworkDataType:
         assert protobuf_data.weights == neural_network_data_type.weights
         assert protobuf_data.biases == neural_network_data_type.biases
 
-    def test_to_bytes(self, neural_network_data_type: NeuralNetworkDataType) -> None:
-        """Test serializing NeuralNetworkDataType to bytes."""
-        assert isinstance(NeuralNetworkDataType.to_bytes(neural_network_data_type), bytes)
-
     def test_from_bytes(self, neural_network_data_type: NeuralNetworkDataType) -> None:
         """Test deserializing NeuralNetworkDataType from bytes."""
         msg_bytes = NeuralNetworkDataType.to_bytes(neural_network_data_type)
@@ -325,3 +321,7 @@ class TestNeuralNetworkDataType:
         assert result.weights == pytest.approx(neural_network_data_type.weights)
         assert result.biases == pytest.approx(neural_network_data_type.biases)
         assert result.learning_rate == neural_network_data_type.learning_rate
+
+    def test_to_bytes(self, neural_network_data_type: NeuralNetworkDataType) -> None:
+        """Test serializing NeuralNetworkDataType to bytes."""
+        assert isinstance(NeuralNetworkDataType.to_bytes(neural_network_data_type), bytes)
