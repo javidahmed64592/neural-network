@@ -10,7 +10,7 @@ from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.math.optimizer import Optimizer, SGDOptimizer
-from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, NeuralNetworkDataType
+from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, MatrixDataType, NeuralNetworkDataType
 
 
 class NeuralNetwork:
@@ -107,8 +107,8 @@ class NeuralNetwork:
         ]
 
         nn = cls(input_layer, output_layer, hidden_layers)
-        nn.weights = [Matrix.from_protobuf(weights) for weights in nn_data.weights]
-        nn.bias = [Matrix.from_protobuf(bias) for bias in nn_data.biases]
+        nn.weights = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(weights)) for weights in nn_data.weights]
+        nn.bias = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(bias)) for bias in nn_data.biases]
         return nn
 
     @staticmethod
@@ -127,8 +127,8 @@ class NeuralNetwork:
             input_activation=ActivationFunctionEnum.from_class(nn._input_layer._activation),
             hidden_activation=ActivationFunctionEnum.from_class(nn._hidden_layers[0]._activation),
             output_activation=ActivationFunctionEnum.from_class(nn._output_layer._activation),
-            weights=[Matrix.to_protobuf(weights) for weights in nn.weights],
-            biases=[Matrix.to_protobuf(bias) for bias in nn.bias],
+            weights=[MatrixDataType.to_protobuf(MatrixDataType.from_matrix(weights)) for weights in nn.weights],
+            biases=[MatrixDataType.to_protobuf(MatrixDataType.from_matrix(bias)) for bias in nn.bias],
             learning_rate=nn._lr,
         )
 
