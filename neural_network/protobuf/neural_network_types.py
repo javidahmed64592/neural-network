@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
+import numpy as np
+
 from neural_network.math.activation_functions import (
     ActivationFunction,
     LinearActivation,
@@ -12,7 +14,12 @@ from neural_network.math.activation_functions import (
     SigmoidActivation,
     TanhActivation,
 )
-from neural_network.protobuf.compiled.NeuralNetwork_pb2 import ActivationFunctionData, MatrixData, NeuralNetworkData
+from neural_network.math.matrix import Matrix
+from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
+    ActivationFunctionData,
+    MatrixData,
+    NeuralNetworkData,
+)
 
 
 class ActivationFunctionEnum(IntEnum):
@@ -143,6 +150,32 @@ class MatrixDataType:
         matrix = MatrixDataType.to_protobuf(matrix_data)
         return matrix.SerializeToString()  # type: ignore[no-any-return]
 
+    @classmethod
+    def from_matrix(cls, matrix: Matrix) -> MatrixDataType:
+        """Create a MatrixDataType instance from a Matrix.
+
+        :param Matrix matrix:
+            The Matrix instance.
+        :return MatrixDataType:
+            The corresponding MatrixDataType instance.
+        """
+        return cls(
+            data=matrix.vals.flatten().tolist(),
+            rows=matrix.rows,
+            cols=matrix.cols,
+        )
+
+    @staticmethod
+    def to_matrix(matrix_data: MatrixDataType) -> Matrix:
+        """Convert MatrixDataType to a Matrix.
+
+        :param MatrixDataType matrix_data:
+            The MatrixDataType instance.
+        :return Matrix:
+            The corresponding Matrix instance.
+        """
+        matrix_array = np.array(matrix_data.data, dtype=np.float64).reshape((matrix_data.rows, matrix_data.cols))
+        return Matrix.from_array(matrix_array)
 
 @dataclass
 class NeuralNetworkDataType:

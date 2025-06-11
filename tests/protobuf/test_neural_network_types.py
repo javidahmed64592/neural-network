@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
+from neural_network.math.matrix import Matrix
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import ActivationFunctionData, MatrixData, NeuralNetworkData
 from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, MatrixDataType, NeuralNetworkDataType
 
@@ -81,6 +82,25 @@ class TestMatrixDataType:
         """Test deserializing MatrixDataType from bytes."""
         msg_bytes = MatrixDataType.to_bytes(matrix_data_type)
         result = MatrixDataType.from_bytes(msg_bytes)
+
+        assert result.data == pytest.approx(matrix_data_type.data)
+        assert result.rows == matrix_data_type.rows
+        assert result.cols == matrix_data_type.cols
+
+    def test_to_matrix(self, matrix_data_type: MatrixDataType) -> None:
+        """Test converting MatrixDataType to Matrix."""
+        matrix = MatrixDataType.to_matrix(matrix_data_type)
+
+        assert isinstance(matrix, Matrix)
+        assert matrix.vals.shape == (matrix_data_type.rows, matrix_data_type.cols)
+        assert np.allclose(matrix.vals.flatten(), matrix_data_type.data)
+
+    def test_from_matrix(self, matrix_data_type: MatrixDataType) -> None:
+        """Test creating MatrixDataType from Matrix."""
+        matrix = Matrix.from_array(
+            np.array(matrix_data_type.data).reshape((matrix_data_type.rows, matrix_data_type.cols))
+        )
+        result = MatrixDataType.from_matrix(matrix)
 
         assert result.data == pytest.approx(matrix_data_type.data)
         assert result.rows == matrix_data_type.rows

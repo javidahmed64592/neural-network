@@ -9,7 +9,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from neural_network.math.activation_functions import ActivationFunction
-from neural_network.protobuf.neural_network_types import MatrixDataType
 
 rng = np.random.default_rng()
 
@@ -135,33 +134,6 @@ class Matrix:
         if matrix_array.ndim == 1:
             matrix_array = np.expand_dims(matrix_array, axis=1)
         return cls(matrix_array)
-
-    @classmethod
-    def from_protobuf(cls, matrix_data: MatrixDataType) -> Matrix:
-        """Create a Matrix from Protobuf data.
-
-        :param MatrixDataType matrix_data:
-            Protobuf data containing matrix values.
-        :return Matrix:
-            Matrix with assigned values.
-        """
-        matrix_array = np.array(matrix_data.data, dtype=np.float64).reshape((matrix_data.rows, matrix_data.cols))
-        return cls.from_array(matrix_array)
-
-    @staticmethod
-    def to_protobuf(matrix: Matrix) -> MatrixDataType:
-        """Convert Matrix to Protobuf data.
-
-        :param Matrix matrix:
-            Matrix to convert.
-        :return MatrixDataType:
-            Protobuf data containing matrix values.
-        """
-        return MatrixDataType(
-            data=matrix.vals.flatten().tolist(),
-            rows=matrix.rows,
-            cols=matrix.cols,
-        )
 
     @classmethod
     def zeros(cls, rows: int, cols: int) -> Matrix:

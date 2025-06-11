@@ -3,43 +3,13 @@
 from unittest.mock import patch
 
 import numpy as np
-import pytest
 
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.math.matrix import Matrix
-from neural_network.protobuf.neural_network_types import MatrixDataType
 
 
 class TestMatrix:
     """Test cases for the Matrix class."""
-
-    def test_given_protobuf_message_when_creating_matrix_then_check_has_correct_vals(self) -> None:
-        """Test creating a Matrix from a protobuf message."""
-        test_vals = [1.0, 2.0, 3.0]
-        test_rows = 1
-        test_cols = 3
-        matrix_data = MatrixDataType(data=test_vals, rows=test_rows, cols=test_cols)
-
-        test_matrix = Matrix.from_protobuf(matrix_data=matrix_data)
-        actual_vals = test_matrix.vals.flatten().tolist()
-
-        assert actual_vals == test_vals
-        assert test_matrix.shape == (test_rows, test_cols)
-        assert test_matrix.rows == test_rows
-        assert test_matrix.cols == test_cols
-
-    def test_given_matrix_when_converting_to_protobuf_then_check_has_correct_vals(
-        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
-    ) -> None:
-        """Test converting a Matrix to a protobuf message."""
-        test_matrix = Matrix.random_matrix(
-            rows=mock_len_inputs, cols=mock_len_hidden[0], low=mock_weights_range[0], high=mock_weights_range[1]
-        )
-        matrix_data = Matrix.to_protobuf(test_matrix)
-
-        assert matrix_data.data == pytest.approx(test_matrix.vals.flatten().tolist())
-        assert matrix_data.rows == test_matrix.rows
-        assert matrix_data.cols == test_matrix.cols
 
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
