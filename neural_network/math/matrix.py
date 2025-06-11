@@ -96,7 +96,7 @@ class Matrix:
         return cast(list[float], matrix_list)
 
     @property
-    def shape(self) -> tuple:
+    def shape(self) -> tuple[int, ...]:
         """Return shape of the matrix.
 
         :return tuple:
@@ -111,7 +111,7 @@ class Matrix:
         :return int:
             Number of rows.
         """
-        return self.shape[0]
+        return int(self.shape[0])
 
     @property
     def cols(self) -> int:
@@ -120,7 +120,7 @@ class Matrix:
         :return int:
             Number of columns.
         """
-        return self.shape[1]
+        return int(self.shape[1])
 
     @classmethod
     def from_array(cls, matrix_array: NDArray | list[list[float]] | list[float]) -> Matrix:
