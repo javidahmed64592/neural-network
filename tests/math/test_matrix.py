@@ -11,6 +11,24 @@ from neural_network.math.matrix import Matrix
 class TestMatrix:
     """Test cases for the Matrix class."""
 
+    def test_given_shape_when_creating_zeros_matrix_then_check_matrix_has_correct_shape(
+        self, mock_len_inputs: int, mock_len_outputs: int
+    ) -> None:
+        """Test creating a zero Matrix with a given shape."""
+        test_matrix = Matrix.zeros(rows=mock_len_inputs, cols=mock_len_outputs)
+
+        assert np.all(test_matrix.vals == 0)
+        assert test_matrix.shape == (mock_len_inputs, mock_len_outputs)
+
+    def test_given_shape_when_creating_filled_matrix_then_check_matrix_has_correct_shape(
+        self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
+    ) -> None:
+        """Test creating a filled Matrix with a given shape."""
+        test_matrix = Matrix.filled(rows=mock_len_inputs, cols=mock_len_outputs, value=mock_weights_range[0])
+
+        assert np.all(test_matrix.vals == mock_weights_range[0])
+        assert test_matrix.shape == (mock_len_inputs, mock_len_outputs)
+
     def test_given_shape_when_creating_random_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_outputs: int
     ) -> None:
@@ -19,10 +37,7 @@ class TestMatrix:
             rows=mock_len_inputs, cols=mock_len_outputs, low=mock_weights_range[0], high=mock_weights_range[1]
         )
 
-        expected_shape = (mock_len_inputs, mock_len_outputs)
-        actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape, strict=False):
-            assert actual == expected
+        assert test_matrix.shape == (mock_len_inputs, mock_len_outputs)
 
     def test_given_shape_when_creating_random_column_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int
@@ -30,10 +45,7 @@ class TestMatrix:
         """Test creating a random column Matrix with a given shape."""
         test_matrix = Matrix.random_column(rows=mock_len_inputs, low=mock_weights_range[0], high=mock_weights_range[1])
 
-        expected_shape = (mock_len_inputs, 1)
-        actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape, strict=False):
-            assert actual == expected
+        assert test_matrix.shape == (mock_len_inputs, 1)
 
     def test_given_2d_array_when_creating_matrix_then_check_matrix_has_correct_shape(
         self, mock_weights_range: list[float], mock_len_inputs: int, mock_len_hidden: list[int]
@@ -43,10 +55,7 @@ class TestMatrix:
             rows=mock_len_inputs, cols=mock_len_hidden[0], low=mock_weights_range[0], high=mock_weights_range[1]
         )
 
-        expected_shape = (mock_len_inputs, mock_len_hidden[0])
-        actual_shape = test_matrix.shape
-        for actual, expected in zip(actual_shape, expected_shape, strict=False):
-            assert actual == expected
+        assert test_matrix.shape == (mock_len_inputs, mock_len_hidden[0])
 
     def test_given_two_matrices_when_adding_then_check_new_matrix_correctly_calculated(self) -> None:
         """Test element-wise addition of two matrices."""
@@ -125,9 +134,7 @@ class TestMatrix:
         actual_vals = new_matrix.vals
         assert np.all(actual_vals == expected_vals)
 
-    def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_correctly_calculated(
-        self, mock_weights_range: list[float]
-    ) -> None:
+    def test_given_two_matrices_when_performing_crossover_then_check_new_matrix_correctly_calculated(self) -> None:
         """Test crossover operation between two matrices."""
         mutation_rate = 0.5
 
