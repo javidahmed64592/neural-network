@@ -39,10 +39,7 @@ class TestNeuralNetwork:
         assert nn_data.output_activation == ActivationFunctionEnum.from_class(mock_nn._output_layer._activation)
         assert len(nn_data.weights) == len(mock_nn.weights)
         assert len(nn_data.biases) == len(mock_nn.bias)
-
-        mock_nn_optimizer_data_type = OptimizerDataType.from_optimizer(mock_nn._optimizer_class(mock_nn._lr))
-        assert nn_data.optimizer.algorithm == mock_nn_optimizer_data_type.algorithm
-        assert nn_data.optimizer.learning_rate == pytest.approx(mock_nn._lr)
+        assert nn_data.optimizer == OptimizerDataType.from_class_instance(mock_nn._input_layer._optimizer)
 
     def test_from_protobuf(self, mock_nn: NeuralNetwork) -> None:
         """Test creating a neural network from protobuf format."""
