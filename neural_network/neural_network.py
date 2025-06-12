@@ -10,7 +10,13 @@ from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
 from neural_network.math.optimizer import Optimizer, SGDOptimizer
-from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, MatrixDataType, NeuralNetworkDataType
+from neural_network.protobuf.neural_network_types import (
+    ActivationFunctionEnum,
+    MatrixDataType,
+    NeuralNetworkDataType,
+    OptimizationAlgorithmEnum,
+    OptimizerDataType,
+)
 
 
 class NeuralNetwork:
@@ -44,10 +50,10 @@ class NeuralNetwork:
             self.layers[index].set_prev_layer(self.layers[index - 1])
 
         self._lr = lr
-        optimizer_class: type[Optimizer] = optimizer or SGDOptimizer
+        self._optimizer_class: type[Optimizer] = optimizer or SGDOptimizer
 
         for layer in self.layers:
-            layer._optimizer = optimizer_class(learning_rate=self._lr)
+            layer._optimizer = self._optimizer_class(learning_rate=self._lr)
 
         self._num_inputs = self._input_layer.size
         self._num_outputs = self._output_layer.size
@@ -106,7 +112,16 @@ class NeuralNetwork:
             for size in nn_data.hidden_layer_sizes
         ]
 
-        nn = cls(input_layer, output_layer, hidden_layers)
+        optimizer_data = nn_data.optimizer
+        optimizer_class = OptimizationAlgorithmEnum.from_protobuf(optimizer_data.algorithm).get_class()
+
+        nn = cls(
+            input_layer=input_layer,
+            output_layer=output_layer,
+            hidden_layers=hidden_layers,
+            lr=optimizer_data.learning_rate,
+            optimizer=optimizer_class,
+        )
         nn.weights = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(weights)) for weights in nn_data.weights]
         nn.bias = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(bias)) for bias in nn_data.biases]
         return nn
@@ -129,7 +144,7 @@ class NeuralNetwork:
             output_activation=ActivationFunctionEnum.from_class(nn._output_layer._activation),
             weights=[MatrixDataType.to_protobuf(MatrixDataType.from_matrix(weights)) for weights in nn.weights],
             biases=[MatrixDataType.to_protobuf(MatrixDataType.from_matrix(bias)) for bias in nn.bias],
-            learning_rate=nn._lr,
+            optimizer=OptimizerDataType.to_protobuf(OptimizerDataType.from_optimizer(nn._optimizer_class(nn._lr))),
         )
 
     @classmethod

@@ -15,17 +15,22 @@ message MatrixData {
     int32 cols = 3;
 }
 
-enum OptimizationAlgorithm {
-    SGD = 0; // Stochastic Gradient Descent
-    ADAM = 1; // Adaptive Moment Estimation
+message SGDOptimizerData {
+    float learning_rate = 1;
+}
+
+message AdamOptimizerData {
+    float learning_rate = 1;
+    float beta1 = 2;
+    float beta2 = 3;
+    float epsilon = 4;
 }
 
 message OptimizerData {
-    OptimizationAlgorithm algorithm = 1;
-    float learning_rate = 2;
-    optional float beta1 = 3; // For ADAM
-    optional float beta2 = 4; // For ADAM
-    optional float epsilon = 5; // For ADAM
+    oneof algorithm {
+        SGDOptimizerData sgd = 1;
+        AdamOptimizerData adam = 2;
+    }
 }
 
 message NeuralNetworkData {

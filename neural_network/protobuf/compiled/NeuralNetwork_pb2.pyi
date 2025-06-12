@@ -13,17 +13,10 @@ class ActivationFunctionData(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RELU: _ClassVar[ActivationFunctionData]
     SIGMOID: _ClassVar[ActivationFunctionData]
     TANH: _ClassVar[ActivationFunctionData]
-
-class OptimizationAlgorithm(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = ()
-    SGD: _ClassVar[OptimizationAlgorithm]
-    ADAM: _ClassVar[OptimizationAlgorithm]
 LINEAR: ActivationFunctionData
 RELU: ActivationFunctionData
 SIGMOID: ActivationFunctionData
 TANH: ActivationFunctionData
-SGD: OptimizationAlgorithm
-ADAM: OptimizationAlgorithm
 
 class MatrixData(_message.Message):
     __slots__ = ("data", "rows", "cols")
@@ -35,19 +28,31 @@ class MatrixData(_message.Message):
     cols: int
     def __init__(self, data: _Optional[_Iterable[float]] = ..., rows: _Optional[int] = ..., cols: _Optional[int] = ...) -> None: ...
 
-class OptimizerData(_message.Message):
-    __slots__ = ("algorithm", "learning_rate", "beta1", "beta2", "epsilon")
-    ALGORITHM_FIELD_NUMBER: _ClassVar[int]
+class SGDOptimizerData(_message.Message):
+    __slots__ = ("learning_rate",)
+    LEARNING_RATE_FIELD_NUMBER: _ClassVar[int]
+    learning_rate: float
+    def __init__(self, learning_rate: _Optional[float] = ...) -> None: ...
+
+class AdamOptimizerData(_message.Message):
+    __slots__ = ("learning_rate", "beta1", "beta2", "epsilon")
     LEARNING_RATE_FIELD_NUMBER: _ClassVar[int]
     BETA1_FIELD_NUMBER: _ClassVar[int]
     BETA2_FIELD_NUMBER: _ClassVar[int]
     EPSILON_FIELD_NUMBER: _ClassVar[int]
-    algorithm: OptimizationAlgorithm
     learning_rate: float
     beta1: float
     beta2: float
     epsilon: float
-    def __init__(self, algorithm: _Optional[_Union[OptimizationAlgorithm, str]] = ..., learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
+    def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
+
+class OptimizerData(_message.Message):
+    __slots__ = ("sgd", "adam")
+    SGD_FIELD_NUMBER: _ClassVar[int]
+    ADAM_FIELD_NUMBER: _ClassVar[int]
+    sgd: SGDOptimizerData
+    adam: AdamOptimizerData
+    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ...) -> None: ...
 
 class NeuralNetworkData(_message.Message):
     __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "optimizer")

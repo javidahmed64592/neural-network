@@ -15,13 +15,14 @@ from neural_network.math.activation_functions import (
     TanhActivation,
 )
 from neural_network.math.matrix import Matrix
-from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
+from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
+    AdamOptimizerData,
     MatrixData,
     NeuralNetworkData,
-    OptimizationAlgorithm,
     OptimizerData,
+    SGDOptimizerData,
 )
 
 
@@ -181,76 +182,104 @@ class MatrixDataType:
         return Matrix.from_array(matrix_array)
 
 
-class OptimizationAlgorithmEnum(IntEnum):
-    """Enum for supported activation functions."""
+@dataclass
+class SGDOptimizerDataType:
+    """Data class to hold SGD optimizer data."""
 
-    SGD = 0
-    ADAM = 1
-
-    @property
-    def map(self) -> dict[OptimizationAlgorithmEnum, type[Optimizer]]:
-        """Return a mapping from enum to optimizer class.
-
-        :return dict[OptimizationAlgorithmEnum, type[Optimizer]]:
-            Mapping from enum to optimizer class.
-        """
-        return {
-            OptimizationAlgorithmEnum.SGD: SGDOptimizer,
-            OptimizationAlgorithmEnum.ADAM: AdamOptimizer,
-        }
-
-    def get_class(self) -> type[Optimizer]:
-        """Return the corresponding optimizer class.
-
-        :return type[Optimizer]:
-            The optimizer class.
-        """
-        return self.map[self]
+    learning_rate: float
 
     @classmethod
-    def from_class(cls, optimizer: type[Optimizer]) -> OptimizationAlgorithmEnum:
-        """Return the enum value for a given optimizer class.
+    def from_protobuf(cls, sgd_data: SGDOptimizerData) -> SGDOptimizerDataType:
+        """Create a SGDOptimizerDataType instance from Protobuf.
 
-        :param type[Optimizer] optimizer:
-            The optimizer class.
-        :return OptimizationAlgorithmEnum:
-            The corresponding enum value.
+        :param SGDOptimizerData sgd_data:
+            The Protobuf SGDOptimizerData message.
+        :return SGDOptimizerDataType:
+            The corresponding SGDOptimizerDataType instance.
         """
-        reverse_map = {v: k for k, v in cls.SGD.map.items()}
-        return reverse_map[optimizer]
-
-    @classmethod
-    def from_protobuf(cls, proto_enum_value: OptimizationAlgorithm) -> OptimizationAlgorithmEnum:
-        """Return the enum value from a Protobuf OptimizationAlgorithmEnum value.
-
-        :param OptimizationAlgorithmEnum proto_enum_value:
-            The Protobuf enum value.
-        :return OptimizationAlgorithmEnum:
-            The corresponding enum value.
-        """
-        return cls(proto_enum_value)
+        return cls(learning_rate=sgd_data.learning_rate)
 
     @staticmethod
-    def to_protobuf(enum_value: OptimizationAlgorithmEnum) -> OptimizationAlgorithm:
-        """Return the Protobuf OptimizationAlgorithm from an enum value.
+    def to_protobuf(sgd_data: SGDOptimizerDataType) -> SGDOptimizerData:
+        """Convert SGDOptimizerDataType to Protobuf.
 
-        :param OptimizationAlgorithmEnum enum_value:
-            The enum value.
-        :return OptimizationAlgorithm:
-            The Protobuf enum value.
+        :param SGDOptimizerDataType sgd_data:
+            The SGDOptimizerDataType instance.
+        :return SGDOptimizerData:
+            The corresponding Protobuf SGDOptimizerData message.
         """
-        return OptimizationAlgorithm.Value(enum_value.name)  # type: ignore[no-any-return]
+        return SGDOptimizerData(learning_rate=sgd_data.learning_rate)
+
+    def get_class_instance(self) -> SGDOptimizer:
+        """Return an instance of the SGDOptimizer with the stored learning rate.
+
+        :return SGDOptimizer:
+            An instance of SGDOptimizer with the specified learning rate.
+        """
+        return SGDOptimizer(learning_rate=self.learning_rate)
+
+
+@dataclass
+class AdamOptimizerDataType:
+    """Data class to hold Adam optimizer data."""
+
+    learning_rate: float
+    beta1: float = 0.9
+    beta2: float = 0.999
+    epsilon: float = 1e-8
+
+    @classmethod
+    def from_protobuf(cls, adam_data: AdamOptimizerData) -> AdamOptimizerDataType:
+        """Create a AdamOptimizerDataType instance from Protobuf.
+
+        :param AdamOptimizerData adam_data:
+            The Protobuf AdamOptimizerData message.
+        :return AdamOptimizerDataType:
+            The corresponding AdamOptimizerDataType instance.
+        """
+        return cls(
+            learning_rate=adam_data.learning_rate,
+            beta1=adam_data.beta1,
+            beta2=adam_data.beta2,
+            epsilon=adam_data.epsilon,
+        )
+
+    @staticmethod
+    def to_protobuf(adam_data: AdamOptimizerDataType) -> AdamOptimizerData:
+        """Convert AdamOptimizerDataType to Protobuf.
+
+        :param AdamOptimizerDataType adam_data:
+            The AdamOptimizerDataType instance.
+        :return AdamOptimizerData:
+            The corresponding Protobuf AdamOptimizerData message.
+        """
+        return AdamOptimizerData(
+            learning_rate=adam_data.learning_rate,
+            beta1=adam_data.beta1,
+            beta2=adam_data.beta2,
+            epsilon=adam_data.epsilon,
+        )
+
+    def get_class_instance(self) -> AdamOptimizer:
+        """Return an instance of the AdamOptimizer with the stored parameters.
+
+        :return AdamOptimizer:
+            An instance of AdamOptimizer with the specified parameters.
+        """
+        return AdamOptimizer(
+            learning_rate=self.learning_rate,
+            beta1=self.beta1,
+            beta2=self.beta2,
+            epsilon=self.epsilon,
+        )
 
 
 @dataclass
 class OptimizerDataType:
     """Data class to hold optimizer data."""
 
-    algorithm: OptimizationAlgorithmEnum
-    learning_rate: float
-    beta1: float = 0.9
-    beta2: float = 0.999
-    epsilon: float = 1e-8
+    sgd: SGDOptimizerDataType | None = None
+    adam: AdamOptimizerDataType | None = None
 
     @classmethod
     def from_protobuf(cls, optimizer_data: OptimizerData) -> OptimizerDataType:
@@ -261,13 +290,15 @@ class OptimizerDataType:
         :return OptimizerDataType:
             The corresponding OptimizerDataType instance.
         """
-        return cls(
-            algorithm=OptimizationAlgorithmEnum.from_protobuf(optimizer_data.algorithm),
-            learning_rate=optimizer_data.learning_rate,
-            beta1=optimizer_data.beta1,
-            beta2=optimizer_data.beta2,
-            epsilon=optimizer_data.epsilon,
-        )
+        which_oneof = optimizer_data.WhichOneof("algorithm")
+        match which_oneof:
+            case "sgd":
+                return cls(sgd=SGDOptimizerDataType.from_protobuf(optimizer_data.sgd), adam=None)
+            case "adam":
+                return cls(sgd=None, adam=AdamOptimizerDataType.from_protobuf(optimizer_data.adam))
+            case _:
+                msg = "OptimizerData must contain either SGD or Adam optimizer data."
+                raise ValueError(msg)
 
     @staticmethod
     def to_protobuf(optimizer_data: OptimizerDataType) -> OptimizerData:
@@ -278,13 +309,13 @@ class OptimizerDataType:
         :return OptimizerData:
             The corresponding Protobuf OptimizerData message.
         """
-        return OptimizerData(
-            algorithm=OptimizationAlgorithmEnum.to_protobuf(optimizer_data.algorithm),
-            learning_rate=optimizer_data.learning_rate,
-            beta1=optimizer_data.beta1,
-            beta2=optimizer_data.beta2,
-            epsilon=optimizer_data.epsilon,
-        )
+        if optimizer_data.sgd:
+            return OptimizerData(sgd=SGDOptimizerDataType.to_protobuf(optimizer_data.sgd), adam=None)
+        if optimizer_data.adam:
+            return OptimizerData(sgd=None, adam=AdamOptimizerDataType.to_protobuf(optimizer_data.adam))
+
+        msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
+        raise ValueError(msg)
 
     @classmethod
     def from_bytes(cls, optimizer_data: bytes) -> OptimizerDataType:
@@ -311,47 +342,22 @@ class OptimizerDataType:
         optimizer = OptimizerDataType.to_protobuf(optimizer_data)
         return optimizer.SerializeToString()  # type: ignore[no-any-return]
 
-    @classmethod
-    def from_optimizer(cls, optimizer: Optimizer) -> OptimizerDataType:
-        """Create a OptimizerDataType instance from an Optimizer.
-
-        :param Optimizer optimizer:
-            The Optimizer instance.
-        :return OptimizerDataType:
-            The corresponding OptimizerDataType instance.
-        """
-        if isinstance(optimizer, AdamOptimizer):
-            cls(
-                algorithm=OptimizationAlgorithmEnum.from_class(optimizer.__class__),
-                learning_rate=optimizer.learning_rate,
-                beta1=optimizer.beta1,
-                beta2=optimizer.beta2,
-                epsilon=optimizer.epsilon,
-            )
-
-        return cls(
-            algorithm=OptimizationAlgorithmEnum.from_class(optimizer.__class__),
-            learning_rate=optimizer.learning_rate,
-        )
-
     @staticmethod
-    def to_optimizer(optimizer_data: OptimizerDataType) -> Optimizer:
-        """Convert OptimizerDataType to an Optimizer.
+    def get_class_instance(optimizer_data: OptimizerDataType) -> SGDOptimizer | AdamOptimizer:
+        """Return an instance of the optimizer based on the stored data.
 
         :param OptimizerDataType optimizer_data:
             The OptimizerDataType instance.
-        :return Optimizer:
-            The corresponding Optimizer instance.
+        :return SGDOptimizer | AdamOptimizer:
+            An instance of the specified optimizer.
         """
-        optimizer_class = OptimizationAlgorithmEnum.get_class(optimizer_data.algorithm)
-        if optimizer_class == SGDOptimizer:
-            return optimizer_class(learning_rate=optimizer_data.learning_rate)
-        return optimizer_class(
-            learning_rate=optimizer_data.learning_rate,
-            beta1=optimizer_data.beta1,
-            beta2=optimizer_data.beta2,
-            epsilon=optimizer_data.epsilon,
-        )
+        if optimizer_data.sgd:
+            return optimizer_data.sgd.get_class_instance()
+        if optimizer_data.adam:
+            return optimizer_data.adam.get_class_instance()
+
+        msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
+        raise ValueError(msg)
 
 
 @dataclass
@@ -384,8 +390,8 @@ class NeuralNetworkDataType:
             input_activation=ActivationFunctionEnum.from_protobuf(nn_data.input_activation),
             hidden_activation=ActivationFunctionEnum.from_protobuf(nn_data.hidden_activation),
             output_activation=ActivationFunctionEnum.from_protobuf(nn_data.output_activation),
-            weights=nn_data.weights,
-            biases=nn_data.biases,
+            weights=[MatrixDataType.from_protobuf(weight) for weight in nn_data.weights],
+            biases=[MatrixDataType.from_protobuf(bias) for bias in nn_data.biases],
             optimizer=OptimizerDataType.from_protobuf(nn_data.optimizer),
         )
 
