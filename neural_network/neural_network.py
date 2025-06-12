@@ -26,8 +26,7 @@ class NeuralNetwork:
         input_layer: InputLayer,
         output_layer: OutputLayer,
         hidden_layers: list[HiddenLayer] | None = None,
-        lr: float = 0.1,
-        optimizer: type[Optimizer] | None = None,
+        optimizer: Optimizer | None = None,
     ) -> None:
         """Initialise NeuralNetwork with a list of Layers and a learning rate.
 
@@ -37,10 +36,8 @@ class NeuralNetwork:
             Output layer of the neural network.
         :param list[HiddenLayer] | None hidden_layers:
             List of hidden layers (optional).
-        :param float lr:
-            Learning rate for training (default 0.1).
-        :param type[Optimizer] | None optimizer:
-            Optimizer class for training (defaults to SGD). Each layer gets its own instance.
+        :param Optimizer | None optimizer:
+            Optimizer for training (defaults to SGD). Each layer gets its own instance.
         """
         self._input_layer = input_layer
         self._output_layer = output_layer
@@ -48,11 +45,12 @@ class NeuralNetwork:
         for index in range(1, len(self.layers)):
             self.layers[index].set_prev_layer(self.layers[index - 1])
 
-        self._lr = lr
-        self._optimizer_class: type[Optimizer] = optimizer or SGDOptimizer
+        self._optimizer = optimizer or SGDOptimizer(learning_rate=0.1)
+        optimizer_class = self._optimizer.__class__
 
         for layer in self.layers:
-            layer._optimizer = self._optimizer_class(learning_rate=self._lr)
+            optimizer_instance = optimizer_class(**dict(self._optimizer.__dict__.items()))
+            layer.set_optimizer(optimizer_instance)
 
         self._num_inputs = self._input_layer.size
         self._num_outputs = self._output_layer.size
@@ -67,13 +65,17 @@ class NeuralNetwork:
         return "NeuralNetwork:\n" + "\n".join([str(layer) for layer in self.layers])
 
     @classmethod
-    def from_layers(cls, layers: list[Layer], lr: float = 0.1) -> NeuralNetwork:
+    def from_layers(
+        cls,
+        layers: list[Layer],
+        optimizer: Optimizer | None = None,
+    ) -> NeuralNetwork:
         """Create a NeuralNetwork from a list of layers.
 
         :param list[Layer] layers:
             List of layers for the neural network.
-        :param float lr:
-            Learning rate for training (default 0.1).
+        :param Optimizer | None optimizer:
+            Optimizer for training (defaults to SGD). Each layer gets its own instance.
         :return NeuralNetwork:
             NeuralNetwork instance.
         """
@@ -81,7 +83,7 @@ class NeuralNetwork:
         output_layer = cast(OutputLayer, layers[-1])
         hidden_layers = cast(list[HiddenLayer], layers[1:-1])
 
-        return cls(input_layer=input_layer, output_layer=output_layer, hidden_layers=hidden_layers, lr=lr)
+        return cls(input_layer=input_layer, output_layer=output_layer, hidden_layers=hidden_layers, optimizer=optimizer)
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkDataType) -> NeuralNetwork:
@@ -115,11 +117,10 @@ class NeuralNetwork:
             input_layer=input_layer,
             output_layer=output_layer,
             hidden_layers=hidden_layers,
+            optimizer=nn_data.optimizer.get_class_instance(),
         )
         nn.weights = [MatrixDataType.to_matrix(weights) for weights in nn_data.weights]
         nn.bias = [MatrixDataType.to_matrix(bias) for bias in nn_data.biases]
-        for layer in nn.layers:
-            layer._optimizer = nn_data.optimizer.get_class_instance()
         return nn
 
     @staticmethod

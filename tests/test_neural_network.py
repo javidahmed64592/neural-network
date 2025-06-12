@@ -3,8 +3,6 @@
 from pathlib import Path
 from unittest.mock import mock_open, patch
 
-import pytest
-
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.neural_network import NeuralNetwork
@@ -53,8 +51,7 @@ class TestNeuralNetwork:
         assert new_nn._output_layer._activation == mock_nn._output_layer._activation
         assert len(new_nn.weights) == len(mock_nn.weights)
         assert len(new_nn.bias) == len(mock_nn.bias)
-        assert new_nn._lr == pytest.approx(mock_nn._lr)
-        assert new_nn._optimizer_class == mock_nn._optimizer_class
+        assert isinstance(new_nn._optimizer, mock_nn._optimizer.__class__)
 
     def test_load_from_file(self, mock_nn: NeuralNetwork) -> None:
         """Test loading a neural network from a file."""
@@ -71,7 +68,7 @@ class TestNeuralNetwork:
             assert loaded_nn._output_layer._activation == mock_nn._output_layer._activation
             assert len(loaded_nn.weights) == len(mock_nn.weights)
             assert len(loaded_nn.bias) == len(mock_nn.bias)
-            assert loaded_nn._lr == mock_nn._lr
+            assert isinstance(loaded_nn._optimizer, mock_nn._optimizer.__class__)
 
     def test_save_to_file(self, mock_nn: NeuralNetwork) -> None:
         """Test saving a neural network to a file."""
