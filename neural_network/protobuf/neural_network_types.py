@@ -210,6 +210,17 @@ class SGDOptimizerDataType:
         """
         return SGDOptimizerData(learning_rate=sgd_data.learning_rate)
 
+    @classmethod
+    def from_class_instance(cls, optimizer: SGDOptimizer) -> SGDOptimizerDataType:
+        """Create a SGDOptimizerDataType instance from an SGDOptimizer class instance.
+
+        :param SGDOptimizer optimizer:
+            The SGDOptimizer class instance.
+        :return SGDOptimizerDataType:
+            The corresponding SGDOptimizerDataType instance.
+        """
+        return cls(learning_rate=optimizer.learning_rate)
+
     def get_class_instance(self) -> SGDOptimizer:
         """Return an instance of the SGDOptimizer with the stored learning rate.
 
@@ -258,6 +269,22 @@ class AdamOptimizerDataType:
             beta1=adam_data.beta1,
             beta2=adam_data.beta2,
             epsilon=adam_data.epsilon,
+        )
+
+    @classmethod
+    def from_class_instance(cls, optimizer: AdamOptimizer) -> AdamOptimizerDataType:
+        """Create an AdamOptimizerDataType instance from an AdamOptimizer class instance.
+
+        :param AdamOptimizer optimizer:
+            The AdamOptimizer class instance.
+        :return AdamOptimizerDataType:
+            The corresponding AdamOptimizerDataType instance.
+        """
+        return cls(
+            learning_rate=optimizer.learning_rate,
+            beta1=optimizer.beta1,
+            beta2=optimizer.beta2,
+            epsilon=optimizer.epsilon,
         )
 
     def get_class_instance(self) -> AdamOptimizer:
@@ -352,20 +379,14 @@ class OptimizerDataType:
             The corresponding OptimizerDataType instance.
         """
         if isinstance(optimizer, SGDOptimizer):
-            return cls(sgd=SGDOptimizerDataType(optimizer.learning_rate), adam=None)
+            return cls(sgd=SGDOptimizerDataType.from_class_instance(optimizer))
         if isinstance(optimizer, AdamOptimizer):
-            return cls(
-                sgd=None,
-                adam=AdamOptimizerDataType(
-                    optimizer.learning_rate, optimizer.beta1, optimizer.beta2, optimizer.epsilon
-                ),
-            )
+            return cls(adam=AdamOptimizerDataType.from_class_instance(optimizer))
 
         msg = "Optimizer must be an instance of SGDOptimizer or AdamOptimizer."
         raise ValueError(msg)
 
-    @staticmethod
-    def get_class_instance(optimizer_data: OptimizerDataType) -> SGDOptimizer | AdamOptimizer:
+    def get_class_instance(self) -> SGDOptimizer | AdamOptimizer:
         """Return an instance of the optimizer based on the stored data.
 
         :param OptimizerDataType optimizer_data:
@@ -373,10 +394,10 @@ class OptimizerDataType:
         :return SGDOptimizer | AdamOptimizer:
             An instance of the specified optimizer.
         """
-        if optimizer_data.sgd:
-            return optimizer_data.sgd.get_class_instance()
-        if optimizer_data.adam:
-            return optimizer_data.adam.get_class_instance()
+        if self.sgd:
+            return self.sgd.get_class_instance()
+        if self.adam:
+            return self.adam.get_class_instance()
 
         msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
         raise ValueError(msg)

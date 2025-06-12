@@ -147,9 +147,17 @@ class TestSGDOptimizerDataType:
 
         assert protobuf_data.learning_rate == sgd_optimizer_data_type.learning_rate
 
+    def test_from_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
+        """Test creating SGDOptimizerDataType from class instance."""
+        optimizer = sgd_optimizer_data_type.get_class_instance()
+        sgd_data = SGDOptimizerDataType.from_class_instance(optimizer)
+
+        assert sgd_data.learning_rate == sgd_optimizer_data_type.learning_rate
+
     def test_get_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
         """Test getting the SGDOptimizer class instance."""
-        optimizer = SGDOptimizerDataType.get_class_instance(sgd_optimizer_data_type)
+        optimizer = sgd_optimizer_data_type.get_class_instance()
+
         assert isinstance(optimizer, SGDOptimizer)
         assert optimizer.learning_rate == sgd_optimizer_data_type.learning_rate
 
@@ -190,9 +198,20 @@ class TestAdamOptimizerDataType:
         assert protobuf_data.beta2 == adam_optimizer_data_type.beta2
         assert protobuf_data.epsilon == adam_optimizer_data_type.epsilon
 
+    def test_from_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
+        """Test creating AdamOptimizerDataType from class instance."""
+        optimizer = adam_optimizer_data_type.get_class_instance()
+        adam_data = AdamOptimizerDataType.from_class_instance(optimizer)
+
+        assert adam_data.learning_rate == adam_optimizer_data_type.learning_rate
+        assert adam_data.beta1 == adam_optimizer_data_type.beta1
+        assert adam_data.beta2 == adam_optimizer_data_type.beta2
+        assert adam_data.epsilon == adam_optimizer_data_type.epsilon
+
     def test_get_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
         """Test getting the AdamOptimizer class instance."""
-        optimizer = AdamOptimizerDataType.get_class_instance(adam_optimizer_data_type)
+        optimizer = adam_optimizer_data_type.get_class_instance()
+
         assert isinstance(optimizer, AdamOptimizer)
         assert optimizer.learning_rate == adam_optimizer_data_type.learning_rate
         assert optimizer.beta1 == adam_optimizer_data_type.beta1
@@ -284,11 +303,11 @@ class TestOptimizerDataType:
         self, sgd_optimizer_data_type: OptimizerDataType, adam_optimizer_data_type: OptimizerDataType
     ) -> None:
         """Test creating OptimizerDataType from class instance."""
-        sgd_instance = OptimizerDataType.get_class_instance(sgd_optimizer_data_type)
+        sgd_instance = sgd_optimizer_data_type.get_class_instance()
         sgd_data = OptimizerDataType.from_class_instance(sgd_instance)
         assert sgd_data.sgd.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
 
-        adam_instance = OptimizerDataType.get_class_instance(adam_optimizer_data_type)
+        adam_instance = adam_optimizer_data_type.get_class_instance()
         adam_data = OptimizerDataType.from_class_instance(adam_instance)
         assert adam_data.adam.learning_rate == adam_optimizer_data_type.adam.learning_rate
         assert adam_data.adam.beta1 == adam_optimizer_data_type.adam.beta1
@@ -299,11 +318,11 @@ class TestOptimizerDataType:
         self, sgd_optimizer_data_type: OptimizerDataType, adam_optimizer_data_type: OptimizerDataType
     ) -> None:
         """Test getting the optimizer class instance."""
-        sgd_instance = OptimizerDataType.get_class_instance(sgd_optimizer_data_type)
+        sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
         assert sgd_instance.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
 
-        adam_instance = OptimizerDataType.get_class_instance(adam_optimizer_data_type)
+        adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
         assert adam_instance.learning_rate == adam_optimizer_data_type.adam.learning_rate
         assert adam_instance.beta1 == adam_optimizer_data_type.adam.beta1
