@@ -280,6 +280,21 @@ class TestOptimizerDataType:
         assert isinstance(OptimizerDataType.to_bytes(sgd_optimizer_data_type), bytes)
         assert isinstance(OptimizerDataType.to_bytes(adam_optimizer_data_type), bytes)
 
+    def test_from_class_instance(
+        self, sgd_optimizer_data_type: OptimizerDataType, adam_optimizer_data_type: OptimizerDataType
+    ) -> None:
+        """Test creating OptimizerDataType from class instance."""
+        sgd_instance = OptimizerDataType.get_class_instance(sgd_optimizer_data_type)
+        sgd_data = OptimizerDataType.from_class_instance(sgd_instance)
+        assert sgd_data.sgd.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
+
+        adam_instance = OptimizerDataType.get_class_instance(adam_optimizer_data_type)
+        adam_data = OptimizerDataType.from_class_instance(adam_instance)
+        assert adam_data.adam.learning_rate == adam_optimizer_data_type.adam.learning_rate
+        assert adam_data.adam.beta1 == adam_optimizer_data_type.adam.beta1
+        assert adam_data.adam.beta2 == adam_optimizer_data_type.adam.beta2
+        assert adam_data.adam.epsilon == adam_optimizer_data_type.adam.epsilon
+
     def test_get_class_instance(
         self, sgd_optimizer_data_type: OptimizerDataType, adam_optimizer_data_type: OptimizerDataType
     ) -> None:

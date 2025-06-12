@@ -342,6 +342,28 @@ class OptimizerDataType:
         optimizer = OptimizerDataType.to_protobuf(optimizer_data)
         return optimizer.SerializeToString()  # type: ignore[no-any-return]
 
+    @classmethod
+    def from_class_instance(cls, optimizer: SGDOptimizer | AdamOptimizer) -> OptimizerDataType:
+        """Create an OptimizerDataType instance from an optimizer class instance.
+
+        :param SGDOptimizer | AdamOptimizer optimizer:
+            The optimizer class instance.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        if isinstance(optimizer, SGDOptimizer):
+            return cls(sgd=SGDOptimizerDataType(optimizer.learning_rate), adam=None)
+        if isinstance(optimizer, AdamOptimizer):
+            return cls(
+                sgd=None,
+                adam=AdamOptimizerDataType(
+                    optimizer.learning_rate, optimizer.beta1, optimizer.beta2, optimizer.epsilon
+                ),
+            )
+
+        msg = "Optimizer must be an instance of SGDOptimizer or AdamOptimizer."
+        raise ValueError(msg)
+
     @staticmethod
     def get_class_instance(optimizer_data: OptimizerDataType) -> SGDOptimizer | AdamOptimizer:
         """Return an instance of the optimizer based on the stored data.
