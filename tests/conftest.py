@@ -5,6 +5,7 @@ import pytest
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
+from neural_network.math.optimizer import AdamOptimizer
 from neural_network.neural_network import NeuralNetwork
 
 
@@ -12,6 +13,12 @@ from neural_network.neural_network import NeuralNetwork
 def mock_activation() -> type[LinearActivation]:
     """Fixture for a mock activation function class."""
     return LinearActivation
+
+
+@pytest.fixture
+def mock_optimizer() -> AdamOptimizer:
+    """Fixture for a mock optimizer class."""
+    return AdamOptimizer(learning_rate=0.1)
 
 
 @pytest.fixture

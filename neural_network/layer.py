@@ -18,7 +18,7 @@ class Layer:
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
         lr: float = 0.1,
-        optimizer: type[Optimizer] | None = None,
+        optimizer: type[Optimizer] = SGDOptimizer,
     ) -> None:
         """Initialise Layer object with number of nodes, activation function, weights range and bias range.
 
@@ -39,8 +39,8 @@ class Layer:
         self._next_layer: Layer | None = None
         self._weights: Matrix | None = None
         self._bias: Matrix | None = None
-        optimizer_class: type[Optimizer] = optimizer or SGDOptimizer
-        self._optimizer = optimizer_class(learning_rate=lr)
+
+        self._optimizer = optimizer(learning_rate=lr)
 
         self._size = size
         self._activation = activation
@@ -126,6 +126,14 @@ class Layer:
         self._prev_layer = prev_layer
         prev_layer._next_layer = self
 
+    def set_optimizer(self, optimizer: Optimizer) -> None:
+        """Set the optimizer for the layer.
+
+        :param Optimizer optimizer:
+            Optimizer instance to use for weight and bias updates.
+        """
+        self._optimizer = optimizer
+
     def feedforward(self, vals: Matrix) -> Matrix:
         """Feedforward values through the layer.
 
@@ -165,7 +173,7 @@ class InputLayer(Layer):
         size: int,
         activation: type[ActivationFunction],
         lr: float = 0.1,
-        optimizer: type[Optimizer] | None = None,
+        optimizer: type[Optimizer] = SGDOptimizer,
     ) -> None:
         """Initialise InputLayer object with number of nodes and activation function.
 
@@ -211,7 +219,7 @@ class HiddenLayer(Layer):
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
         lr: float = 0.1,
-        optimizer: type[Optimizer] | None = None,
+        optimizer: type[Optimizer] = SGDOptimizer,
     ) -> None:
         """Initialize HiddenLayer object.
 
@@ -248,7 +256,7 @@ class OutputLayer(Layer):
         activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        optimizer: type[Optimizer] | None = None,
+        optimizer: type[Optimizer] = SGDOptimizer,
         lr: float = 0.1,
     ) -> None:
         """Initialise OutputLayer object with number of nodes, activation function, weights range and bias range.
