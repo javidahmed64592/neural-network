@@ -1,5 +1,6 @@
 """Unit tests for the neural_network.protobuf.neural_network_types module."""
 
+# mypy: disable-error-code="union-attr"
 import numpy as np
 import pytest
 
@@ -270,6 +271,7 @@ class TestOptimizerDataType:
     ) -> None:
         """Test converting OptimizerDataType to protobuf message."""
         sgd_protobuf_data = OptimizerDataType.to_protobuf(sgd_optimizer_data_type)
+        assert isinstance(sgd_protobuf_data.sgd, SGDOptimizerData)
         assert sgd_protobuf_data.sgd.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
 
         adam_protobuf_data = OptimizerDataType.to_protobuf(adam_optimizer_data_type)

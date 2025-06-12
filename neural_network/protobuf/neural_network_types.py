@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
 
 import numpy as np
@@ -15,7 +15,7 @@ from neural_network.math.activation_functions import (
     TanhActivation,
 )
 from neural_network.math.matrix import Matrix
-from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
+from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
@@ -370,10 +370,10 @@ class OptimizerDataType:
         return optimizer.SerializeToString()  # type: ignore[no-any-return]
 
     @classmethod
-    def from_class_instance(cls, optimizer: SGDOptimizer | AdamOptimizer) -> OptimizerDataType:
+    def from_class_instance(cls, optimizer: Optimizer) -> OptimizerDataType:
         """Create an OptimizerDataType instance from an optimizer class instance.
 
-        :param SGDOptimizer | AdamOptimizer optimizer:
+        :param Optimizer optimizer:
             The optimizer class instance.
         :return OptimizerDataType:
             The corresponding OptimizerDataType instance.
@@ -415,7 +415,7 @@ class NeuralNetworkDataType:
     output_activation: ActivationFunctionEnum
     weights: list[MatrixDataType]
     biases: list[MatrixDataType]
-    optimizer: OptimizerDataType | None = None
+    optimizer: OptimizerDataType = field(default_factory=OptimizerDataType)
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkData) -> NeuralNetworkDataType:

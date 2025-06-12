@@ -116,8 +116,8 @@ class NeuralNetwork:
             output_layer=output_layer,
             hidden_layers=hidden_layers,
         )
-        nn.weights = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(weights)) for weights in nn_data.weights]
-        nn.bias = [MatrixDataType.to_matrix(MatrixDataType.from_protobuf(bias)) for bias in nn_data.biases]
+        nn.weights = [MatrixDataType.to_matrix(weights) for weights in nn_data.weights]
+        nn.bias = [MatrixDataType.to_matrix(bias) for bias in nn_data.biases]
         for layer in nn.layers:
             layer._optimizer = nn_data.optimizer.get_class_instance()
         return nn
