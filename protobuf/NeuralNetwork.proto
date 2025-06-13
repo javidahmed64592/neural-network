@@ -26,16 +26,16 @@ message AdamOptimizerData {
     float epsilon = 4;
 }
 
-message StepDecayData {
-    float initial_lr = 1;
-    float drop_factor = 2;
-    float epochs_drop = 3;
+enum LearningRateMethod {
+    STEP_DECAY = 0;
+    EXPONENTIAL_DECAY = 1;
 }
 
-message ExponentialDecayData {
+message LearningRateSchedulerData {
     float initial_lr = 1;
     float decay_rate = 2;
     float decay_steps = 3;
+    LearningRateMethod method = 4;
 }
 
 message OptimizerData {
@@ -43,10 +43,7 @@ message OptimizerData {
         SGDOptimizerData sgd = 1;
         AdamOptimizerData adam = 2;
     }
-    oneof learning_rate_scheduler {
-        StepDecayData step_decay = 3;
-        ExponentialDecayData exponential_decay = 4;
-    }
+    LearningRateSchedulerData learning_rate_scheduler = 3;
 }
 
 message NeuralNetworkData {

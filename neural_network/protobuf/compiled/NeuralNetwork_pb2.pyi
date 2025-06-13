@@ -13,10 +13,17 @@ class ActivationFunctionData(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RELU: _ClassVar[ActivationFunctionData]
     SIGMOID: _ClassVar[ActivationFunctionData]
     TANH: _ClassVar[ActivationFunctionData]
+
+class LearningRateMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    STEP_DECAY: _ClassVar[LearningRateMethod]
+    EXPONENTIAL_DECAY: _ClassVar[LearningRateMethod]
 LINEAR: ActivationFunctionData
 RELU: ActivationFunctionData
 SIGMOID: ActivationFunctionData
 TANH: ActivationFunctionData
+STEP_DECAY: LearningRateMethod
+EXPONENTIAL_DECAY: LearningRateMethod
 
 class MatrixData(_message.Message):
     __slots__ = ("data", "rows", "cols")
@@ -46,37 +53,27 @@ class AdamOptimizerData(_message.Message):
     epsilon: float
     def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
 
-class StepDecayData(_message.Message):
-    __slots__ = ("initial_lr", "drop_factor", "epochs_drop")
-    INITIAL_LR_FIELD_NUMBER: _ClassVar[int]
-    DROP_FACTOR_FIELD_NUMBER: _ClassVar[int]
-    EPOCHS_DROP_FIELD_NUMBER: _ClassVar[int]
-    initial_lr: float
-    drop_factor: float
-    epochs_drop: float
-    def __init__(self, initial_lr: _Optional[float] = ..., drop_factor: _Optional[float] = ..., epochs_drop: _Optional[float] = ...) -> None: ...
-
-class ExponentialDecayData(_message.Message):
-    __slots__ = ("initial_lr", "decay_rate", "decay_steps")
+class LearningRateSchedulerData(_message.Message):
+    __slots__ = ("initial_lr", "decay_rate", "decay_steps", "method")
     INITIAL_LR_FIELD_NUMBER: _ClassVar[int]
     DECAY_RATE_FIELD_NUMBER: _ClassVar[int]
     DECAY_STEPS_FIELD_NUMBER: _ClassVar[int]
+    METHOD_FIELD_NUMBER: _ClassVar[int]
     initial_lr: float
     decay_rate: float
     decay_steps: float
-    def __init__(self, initial_lr: _Optional[float] = ..., decay_rate: _Optional[float] = ..., decay_steps: _Optional[float] = ...) -> None: ...
+    method: LearningRateMethod
+    def __init__(self, initial_lr: _Optional[float] = ..., decay_rate: _Optional[float] = ..., decay_steps: _Optional[float] = ..., method: _Optional[_Union[LearningRateMethod, str]] = ...) -> None: ...
 
 class OptimizerData(_message.Message):
-    __slots__ = ("sgd", "adam", "step_decay", "exponential_decay")
+    __slots__ = ("sgd", "adam", "learning_rate_scheduler")
     SGD_FIELD_NUMBER: _ClassVar[int]
     ADAM_FIELD_NUMBER: _ClassVar[int]
-    STEP_DECAY_FIELD_NUMBER: _ClassVar[int]
-    EXPONENTIAL_DECAY_FIELD_NUMBER: _ClassVar[int]
+    LEARNING_RATE_SCHEDULER_FIELD_NUMBER: _ClassVar[int]
     sgd: SGDOptimizerData
     adam: AdamOptimizerData
-    step_decay: StepDecayData
-    exponential_decay: ExponentialDecayData
-    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ..., step_decay: _Optional[_Union[StepDecayData, _Mapping]] = ..., exponential_decay: _Optional[_Union[ExponentialDecayData, _Mapping]] = ...) -> None: ...
+    learning_rate_scheduler: LearningRateSchedulerData
+    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ..., learning_rate_scheduler: _Optional[_Union[LearningRateSchedulerData, _Mapping]] = ...) -> None: ...
 
 class NeuralNetworkData(_message.Message):
     __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "optimizer")

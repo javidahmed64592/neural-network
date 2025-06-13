@@ -18,19 +18,19 @@ class LearningRateScheduler(ABC):
 class StepDecayScheduler(LearningRateScheduler):
     """Step decay learning rate scheduler."""
 
-    def __init__(self, initial_lr: float = 0.1, drop_factor: float = 0.5, epochs_drop: int = 10) -> None:
+    def __init__(self, initial_lr: float = 0.1, decay_rate: float = 0.5, decay_steps: int = 10) -> None:
         """Initialize step decay learning rate scheduler.
 
         :param float initial_lr:
             Initial learning rate.
-        :param float drop_factor:
-            Factor by which the learning rate will be reduced.
-        :param int epochs_drop:
-            Number of epochs after which the learning rate will be reduced.
+        :param float decay_rate:
+            Rate at which the learning rate decays.
+        :param int decay_steps:
+            Number of steps after which the learning rate will be reduced.
         """
         self.initial_lr = initial_lr
-        self.drop_factor = drop_factor
-        self.epochs_drop = epochs_drop
+        self.decay_rate = decay_rate
+        self.decay_steps = decay_steps
 
     def step(self, epoch: int) -> float:
         """Step decay learning rate scheduler.
@@ -41,7 +41,7 @@ class StepDecayScheduler(LearningRateScheduler):
         :return float:
             Learning rate for current epoch.
         """
-        return float(self.initial_lr * np.power(self.drop_factor, np.floor((1 + epoch) / self.epochs_drop)))
+        return float(self.initial_lr * np.power(self.decay_rate, np.floor((1 + epoch) / self.decay_steps)))
 
 
 class ExponentialDecayScheduler(LearningRateScheduler):
