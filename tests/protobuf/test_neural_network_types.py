@@ -39,33 +39,57 @@ rng = np.random.default_rng()
 class TestActivationFunctionEnum:
     """Test cases for ActivationFunctionEnum conversions."""
 
-    def test_get_class(self) -> None:
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_class"),
+        [
+            (ActivationFunctionEnum.LINEAR, LinearActivation),
+            (ActivationFunctionEnum.RELU, ReluActivation),
+            (ActivationFunctionEnum.SIGMOID, SigmoidActivation),
+            (ActivationFunctionEnum.TANH, TanhActivation),
+        ],
+    )
+    def test_get_class(self, enum_value: ActivationFunctionEnum, expected_class: type) -> None:
         """Test getting the activation function class from enum."""
-        assert ActivationFunctionEnum.LINEAR.get_class() == LinearActivation
-        assert ActivationFunctionEnum.RELU.get_class() == ReluActivation
-        assert ActivationFunctionEnum.SIGMOID.get_class() == SigmoidActivation
-        assert ActivationFunctionEnum.TANH.get_class() == TanhActivation
+        assert enum_value.get_class() == expected_class
 
-    def test_from_class(self) -> None:
+    @pytest.mark.parametrize(
+        ("activation_class", "expected_enum"),
+        [
+            (LinearActivation, ActivationFunctionEnum.LINEAR),
+            (ReluActivation, ActivationFunctionEnum.RELU),
+            (SigmoidActivation, ActivationFunctionEnum.SIGMOID),
+            (TanhActivation, ActivationFunctionEnum.TANH),
+        ],
+    )
+    def test_from_class(self, activation_class: type, expected_enum: ActivationFunctionEnum) -> None:
         """Test getting the enum from activation function class."""
-        assert ActivationFunctionEnum.from_class(LinearActivation) == ActivationFunctionEnum.LINEAR
-        assert ActivationFunctionEnum.from_class(ReluActivation) == ActivationFunctionEnum.RELU
-        assert ActivationFunctionEnum.from_class(SigmoidActivation) == ActivationFunctionEnum.SIGMOID
-        assert ActivationFunctionEnum.from_class(TanhActivation) == ActivationFunctionEnum.TANH
+        assert ActivationFunctionEnum.from_class(activation_class) == expected_enum
 
-    def test_from_protobuf(self) -> None:
+    @pytest.mark.parametrize(
+        ("protobuf_value", "expected_enum"),
+        [
+            (ActivationFunctionData.LINEAR, ActivationFunctionEnum.LINEAR),
+            (ActivationFunctionData.RELU, ActivationFunctionEnum.RELU),
+            (ActivationFunctionData.SIGMOID, ActivationFunctionEnum.SIGMOID),
+            (ActivationFunctionData.TANH, ActivationFunctionEnum.TANH),
+        ],
+    )
+    def test_from_protobuf(self, protobuf_value: ActivationFunctionData, expected_enum: ActivationFunctionEnum) -> None:
         """Test getting the enum from protobuf value."""
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.LINEAR) == ActivationFunctionEnum.LINEAR
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.RELU) == ActivationFunctionEnum.RELU
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.SIGMOID) == ActivationFunctionEnum.SIGMOID
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.TANH) == ActivationFunctionEnum.TANH
+        assert ActivationFunctionEnum.from_protobuf(protobuf_value) == expected_enum
 
-    def test_to_protobuf(self) -> None:
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_protobuf"),
+        [
+            (ActivationFunctionEnum.LINEAR, ActivationFunctionData.LINEAR),
+            (ActivationFunctionEnum.RELU, ActivationFunctionData.RELU),
+            (ActivationFunctionEnum.SIGMOID, ActivationFunctionData.SIGMOID),
+            (ActivationFunctionEnum.TANH, ActivationFunctionData.TANH),
+        ],
+    )
+    def test_to_protobuf(self, enum_value: ActivationFunctionEnum, expected_protobuf: ActivationFunctionData) -> None:
         """Test converting enum to protobuf value."""
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.LINEAR) == ActivationFunctionData.LINEAR
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.RELU) == ActivationFunctionData.RELU
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.SIGMOID) == ActivationFunctionData.SIGMOID
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.TANH) == ActivationFunctionData.TANH
+        assert ActivationFunctionEnum.to_protobuf(enum_value) == expected_protobuf
 
 
 class TestMatrixDataType:
