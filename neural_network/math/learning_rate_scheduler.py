@@ -37,9 +37,7 @@ class StepDecayScheduler(LearningRateScheduler):
         :param int decay_steps:
             Number of steps after which the learning rate will be reduced.
         """
-        self.decay_rate = decay_rate
-        self.decay_rate = decay_rate
-        self.decay_steps = decay_steps
+        super().__init__(decay_rate, decay_steps)
 
     def step(self, lr: float, epoch: int) -> float:
         """Step decay learning rate scheduler.
@@ -64,8 +62,7 @@ class ExponentialDecayScheduler(LearningRateScheduler):
         :param int decay_steps:
             Number of steps after which the learning rate will be decayed.
         """
-        self.decay_rate = decay_rate
-        self.decay_steps = decay_steps
+        super().__init__(decay_rate, decay_steps)
 
     def step(self, lr: float, epoch: int) -> float:
         """Exponential decay learning rate scheduler.
