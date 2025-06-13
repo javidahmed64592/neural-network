@@ -49,7 +49,9 @@ class NeuralNetwork:
         optimizer_class = self._optimizer.__class__
 
         for layer in self.layers:
-            optimizer_instance = optimizer_class(**dict(self._optimizer.__dict__.items()))
+            optimizer_instance = optimizer_class(
+                **{k: v for k, v in self._optimizer.__dict__.items() if not k.startswith("_")}
+            )
             layer.set_optimizer(optimizer_instance)
 
         self._num_inputs = self._input_layer.size
