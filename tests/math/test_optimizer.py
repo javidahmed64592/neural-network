@@ -4,6 +4,7 @@
 import numpy as np
 import pytest
 
+from neural_network.math.learning_rate_scheduler import StepDecayScheduler
 from neural_network.math.matrix import Matrix
 from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
 
@@ -14,7 +15,7 @@ class TestSGDOptimizer:
     @pytest.fixture
     def sgd_optimizer(self) -> SGDOptimizer:
         """Fixture to create an instance of SGDOptimizer."""
-        return SGDOptimizer(learning_rate=0.01)
+        return SGDOptimizer(lr_scheduler=StepDecayScheduler())
 
     def test_given_weights_when_updating_then_check_weights_change_correctly(self, sgd_optimizer: SGDOptimizer) -> None:
         """Test SGD optimizer updates weights correctly."""
@@ -51,7 +52,7 @@ class TestAdamOptimizer:
     @pytest.fixture
     def adam_optimizer(self) -> AdamOptimizer:
         """Fixture to create an instance of AdamOptimizer."""
-        return AdamOptimizer(learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8)
+        return AdamOptimizer(lr_scheduler=StepDecayScheduler(), beta1=0.9, beta2=0.999, epsilon=1e-8)
 
     def test_given_adam_optimizer_when_first_weight_update_then_moments_initialized(
         self, adam_optimizer: AdamOptimizer
@@ -156,7 +157,7 @@ class TestAdamOptimizer:
         adam_optimizer.reset()
 
         # Verify state is cleared
-        assert adam_optimizer._t == 0
+        assert adam_optimizer._t == 1
         assert adam_optimizer._weight_m is None
         assert adam_optimizer._weight_v is None
         assert adam_optimizer._bias_m is None

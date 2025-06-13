@@ -17,8 +17,7 @@ class Layer:
         activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        lr: float = 0.1,
-        optimizer: type[Optimizer] = SGDOptimizer,
+        optimizer: Optimizer | None = None,
     ) -> None:
         """Initialise Layer object with number of nodes, activation function, weights range and bias range.
 
@@ -30,17 +29,15 @@ class Layer:
             Range for initializing layer weights.
         :param tuple[float, float] bias_range:
             Range for initializing layer biases.
-        :param float lr:
-            Learning rate for the optimizer (default is 0.1).
-        :param type[Optimizer] | None optimizer:
-            Optimizer class for updating weights and biases (optional).
+        :param Optimizer | None optimizer:
+            Optimizer instance for updating weights and biases (optional).
         """
         self._prev_layer: Layer | None = None
         self._next_layer: Layer | None = None
         self._weights: Matrix | None = None
         self._bias: Matrix | None = None
 
-        self._optimizer = optimizer(learning_rate=lr)
+        self._optimizer = optimizer or SGDOptimizer()
 
         self._size = size
         self._activation = activation
@@ -156,7 +153,7 @@ class Layer:
             Errors from the next layer.
         """
         gradient = nn_math.calculate_gradient(
-            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=1.0
+            activation=self._activation, layer_vals=self._layer_output, errors=errors, lr=self._optimizer.learning_rate
         )
         weight_gradients = nn_math.calculate_delta(layer_vals=self._layer_input, gradients=gradient)
 
@@ -172,8 +169,7 @@ class InputLayer(Layer):
         self,
         size: int,
         activation: type[ActivationFunction],
-        lr: float = 0.1,
-        optimizer: type[Optimizer] = SGDOptimizer,
+        optimizer: Optimizer | None = None,
     ) -> None:
         """Initialise InputLayer object with number of nodes and activation function.
 
@@ -181,12 +177,10 @@ class InputLayer(Layer):
             Number of input nodes.
         :param type[ActivationFunction] activation:
             Activation function class for the input layer.
-        :param float lr:
-            Learning rate for the optimizer (default is 0.1).
-        :param type[Optimizer] | None optimizer:
-            Optimizer class for updating weights and biases (optional).
+        :param Optimizer | None optimizer:
+            Optimizer instance for updating weights and biases (optional).
         """
-        super().__init__(size, activation, (1.0, 1.0), (0.0, 0.0), lr, optimizer)
+        super().__init__(size, activation, (1.0, 1.0), (0.0, 0.0), optimizer)
 
     def __str__(self) -> str:
         """Return a string representation of the InputLayer.
@@ -218,8 +212,7 @@ class HiddenLayer(Layer):
         activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        lr: float = 0.1,
-        optimizer: type[Optimizer] = SGDOptimizer,
+        optimizer: Optimizer | None = None,
     ) -> None:
         """Initialize HiddenLayer object.
 
@@ -231,12 +224,10 @@ class HiddenLayer(Layer):
             Range for initializing hidden layer weights.
         :param tuple[float, float] bias_range:
             Range for initializing hidden layer biases.
-        :param float lr:
-            Learning rate for the optimizer (default is 0.1).
-        :param type[Optimizer] | None optimizer:
-            Optimizer class for updating weights and biases (optional).
+        :param Optimizer | None optimizer:
+            Optimizer instance for updating weights and biases (optional).
         """
-        super().__init__(size, activation, weights_range, bias_range, lr, optimizer)
+        super().__init__(size, activation, weights_range, bias_range, optimizer)
 
     def __str__(self) -> str:
         """Return a string representation of the HiddenLayer.
@@ -256,8 +247,7 @@ class OutputLayer(Layer):
         activation: type[ActivationFunction],
         weights_range: tuple[float, float],
         bias_range: tuple[float, float],
-        optimizer: type[Optimizer] = SGDOptimizer,
-        lr: float = 0.1,
+        optimizer: Optimizer | None = None,
     ) -> None:
         """Initialise OutputLayer object with number of nodes, activation function, weights range and bias range.
 
@@ -269,12 +259,10 @@ class OutputLayer(Layer):
             Range for initializing output layer weights.
         :param tuple[float, float] bias_range:
             Range for initializing output layer biases.
-        :param float lr:
-            Learning rate for the optimizer (default is 0.1).
-        :param type[Optimizer] | None optimizer:
-            Optimizer class for updating weights and biases (optional).
+        :param Optimizer | None optimizer:
+            Optimizer instance for updating weights and biases (optional).
         """
-        super().__init__(size, activation, weights_range, bias_range, lr, optimizer)
+        super().__init__(size, activation, weights_range, bias_range, optimizer)
 
     def __str__(self) -> str:
         """Return a string representation of the OutputLayer.

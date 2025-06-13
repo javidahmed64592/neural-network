@@ -13,10 +13,17 @@ class ActivationFunctionData(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RELU: _ClassVar[ActivationFunctionData]
     SIGMOID: _ClassVar[ActivationFunctionData]
     TANH: _ClassVar[ActivationFunctionData]
+
+class LearningRateMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    STEP_DECAY: _ClassVar[LearningRateMethod]
+    EXPONENTIAL_DECAY: _ClassVar[LearningRateMethod]
 LINEAR: ActivationFunctionData
 RELU: ActivationFunctionData
 SIGMOID: ActivationFunctionData
 TANH: ActivationFunctionData
+STEP_DECAY: LearningRateMethod
+EXPONENTIAL_DECAY: LearningRateMethod
 
 class MatrixData(_message.Message):
     __slots__ = ("data", "rows", "cols")
@@ -46,13 +53,25 @@ class AdamOptimizerData(_message.Message):
     epsilon: float
     def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
 
+class LearningRateSchedulerData(_message.Message):
+    __slots__ = ("decay_rate", "decay_steps", "method")
+    DECAY_RATE_FIELD_NUMBER: _ClassVar[int]
+    DECAY_STEPS_FIELD_NUMBER: _ClassVar[int]
+    METHOD_FIELD_NUMBER: _ClassVar[int]
+    decay_rate: float
+    decay_steps: int
+    method: LearningRateMethod
+    def __init__(self, decay_rate: _Optional[float] = ..., decay_steps: _Optional[int] = ..., method: _Optional[_Union[LearningRateMethod, str]] = ...) -> None: ...
+
 class OptimizerData(_message.Message):
-    __slots__ = ("sgd", "adam")
+    __slots__ = ("sgd", "adam", "learning_rate_scheduler")
     SGD_FIELD_NUMBER: _ClassVar[int]
     ADAM_FIELD_NUMBER: _ClassVar[int]
+    LEARNING_RATE_SCHEDULER_FIELD_NUMBER: _ClassVar[int]
     sgd: SGDOptimizerData
     adam: AdamOptimizerData
-    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ...) -> None: ...
+    learning_rate_scheduler: LearningRateSchedulerData
+    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ..., learning_rate_scheduler: _Optional[_Union[LearningRateSchedulerData, _Mapping]] = ...) -> None: ...
 
 class NeuralNetworkData(_message.Message):
     __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "optimizer")

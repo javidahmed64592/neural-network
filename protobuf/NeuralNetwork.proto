@@ -26,11 +26,23 @@ message AdamOptimizerData {
     float epsilon = 4;
 }
 
+enum LearningRateMethod {
+    STEP_DECAY = 0;
+    EXPONENTIAL_DECAY = 1;
+}
+
+message LearningRateSchedulerData {
+    float decay_rate = 1;
+    int32 decay_steps = 2;
+    LearningRateMethod method = 3;
+}
+
 message OptimizerData {
     oneof algorithm {
         SGDOptimizerData sgd = 1;
         AdamOptimizerData adam = 2;
     }
+    LearningRateSchedulerData learning_rate_scheduler = 3;
 }
 
 message NeuralNetworkData {

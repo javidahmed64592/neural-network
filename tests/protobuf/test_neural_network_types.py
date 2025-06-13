@@ -5,11 +5,18 @@ import numpy as np
 import pytest
 
 from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
+from neural_network.math.learning_rate_scheduler import (
+    ExponentialDecayScheduler,
+    LearningRateScheduler,
+    StepDecayScheduler,
+)
 from neural_network.math.matrix import Matrix
 from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
+    LearningRateMethod,
+    LearningRateSchedulerData,
     MatrixData,
     NeuralNetworkData,
     OptimizerData,
@@ -18,6 +25,8 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
 from neural_network.protobuf.neural_network_types import (
     ActivationFunctionEnum,
     AdamOptimizerDataType,
+    LearningRateMethodEnum,
+    LearningRateSchedulerDataType,
     MatrixDataType,
     NeuralNetworkDataType,
     OptimizerDataType,
@@ -30,33 +39,57 @@ rng = np.random.default_rng()
 class TestActivationFunctionEnum:
     """Test cases for ActivationFunctionEnum conversions."""
 
-    def test_get_class(self) -> None:
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_class"),
+        [
+            (ActivationFunctionEnum.LINEAR, LinearActivation),
+            (ActivationFunctionEnum.RELU, ReluActivation),
+            (ActivationFunctionEnum.SIGMOID, SigmoidActivation),
+            (ActivationFunctionEnum.TANH, TanhActivation),
+        ],
+    )
+    def test_get_class(self, enum_value: ActivationFunctionEnum, expected_class: type) -> None:
         """Test getting the activation function class from enum."""
-        assert ActivationFunctionEnum.LINEAR.get_class() == LinearActivation
-        assert ActivationFunctionEnum.RELU.get_class() == ReluActivation
-        assert ActivationFunctionEnum.SIGMOID.get_class() == SigmoidActivation
-        assert ActivationFunctionEnum.TANH.get_class() == TanhActivation
+        assert enum_value.get_class() == expected_class
 
-    def test_from_class(self) -> None:
+    @pytest.mark.parametrize(
+        ("activation_class", "expected_enum"),
+        [
+            (LinearActivation, ActivationFunctionEnum.LINEAR),
+            (ReluActivation, ActivationFunctionEnum.RELU),
+            (SigmoidActivation, ActivationFunctionEnum.SIGMOID),
+            (TanhActivation, ActivationFunctionEnum.TANH),
+        ],
+    )
+    def test_from_class(self, activation_class: type, expected_enum: ActivationFunctionEnum) -> None:
         """Test getting the enum from activation function class."""
-        assert ActivationFunctionEnum.from_class(LinearActivation) == ActivationFunctionEnum.LINEAR
-        assert ActivationFunctionEnum.from_class(ReluActivation) == ActivationFunctionEnum.RELU
-        assert ActivationFunctionEnum.from_class(SigmoidActivation) == ActivationFunctionEnum.SIGMOID
-        assert ActivationFunctionEnum.from_class(TanhActivation) == ActivationFunctionEnum.TANH
+        assert ActivationFunctionEnum.from_class(activation_class) == expected_enum
 
-    def test_from_protobuf(self) -> None:
+    @pytest.mark.parametrize(
+        ("protobuf_value", "expected_enum"),
+        [
+            (ActivationFunctionData.LINEAR, ActivationFunctionEnum.LINEAR),
+            (ActivationFunctionData.RELU, ActivationFunctionEnum.RELU),
+            (ActivationFunctionData.SIGMOID, ActivationFunctionEnum.SIGMOID),
+            (ActivationFunctionData.TANH, ActivationFunctionEnum.TANH),
+        ],
+    )
+    def test_from_protobuf(self, protobuf_value: ActivationFunctionData, expected_enum: ActivationFunctionEnum) -> None:
         """Test getting the enum from protobuf value."""
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.LINEAR) == ActivationFunctionEnum.LINEAR
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.RELU) == ActivationFunctionEnum.RELU
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.SIGMOID) == ActivationFunctionEnum.SIGMOID
-        assert ActivationFunctionEnum.from_protobuf(ActivationFunctionData.TANH) == ActivationFunctionEnum.TANH
+        assert ActivationFunctionEnum.from_protobuf(protobuf_value) == expected_enum
 
-    def test_to_protobuf(self) -> None:
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_protobuf"),
+        [
+            (ActivationFunctionEnum.LINEAR, ActivationFunctionData.LINEAR),
+            (ActivationFunctionEnum.RELU, ActivationFunctionData.RELU),
+            (ActivationFunctionEnum.SIGMOID, ActivationFunctionData.SIGMOID),
+            (ActivationFunctionEnum.TANH, ActivationFunctionData.TANH),
+        ],
+    )
+    def test_to_protobuf(self, enum_value: ActivationFunctionEnum, expected_protobuf: ActivationFunctionData) -> None:
         """Test converting enum to protobuf value."""
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.LINEAR) == ActivationFunctionData.LINEAR
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.RELU) == ActivationFunctionData.RELU
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.SIGMOID) == ActivationFunctionData.SIGMOID
-        assert ActivationFunctionEnum.to_protobuf(ActivationFunctionEnum.TANH) == ActivationFunctionData.TANH
+        assert ActivationFunctionEnum.to_protobuf(enum_value) == expected_protobuf
 
 
 class TestMatrixDataType:
@@ -150,17 +183,10 @@ class TestSGDOptimizerDataType:
 
     def test_from_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
         """Test creating SGDOptimizerDataType from class instance."""
-        optimizer = sgd_optimizer_data_type.get_class_instance()
+        optimizer = SGDOptimizer(lr=sgd_optimizer_data_type.learning_rate, lr_scheduler=StepDecayScheduler())
         sgd_data = SGDOptimizerDataType.from_class_instance(optimizer)
 
-        assert sgd_data.learning_rate == sgd_optimizer_data_type.learning_rate
-
-    def test_get_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
-        """Test getting the SGDOptimizer class instance."""
-        optimizer = sgd_optimizer_data_type.get_class_instance()
-
-        assert isinstance(optimizer, SGDOptimizer)
-        assert optimizer.learning_rate == sgd_optimizer_data_type.learning_rate
+        assert sgd_data.learning_rate == pytest.approx(sgd_optimizer_data_type.learning_rate)
 
 
 class TestAdamOptimizerDataType:
@@ -201,23 +227,165 @@ class TestAdamOptimizerDataType:
 
     def test_from_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
         """Test creating AdamOptimizerDataType from class instance."""
-        optimizer = adam_optimizer_data_type.get_class_instance()
+        optimizer = AdamOptimizer(
+            lr=adam_optimizer_data_type.learning_rate,
+            lr_scheduler=StepDecayScheduler(),
+            beta1=adam_optimizer_data_type.beta1,
+            beta2=adam_optimizer_data_type.beta2,
+            epsilon=adam_optimizer_data_type.epsilon,
+        )
         adam_data = AdamOptimizerDataType.from_class_instance(optimizer)
 
-        assert adam_data.learning_rate == adam_optimizer_data_type.learning_rate
+        assert adam_data.learning_rate == pytest.approx(adam_optimizer_data_type.learning_rate)
         assert adam_data.beta1 == adam_optimizer_data_type.beta1
         assert adam_data.beta2 == adam_optimizer_data_type.beta2
         assert adam_data.epsilon == adam_optimizer_data_type.epsilon
 
-    def test_get_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
-        """Test getting the AdamOptimizer class instance."""
-        optimizer = adam_optimizer_data_type.get_class_instance()
 
-        assert isinstance(optimizer, AdamOptimizer)
-        assert optimizer.learning_rate == adam_optimizer_data_type.learning_rate
-        assert optimizer.beta1 == adam_optimizer_data_type.beta1
-        assert optimizer.beta2 == adam_optimizer_data_type.beta2
-        assert optimizer.epsilon == adam_optimizer_data_type.epsilon
+class TestLearningRateMethodEnum:
+    """Test cases for LearningRateMethodEnum conversions."""
+
+    @pytest.mark.parametrize(
+        ("method", "expected_class"),
+        [
+            (LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
+            (LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
+        ],
+    )
+    def test_get_class(self, method: LearningRateMethodEnum, expected_class: type[LearningRateScheduler]) -> None:
+        """Test getting the learning rate method class from enum."""
+        assert method.get_class() == expected_class
+
+    @pytest.mark.parametrize(
+        ("method_class", "expected_enum"),
+        [
+            (StepDecayScheduler, LearningRateMethodEnum.STEP_DECAY),
+            (ExponentialDecayScheduler, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_class(self, method_class: type[LearningRateScheduler], expected_enum: LearningRateMethodEnum) -> None:
+        """Test getting the enum from learning rate method class."""
+        assert LearningRateMethodEnum.from_class(method_class) == expected_enum
+
+    @pytest.mark.parametrize(
+        ("protobuf_value", "expected_enum"),
+        [
+            (LearningRateMethod.STEP_DECAY, LearningRateMethodEnum.STEP_DECAY),
+            (LearningRateMethod.EXPONENTIAL_DECAY, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_protobuf(self, protobuf_value: LearningRateMethod, expected_enum: LearningRateMethodEnum) -> None:
+        """Test getting the enum from protobuf value."""
+        assert LearningRateMethodEnum.from_protobuf(protobuf_value) == expected_enum
+
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_protobuf"),
+        [
+            (LearningRateMethodEnum.STEP_DECAY, LearningRateMethod.STEP_DECAY),
+            (LearningRateMethodEnum.EXPONENTIAL_DECAY, LearningRateMethod.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_to_protobuf(self, enum_value: LearningRateMethodEnum, expected_protobuf: LearningRateMethod) -> None:
+        """Test converting enum to protobuf value."""
+        assert LearningRateMethodEnum.to_protobuf(enum_value) == expected_protobuf
+
+
+class TestLearningRateSchedulerDataType:
+    """Test cases for LearningRateSchedulerDataType conversions."""
+
+    @pytest.mark.parametrize(
+        ("decay_rate", "decay_steps", "method"),
+        [
+            (5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_protobuf(self, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum) -> None:
+        """Test creating LearningRateSchedulerDataType from protobuf message."""
+        lr_data = LearningRateSchedulerData(
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=LearningRateMethodEnum.to_protobuf(method),
+        )
+        lr_data_type = LearningRateSchedulerDataType.from_protobuf(lr_data)
+
+        assert lr_data_type.decay_rate == decay_rate
+        assert lr_data_type.decay_steps == decay_steps
+        assert lr_data_type.method == method
+
+    @pytest.mark.parametrize(
+        ("decay_rate", "decay_steps", "method"),
+        [
+            (5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_to_protobuf(self, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum) -> None:
+        """Test converting LearningRateSchedulerDataType to protobuf message."""
+        lr_data_type = LearningRateSchedulerDataType(
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=method,
+        )
+
+        protobuf_data = LearningRateSchedulerDataType.to_protobuf(lr_data_type)
+
+        assert protobuf_data.decay_rate == lr_data_type.decay_rate
+        assert protobuf_data.decay_steps == lr_data_type.decay_steps
+        assert protobuf_data.method == LearningRateMethodEnum.to_protobuf(lr_data_type.method)
+
+    @pytest.mark.parametrize(
+        ("scheduler_class", "decay_rate", "decay_steps", "expected_method"),
+        [
+            (StepDecayScheduler, 5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (ExponentialDecayScheduler, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_class_instance(
+        self,
+        scheduler_class: type[LearningRateScheduler],
+        decay_rate: float,
+        decay_steps: int,
+        expected_method: LearningRateMethodEnum,
+    ) -> None:
+        """Test creating LearningRateSchedulerDataType from class instance."""
+        scheduler = scheduler_class(
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+        )
+
+        lr_data = LearningRateSchedulerDataType.from_class_instance(scheduler)
+
+        assert lr_data.decay_rate == decay_rate
+        assert lr_data.decay_steps == decay_steps
+        assert lr_data.method == expected_method
+
+    @pytest.mark.parametrize(
+        ("decay_rate", "decay_steps", "method", "expected_class"),
+        [
+            (5, 100, LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
+        ],
+    )
+    def test_get_class_instance(
+        self,
+        decay_rate: float,
+        decay_steps: int,
+        method: LearningRateMethodEnum,
+        expected_class: type[LearningRateScheduler],
+    ) -> None:
+        """Test getting the learning rate scheduler class instance."""
+        lr_data = LearningRateSchedulerDataType(
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=method,
+        )
+
+        scheduler = lr_data.get_class_instance()
+
+        assert isinstance(scheduler, expected_class)
+        assert scheduler.decay_rate == decay_rate
+        assert scheduler.decay_steps == decay_steps
 
 
 class TestOptimizerDataType:
@@ -226,15 +394,21 @@ class TestOptimizerDataType:
     @pytest.fixture
     def sgd_optimizer_data(self) -> OptimizerData:
         """Fixture for an SGDOptimizerData protobuf message."""
-        return OptimizerData(sgd=SGDOptimizerDataType.to_protobuf(SGDOptimizerDataType(learning_rate=0.1)))
+        return OptimizerData(
+            sgd=SGDOptimizerData(learning_rate=0.1),
+            learning_rate_scheduler=LearningRateSchedulerData(
+                decay_rate=0.5, decay_steps=10, method=LearningRateMethod.STEP_DECAY
+            ),
+        )
 
     @pytest.fixture
     def adam_optimizer_data(self) -> OptimizerData:
         """Fixture for an AdamOptimizerData protobuf message."""
         return OptimizerData(
-            adam=AdamOptimizerDataType.to_protobuf(
-                AdamOptimizerDataType(learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8)
-            )
+            adam=AdamOptimizerData(learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8),
+            learning_rate_scheduler=LearningRateSchedulerData(
+                decay_rate=0.5, decay_steps=10, method=LearningRateMethod.STEP_DECAY
+            ),
         )
 
     @pytest.fixture
@@ -252,16 +426,16 @@ class TestOptimizerDataType:
         sgd_optimizer_data_type = OptimizerDataType.from_protobuf(sgd_optimizer_data)
         assert sgd_optimizer_data_type.adam is None
         assert sgd_optimizer_data_type.sgd == SGDOptimizerDataType.from_protobuf(sgd_optimizer_data.sgd)
-        sgd_instance = sgd_optimizer_data_type.sgd.get_class_instance()
+        sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance.learning_rate == sgd_optimizer_data.sgd.learning_rate
+        assert sgd_instance.lr == sgd_optimizer_data.sgd.learning_rate
 
         adam_optimizer_data_type = OptimizerDataType.from_protobuf(adam_optimizer_data)
         assert adam_optimizer_data_type.sgd is None
         assert adam_optimizer_data_type.adam == AdamOptimizerDataType.from_protobuf(adam_optimizer_data.adam)
-        adam_instance = adam_optimizer_data_type.adam.get_class_instance()
+        adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance.learning_rate == adam_optimizer_data.adam.learning_rate
+        assert adam_instance.lr == adam_optimizer_data.adam.learning_rate  # Check _lr directly
         assert adam_instance.beta1 == adam_optimizer_data.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data.adam.epsilon
@@ -322,11 +496,11 @@ class TestOptimizerDataType:
         """Test getting the optimizer class instance."""
         sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
+        assert sgd_instance.lr == sgd_optimizer_data_type.sgd.learning_rate
 
         adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance.learning_rate == adam_optimizer_data_type.adam.learning_rate
+        assert adam_instance.lr == adam_optimizer_data_type.adam.learning_rate
         assert adam_instance.beta1 == adam_optimizer_data_type.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data_type.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data_type.adam.epsilon

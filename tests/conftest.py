@@ -4,6 +4,7 @@ import pytest
 
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import LinearActivation
+from neural_network.math.learning_rate_scheduler import ExponentialDecayScheduler
 from neural_network.math.matrix import Matrix
 from neural_network.math.optimizer import AdamOptimizer
 from neural_network.neural_network import NeuralNetwork
@@ -16,9 +17,15 @@ def mock_activation() -> type[LinearActivation]:
 
 
 @pytest.fixture
-def mock_optimizer() -> AdamOptimizer:
+def mock_learning_rate_scheduler() -> ExponentialDecayScheduler:
+    """Fixture for a mock learning rate scheduler."""
+    return ExponentialDecayScheduler(decay_rate=0.1, decay_steps=1000)
+
+
+@pytest.fixture
+def mock_optimizer(mock_learning_rate_scheduler: ExponentialDecayScheduler) -> AdamOptimizer:
     """Fixture for a mock optimizer class."""
-    return AdamOptimizer(learning_rate=0.1)
+    return AdamOptimizer(lr=0.001, lr_scheduler=mock_learning_rate_scheduler)
 
 
 @pytest.fixture
@@ -138,10 +145,12 @@ def mock_nn(
     mock_hidden_layer_2: HiddenLayer,
     mock_hidden_layer_3: HiddenLayer,
     mock_output_layer: OutputLayer,
+    mock_optimizer: AdamOptimizer,
 ) -> NeuralNetwork:
     """Fixture for a mock neural network."""
     return NeuralNetwork.from_layers(
-        layers=[mock_input_layer, mock_hidden_layer_1, mock_hidden_layer_2, mock_hidden_layer_3, mock_output_layer]
+        layers=[mock_input_layer, mock_hidden_layer_1, mock_hidden_layer_2, mock_hidden_layer_3, mock_output_layer],
+        optimizer=mock_optimizer,
     )
 
 
