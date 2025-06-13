@@ -10,7 +10,7 @@ class TestStepDecayScheduler:
     """Test cases for the StepDecayScheduler class."""
 
     @pytest.mark.parametrize(
-        ("initial_lr", "drop_factor", "epochs_drop", "epoch", "expected_lr"),
+        ("initial_lr", "decay_rate", "decay_steps", "epoch", "expected_lr"),
         [
             (0.1, 0.5, 10, 0, 0.1),
             (0.1, 0.5, 10, 5, 0.1),
@@ -18,10 +18,10 @@ class TestStepDecayScheduler:
         ],
     )
     def test_step_decay_scheduler(
-        self, initial_lr: float, drop_factor: float, epochs_drop: int, epoch: int, expected_lr: float
+        self, initial_lr: float, decay_rate: float, decay_steps: int, epoch: int, expected_lr: float
     ) -> None:
         """Test the step decay learning rate scheduler."""
-        scheduler = StepDecayScheduler(initial_lr, drop_factor, epochs_drop)
+        scheduler = StepDecayScheduler(initial_lr, decay_rate, decay_steps)
         lr = scheduler.step(epoch)
         assert np.isclose(lr, expected_lr, rtol=1e-4)
 

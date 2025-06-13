@@ -10,6 +10,20 @@ import numpy as np
 class LearningRateScheduler(ABC):
     """Abstract base class for learning rate schedulers."""
 
+    def __init__(self, initial_lr: float = 0.1, decay_rate: float = 0.5, decay_steps: int = 10) -> None:
+        """Initialize learning rate scheduler.
+
+        :param float initial_lr:
+            Initial learning rate.
+        :param float decay_rate:
+            Rate at which the learning rate decays.
+        :param int decay_steps:
+            Number of steps after which the learning rate will be reduced.
+        """
+        self.initial_lr = initial_lr
+        self.decay_rate = decay_rate
+        self.decay_steps = decay_steps
+
     @abstractmethod
     def step(self, epoch: int) -> float:
         """Return the learning rate for the current epoch."""
