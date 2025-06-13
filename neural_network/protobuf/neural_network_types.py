@@ -568,7 +568,7 @@ class NeuralNetworkDataType:
     output_activation: ActivationFunctionEnum
     weights: list[MatrixDataType]
     biases: list[MatrixDataType]
-    optimizer: OptimizerDataType = field(default_factory=OptimizerDataType)
+    optimizer: OptimizerDataType
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkData) -> NeuralNetworkDataType:
