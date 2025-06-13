@@ -1,13 +1,15 @@
 """Activation function classes for neural networks."""
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 
 
-class ActivationFunction:
+class ActivationFunction(ABC):
     """Base class for activation functions."""
 
-    @staticmethod
-    def func(x: float) -> float:
+    @abstractmethod
+    def func(self, x: float) -> float:
         """Compute the activation function.
 
         :param float x:
@@ -15,10 +17,9 @@ class ActivationFunction:
         :return float:
             Activated value.
         """
-        return x
 
-    @staticmethod
-    def derivative(x: float) -> float:
+    @abstractmethod
+    def derivative(self, x: float) -> float:
         """Compute the derivative of the activation function.
 
         :param float x:
@@ -26,7 +27,6 @@ class ActivationFunction:
         :return float:
             Derivative value.
         """
-        return 1
 
 
 class LinearActivation(ActivationFunction):

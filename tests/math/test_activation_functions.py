@@ -3,30 +3,11 @@
 import numpy as np
 
 from neural_network.math.activation_functions import (
-    ActivationFunction,
     LinearActivation,
     ReluActivation,
     SigmoidActivation,
     TanhActivation,
 )
-
-
-class TestActivationFunction:
-    """Test cases for the base ActivationFunction class."""
-
-    def test_given_x_when_calculating_y_then_check_calculated_correctly(self) -> None:
-        """Test that the base activation function returns the input value."""
-        x = 5
-        expected_y = x
-        actual_y = ActivationFunction.func(x)
-        assert actual_y == expected_y
-
-    def test_given_x_when_calculating_derivative_then_check_calculated_correctly(self) -> None:
-        """Test that the base activation function derivative returns 1."""
-        x = 5
-        expected_y = 1
-        actual_y = ActivationFunction.derivative(x)
-        assert actual_y == expected_y
 
 
 class TestLinearActivation:
