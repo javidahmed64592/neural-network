@@ -26,10 +26,26 @@ message AdamOptimizerData {
     float epsilon = 4;
 }
 
+message StepDecayData {
+    float initial_lr = 1;
+    float drop_factor = 2;
+    float epochs_drop = 3;
+}
+
+message ExponentialDecayData {
+    float initial_lr = 1;
+    float decay_rate = 2;
+    float decay_steps = 3;
+}
+
 message OptimizerData {
     oneof algorithm {
         SGDOptimizerData sgd = 1;
         AdamOptimizerData adam = 2;
+    }
+    oneof learning_rate_scheduler {
+        StepDecayData step_decay = 3;
+        ExponentialDecayData exponential_decay = 4;
     }
 }
 

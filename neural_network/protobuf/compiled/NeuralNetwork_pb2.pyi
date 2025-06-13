@@ -46,13 +46,37 @@ class AdamOptimizerData(_message.Message):
     epsilon: float
     def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
 
+class StepDecayData(_message.Message):
+    __slots__ = ("initial_lr", "drop_factor", "epochs_drop")
+    INITIAL_LR_FIELD_NUMBER: _ClassVar[int]
+    DROP_FACTOR_FIELD_NUMBER: _ClassVar[int]
+    EPOCHS_DROP_FIELD_NUMBER: _ClassVar[int]
+    initial_lr: float
+    drop_factor: float
+    epochs_drop: float
+    def __init__(self, initial_lr: _Optional[float] = ..., drop_factor: _Optional[float] = ..., epochs_drop: _Optional[float] = ...) -> None: ...
+
+class ExponentialDecayData(_message.Message):
+    __slots__ = ("initial_lr", "decay_rate", "decay_steps")
+    INITIAL_LR_FIELD_NUMBER: _ClassVar[int]
+    DECAY_RATE_FIELD_NUMBER: _ClassVar[int]
+    DECAY_STEPS_FIELD_NUMBER: _ClassVar[int]
+    initial_lr: float
+    decay_rate: float
+    decay_steps: float
+    def __init__(self, initial_lr: _Optional[float] = ..., decay_rate: _Optional[float] = ..., decay_steps: _Optional[float] = ...) -> None: ...
+
 class OptimizerData(_message.Message):
-    __slots__ = ("sgd", "adam")
+    __slots__ = ("sgd", "adam", "step_decay", "exponential_decay")
     SGD_FIELD_NUMBER: _ClassVar[int]
     ADAM_FIELD_NUMBER: _ClassVar[int]
+    STEP_DECAY_FIELD_NUMBER: _ClassVar[int]
+    EXPONENTIAL_DECAY_FIELD_NUMBER: _ClassVar[int]
     sgd: SGDOptimizerData
     adam: AdamOptimizerData
-    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ...) -> None: ...
+    step_decay: StepDecayData
+    exponential_decay: ExponentialDecayData
+    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ..., step_decay: _Optional[_Union[StepDecayData, _Mapping]] = ..., exponential_decay: _Optional[_Union[ExponentialDecayData, _Mapping]] = ...) -> None: ...
 
 class NeuralNetworkData(_message.Message):
     __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "optimizer")
