@@ -226,7 +226,7 @@ class SGDOptimizerDataType:
         :return SGDOptimizerDataType:
             The corresponding SGDOptimizerDataType instance.
         """
-        return cls(learning_rate=optimizer.learning_rate)
+        return cls(learning_rate=optimizer._lr)
 
 
 @dataclass
@@ -280,7 +280,7 @@ class AdamOptimizerDataType:
             The corresponding AdamOptimizerDataType instance.
         """
         return cls(
-            learning_rate=optimizer.learning_rate,
+            learning_rate=optimizer._lr,
             beta1=optimizer.beta1,
             beta2=optimizer.beta2,
             epsilon=optimizer.epsilon,
@@ -383,7 +383,7 @@ class LearningRateSchedulerDataType:
         return LearningRateSchedulerData(
             decay_rate=lr_data.decay_rate,
             decay_steps=lr_data.decay_steps,
-            method=lr_data.method,
+            method=LearningRateMethodEnum.to_protobuf(lr_data.method),
         )
 
     @classmethod
@@ -540,9 +540,12 @@ class OptimizerDataType:
             An instance of the specified optimizer.
         """
         if self.sgd:
-            return SGDOptimizer(lr_scheduler=self.learning_rate_scheduler.get_class_instance())
+            return SGDOptimizer(
+                lr=self.sgd.learning_rate, lr_scheduler=self.learning_rate_scheduler.get_class_instance()
+            )
         if self.adam:
             return AdamOptimizer(
+                lr=self.adam.learning_rate,
                 lr_scheduler=self.learning_rate_scheduler.get_class_instance(),
                 beta1=self.adam.beta1,
                 beta2=self.adam.beta2,

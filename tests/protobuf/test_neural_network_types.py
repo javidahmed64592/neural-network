@@ -183,17 +183,10 @@ class TestSGDOptimizerDataType:
 
     def test_from_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
         """Test creating SGDOptimizerDataType from class instance."""
-        optimizer = sgd_optimizer_data_type.get_class_instance()
+        optimizer = SGDOptimizer(lr=sgd_optimizer_data_type.learning_rate, lr_scheduler=StepDecayScheduler())
         sgd_data = SGDOptimizerDataType.from_class_instance(optimizer)
 
-        assert sgd_data.learning_rate == sgd_optimizer_data_type.learning_rate
-
-    def test_get_class_instance(self, sgd_optimizer_data_type: SGDOptimizerDataType) -> None:
-        """Test getting the SGDOptimizer class instance."""
-        optimizer = sgd_optimizer_data_type.get_class_instance()
-
-        assert isinstance(optimizer, SGDOptimizer)
-        assert optimizer.learning_rate == sgd_optimizer_data_type.learning_rate
+        assert sgd_data.learning_rate == pytest.approx(sgd_optimizer_data_type.learning_rate)
 
 
 class TestAdamOptimizerDataType:
@@ -234,23 +227,19 @@ class TestAdamOptimizerDataType:
 
     def test_from_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
         """Test creating AdamOptimizerDataType from class instance."""
-        optimizer = adam_optimizer_data_type.get_class_instance()
+        optimizer = AdamOptimizer(
+            lr=adam_optimizer_data_type.learning_rate,
+            lr_scheduler=StepDecayScheduler(),
+            beta1=adam_optimizer_data_type.beta1,
+            beta2=adam_optimizer_data_type.beta2,
+            epsilon=adam_optimizer_data_type.epsilon,
+        )
         adam_data = AdamOptimizerDataType.from_class_instance(optimizer)
 
-        assert adam_data.learning_rate == adam_optimizer_data_type.learning_rate
+        assert adam_data.learning_rate == pytest.approx(adam_optimizer_data_type.learning_rate)
         assert adam_data.beta1 == adam_optimizer_data_type.beta1
         assert adam_data.beta2 == adam_optimizer_data_type.beta2
         assert adam_data.epsilon == adam_optimizer_data_type.epsilon
-
-    def test_get_class_instance(self, adam_optimizer_data_type: AdamOptimizerDataType) -> None:
-        """Test getting the AdamOptimizer class instance."""
-        optimizer = adam_optimizer_data_type.get_class_instance()
-
-        assert isinstance(optimizer, AdamOptimizer)
-        assert optimizer.learning_rate == adam_optimizer_data_type.learning_rate
-        assert optimizer.beta1 == adam_optimizer_data_type.beta1
-        assert optimizer.beta2 == adam_optimizer_data_type.beta2
-        assert optimizer.epsilon == adam_optimizer_data_type.epsilon
 
 
 class TestLearningRateMethodEnum:
@@ -304,53 +293,36 @@ class TestLearningRateMethodEnum:
 class TestLearningRateSchedulerDataType:
     """Test cases for LearningRateSchedulerDataType conversions."""
 
-    @pytest.fixture
-    def lr_scheduler_data(self) -> LearningRateSchedulerData:
-        """Fixture for a LearningRateSchedulerData protobuf message."""
-        return LearningRateSchedulerData(
-            initial_lr=0.01,
-            decay_rate=5,
-            decay_steps=100,
-            method=LearningRateMethod.STEP_DECAY,
-        )
-
     @pytest.mark.parametrize(
-        ("initial_lr", "decay_rate", "decay_steps", "method"),
+        ("decay_rate", "decay_steps", "method"),
         [
-            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
-            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+            (5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
         ],
     )
-    def test_from_protobuf(
-        self, initial_lr: float, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum
-    ) -> None:
+    def test_from_protobuf(self, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum) -> None:
         """Test creating LearningRateSchedulerDataType from protobuf message."""
         lr_data = LearningRateSchedulerData(
-            initial_lr=initial_lr,
             decay_rate=decay_rate,
             decay_steps=decay_steps,
             method=LearningRateMethodEnum.to_protobuf(method),
         )
         lr_data_type = LearningRateSchedulerDataType.from_protobuf(lr_data)
 
-        assert lr_data_type.initial_lr == pytest.approx(initial_lr)
         assert lr_data_type.decay_rate == decay_rate
         assert lr_data_type.decay_steps == decay_steps
         assert lr_data_type.method == method
 
     @pytest.mark.parametrize(
-        ("initial_lr", "decay_rate", "decay_steps", "method"),
+        ("decay_rate", "decay_steps", "method"),
         [
-            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
-            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+            (5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
         ],
     )
-    def test_to_protobuf(
-        self, initial_lr: float, decay_rate: int, decay_steps: float, method: LearningRateMethodEnum
-    ) -> None:
+    def test_to_protobuf(self, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum) -> None:
         """Test converting LearningRateSchedulerDataType to protobuf message."""
         lr_data_type = LearningRateSchedulerDataType(
-            initial_lr=initial_lr,
             decay_rate=decay_rate,
             decay_steps=decay_steps,
             method=method,
@@ -358,50 +330,45 @@ class TestLearningRateSchedulerDataType:
 
         protobuf_data = LearningRateSchedulerDataType.to_protobuf(lr_data_type)
 
-        assert protobuf_data.initial_lr == pytest.approx(lr_data_type.initial_lr)
         assert protobuf_data.decay_rate == lr_data_type.decay_rate
         assert protobuf_data.decay_steps == lr_data_type.decay_steps
         assert protobuf_data.method == LearningRateMethodEnum.to_protobuf(lr_data_type.method)
 
     @pytest.mark.parametrize(
-        ("scheduler_class", "initial_lr", "decay_rate", "decay_steps", "expected_method"),
+        ("scheduler_class", "decay_rate", "decay_steps", "expected_method"),
         [
-            (StepDecayScheduler, 0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
-            (ExponentialDecayScheduler, 0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+            (StepDecayScheduler, 5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (ExponentialDecayScheduler, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
         ],
     )
     def test_from_class_instance(
         self,
         scheduler_class: type[LearningRateScheduler],
-        initial_lr: float,
         decay_rate: int,
         decay_steps: float,
         expected_method: LearningRateMethodEnum,
     ) -> None:
         """Test creating LearningRateSchedulerDataType from class instance."""
         scheduler = scheduler_class(
-            initial_lr=initial_lr,
             decay_rate=decay_rate,
             decay_steps=decay_steps,
         )
 
         lr_data = LearningRateSchedulerDataType.from_class_instance(scheduler)
 
-        assert lr_data.initial_lr == initial_lr
         assert lr_data.decay_rate == decay_rate
         assert lr_data.decay_steps == decay_steps
         assert lr_data.method == expected_method
 
     @pytest.mark.parametrize(
-        ("initial_lr", "decay_rate", "decay_steps", "method", "expected_class"),
+        ("decay_rate", "decay_steps", "method", "expected_class"),
         [
-            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
-            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
+            (5, 100, LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
+            (2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
         ],
     )
     def test_get_class_instance(
         self,
-        initial_lr: float,
         decay_rate: int,
         decay_steps: float,
         method: LearningRateMethodEnum,
@@ -409,7 +376,6 @@ class TestLearningRateSchedulerDataType:
     ) -> None:
         """Test getting the learning rate scheduler class instance."""
         lr_data = LearningRateSchedulerDataType(
-            initial_lr=initial_lr,
             decay_rate=decay_rate,
             decay_steps=decay_steps,
             method=method,
@@ -418,7 +384,6 @@ class TestLearningRateSchedulerDataType:
         scheduler = lr_data.get_class_instance()
 
         assert isinstance(scheduler, expected_class)
-        assert scheduler.initial_lr == initial_lr
         assert scheduler.decay_rate == decay_rate
         assert scheduler.decay_steps == decay_steps
 
@@ -429,15 +394,21 @@ class TestOptimizerDataType:
     @pytest.fixture
     def sgd_optimizer_data(self) -> OptimizerData:
         """Fixture for an SGDOptimizerData protobuf message."""
-        return OptimizerData(sgd=SGDOptimizerDataType.to_protobuf(SGDOptimizerDataType(learning_rate=0.1)))
+        return OptimizerData(
+            sgd=SGDOptimizerData(learning_rate=0.1),
+            learning_rate_scheduler=LearningRateSchedulerData(
+                decay_rate=0.5, decay_steps=10.0, method=LearningRateMethod.STEP_DECAY
+            ),
+        )
 
     @pytest.fixture
     def adam_optimizer_data(self) -> OptimizerData:
         """Fixture for an AdamOptimizerData protobuf message."""
         return OptimizerData(
-            adam=AdamOptimizerDataType.to_protobuf(
-                AdamOptimizerDataType(learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8)
-            )
+            adam=AdamOptimizerData(learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8),
+            learning_rate_scheduler=LearningRateSchedulerData(
+                decay_rate=0.5, decay_steps=10.0, method=LearningRateMethod.STEP_DECAY
+            ),
         )
 
     @pytest.fixture
@@ -455,16 +426,16 @@ class TestOptimizerDataType:
         sgd_optimizer_data_type = OptimizerDataType.from_protobuf(sgd_optimizer_data)
         assert sgd_optimizer_data_type.adam is None
         assert sgd_optimizer_data_type.sgd == SGDOptimizerDataType.from_protobuf(sgd_optimizer_data.sgd)
-        sgd_instance = sgd_optimizer_data_type.sgd.get_class_instance()
+        sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance.learning_rate == sgd_optimizer_data.sgd.learning_rate
+        assert sgd_instance._lr == sgd_optimizer_data.sgd.learning_rate
 
         adam_optimizer_data_type = OptimizerDataType.from_protobuf(adam_optimizer_data)
         assert adam_optimizer_data_type.sgd is None
         assert adam_optimizer_data_type.adam == AdamOptimizerDataType.from_protobuf(adam_optimizer_data.adam)
-        adam_instance = adam_optimizer_data_type.adam.get_class_instance()
+        adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance.learning_rate == adam_optimizer_data.adam.learning_rate
+        assert adam_instance._lr == adam_optimizer_data.adam.learning_rate  # Check _lr directly
         assert adam_instance.beta1 == adam_optimizer_data.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data.adam.epsilon
@@ -525,11 +496,11 @@ class TestOptimizerDataType:
         """Test getting the optimizer class instance."""
         sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance.learning_rate == sgd_optimizer_data_type.sgd.learning_rate
+        assert sgd_instance._lr == sgd_optimizer_data_type.sgd.learning_rate
 
         adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance.learning_rate == adam_optimizer_data_type.adam.learning_rate
+        assert adam_instance._lr == adam_optimizer_data_type.adam.learning_rate
         assert adam_instance.beta1 == adam_optimizer_data_type.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data_type.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data_type.adam.epsilon
