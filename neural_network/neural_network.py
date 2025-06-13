@@ -45,7 +45,7 @@ class NeuralNetwork:
         for index in range(1, len(self.layers)):
             self.layers[index].set_prev_layer(self.layers[index - 1])
 
-        self._optimizer = optimizer or SGDOptimizer(learning_rate=0.1)
+        self._optimizer = optimizer or SGDOptimizer()
         optimizer_class = self._optimizer.__class__
 
         for layer in self.layers:
