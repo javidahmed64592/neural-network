@@ -32,10 +32,9 @@ enum LearningRateMethod {
 }
 
 message LearningRateSchedulerData {
-    float initial_lr = 1;
-    float decay_rate = 2;
-    float decay_steps = 3;
-    LearningRateMethod method = 4;
+    float decay_rate = 1;
+    float decay_steps = 2;
+    LearningRateMethod method = 3;
 }
 
 message OptimizerData {

@@ -21,8 +21,8 @@ class TestStepDecayScheduler:
         self, initial_lr: float, decay_rate: float, decay_steps: int, epoch: int, expected_lr: float
     ) -> None:
         """Test the step decay learning rate scheduler."""
-        scheduler = StepDecayScheduler(initial_lr, decay_rate, decay_steps)
-        lr = scheduler.step(epoch)
+        scheduler = StepDecayScheduler(decay_rate, decay_steps)
+        lr = scheduler.step(initial_lr, epoch)
         assert np.isclose(lr, expected_lr, rtol=1e-4)
 
 
@@ -41,6 +41,6 @@ class TestExponentialDecayScheduler:
         self, initial_lr: float, decay_rate: float, decay_steps: int, epoch: int, expected_lr: float
     ) -> None:
         """Test the exponential decay learning rate scheduler."""
-        scheduler = ExponentialDecayScheduler(initial_lr, decay_rate, decay_steps)
-        lr = scheduler.step(epoch)
+        scheduler = ExponentialDecayScheduler(decay_rate, decay_steps)
+        lr = scheduler.step(initial_lr, epoch)
         assert np.isclose(lr, expected_lr, rtol=1e-4)

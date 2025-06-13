@@ -54,16 +54,14 @@ class AdamOptimizerData(_message.Message):
     def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
 
 class LearningRateSchedulerData(_message.Message):
-    __slots__ = ("initial_lr", "decay_rate", "decay_steps", "method")
-    INITIAL_LR_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("decay_rate", "decay_steps", "method")
     DECAY_RATE_FIELD_NUMBER: _ClassVar[int]
     DECAY_STEPS_FIELD_NUMBER: _ClassVar[int]
     METHOD_FIELD_NUMBER: _ClassVar[int]
-    initial_lr: float
     decay_rate: float
     decay_steps: float
     method: LearningRateMethod
-    def __init__(self, initial_lr: _Optional[float] = ..., decay_rate: _Optional[float] = ..., decay_steps: _Optional[float] = ..., method: _Optional[_Union[LearningRateMethod, str]] = ...) -> None: ...
+    def __init__(self, decay_rate: _Optional[float] = ..., decay_steps: _Optional[float] = ..., method: _Optional[_Union[LearningRateMethod, str]] = ...) -> None: ...
 
 class OptimizerData(_message.Message):
     __slots__ = ("sgd", "adam", "learning_rate_scheduler")

@@ -228,14 +228,6 @@ class SGDOptimizerDataType:
         """
         return cls(learning_rate=optimizer.learning_rate)
 
-    def get_class_instance(self) -> SGDOptimizer:
-        """Return an instance of the SGDOptimizer with the stored learning rate.
-
-        :return SGDOptimizer:
-            An instance of SGDOptimizer with the specified learning rate.
-        """
-        return SGDOptimizer(learning_rate=self.learning_rate)
-
 
 @dataclass
 class AdamOptimizerDataType:
@@ -292,19 +284,6 @@ class AdamOptimizerDataType:
             beta1=optimizer.beta1,
             beta2=optimizer.beta2,
             epsilon=optimizer.epsilon,
-        )
-
-    def get_class_instance(self) -> AdamOptimizer:
-        """Return an instance of the AdamOptimizer with the stored parameters.
-
-        :return AdamOptimizer:
-            An instance of AdamOptimizer with the specified parameters.
-        """
-        return AdamOptimizer(
-            learning_rate=self.learning_rate,
-            beta1=self.beta1,
-            beta2=self.beta2,
-            epsilon=self.epsilon,
         )
 
 
@@ -373,7 +352,6 @@ class LearningRateMethodEnum(IntEnum):
 class LearningRateSchedulerDataType:
     """Data class to hold learning rate scheduler data."""
 
-    initial_lr: float
     decay_rate: int
     decay_steps: float
     method: LearningRateMethodEnum
@@ -388,7 +366,6 @@ class LearningRateSchedulerDataType:
             The corresponding LearningRateSchedulerDataType instance.
         """
         return cls(
-            initial_lr=lr_data.initial_lr,
             decay_rate=lr_data.decay_rate,
             decay_steps=lr_data.decay_steps,
             method=LearningRateMethodEnum.from_protobuf(lr_data.method),
@@ -404,7 +381,6 @@ class LearningRateSchedulerDataType:
             The corresponding Protobuf LearningRateSchedulerData message.
         """
         return LearningRateSchedulerData(
-            initial_lr=lr_data.initial_lr,
             decay_rate=lr_data.decay_rate,
             decay_steps=lr_data.decay_steps,
             method=lr_data.method,
@@ -420,7 +396,6 @@ class LearningRateSchedulerDataType:
             The corresponding LearningRateSchedulerDataType instance.
         """
         return cls(
-            initial_lr=lr_scheduler.initial_lr,
             decay_rate=lr_scheduler.decay_rate,
             decay_steps=lr_scheduler.decay_steps,
             method=LearningRateMethodEnum.from_class(lr_scheduler.__class__),
@@ -433,7 +408,6 @@ class LearningRateSchedulerDataType:
             An instance of LearningRateScheduler with the specified parameters.
         """
         return self.method.get_class()(
-            initial_lr=self.initial_lr,
             decay_rate=self.decay_rate,
             decay_steps=self.decay_steps,
         )
@@ -443,8 +417,9 @@ class LearningRateSchedulerDataType:
 class OptimizerDataType:
     """Data class to hold optimizer data."""
 
-    sgd: SGDOptimizerDataType | None = None
-    adam: AdamOptimizerDataType | None = None
+    sgd: SGDOptimizerDataType | None
+    adam: AdamOptimizerDataType | None
+    learning_rate_scheduler: LearningRateSchedulerDataType
 
     @classmethod
     def from_protobuf(cls, optimizer_data: OptimizerData) -> OptimizerDataType:
@@ -458,9 +433,21 @@ class OptimizerDataType:
         which_oneof = optimizer_data.WhichOneof("algorithm")
         match which_oneof:
             case "sgd":
-                return cls(sgd=SGDOptimizerDataType.from_protobuf(optimizer_data.sgd), adam=None)
+                return cls(
+                    sgd=SGDOptimizerDataType.from_protobuf(optimizer_data.sgd),
+                    adam=None,
+                    learning_rate_scheduler=LearningRateSchedulerDataType.from_protobuf(
+                        optimizer_data.learning_rate_scheduler
+                    ),
+                )
             case "adam":
-                return cls(sgd=None, adam=AdamOptimizerDataType.from_protobuf(optimizer_data.adam))
+                return cls(
+                    sgd=None,
+                    adam=AdamOptimizerDataType.from_protobuf(optimizer_data.adam),
+                    learning_rate_scheduler=LearningRateSchedulerDataType.from_protobuf(
+                        optimizer_data.learning_rate_scheduler
+                    ),
+                )
             case _:
                 msg = "OptimizerData must contain either SGD or Adam optimizer data."
                 raise ValueError(msg)
@@ -475,9 +462,21 @@ class OptimizerDataType:
             The corresponding Protobuf OptimizerData message.
         """
         if optimizer_data.sgd:
-            return OptimizerData(sgd=SGDOptimizerDataType.to_protobuf(optimizer_data.sgd), adam=None)
+            return OptimizerData(
+                sgd=SGDOptimizerDataType.to_protobuf(optimizer_data.sgd),
+                adam=None,
+                learning_rate_scheduler=LearningRateSchedulerDataType.to_protobuf(
+                    optimizer_data.learning_rate_scheduler
+                ),
+            )
         if optimizer_data.adam:
-            return OptimizerData(sgd=None, adam=AdamOptimizerDataType.to_protobuf(optimizer_data.adam))
+            return OptimizerData(
+                sgd=None,
+                adam=AdamOptimizerDataType.to_protobuf(optimizer_data.adam),
+                learning_rate_scheduler=LearningRateSchedulerDataType.to_protobuf(
+                    optimizer_data.learning_rate_scheduler
+                ),
+            )
 
         msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
         raise ValueError(msg)
@@ -517,9 +516,17 @@ class OptimizerDataType:
             The corresponding OptimizerDataType instance.
         """
         if isinstance(optimizer, SGDOptimizer):
-            return cls(sgd=SGDOptimizerDataType.from_class_instance(optimizer))
+            return cls(
+                sgd=SGDOptimizerDataType.from_class_instance(optimizer),
+                adam=None,
+                learning_rate_scheduler=LearningRateSchedulerDataType.from_class_instance(optimizer.lr_scheduler),
+            )
         if isinstance(optimizer, AdamOptimizer):
-            return cls(adam=AdamOptimizerDataType.from_class_instance(optimizer))
+            return cls(
+                sgd=None,
+                adam=AdamOptimizerDataType.from_class_instance(optimizer),
+                learning_rate_scheduler=LearningRateSchedulerDataType.from_class_instance(optimizer.lr_scheduler),
+            )
 
         msg = "Optimizer must be an instance of SGDOptimizer or AdamOptimizer."
         raise ValueError(msg)
@@ -533,9 +540,14 @@ class OptimizerDataType:
             An instance of the specified optimizer.
         """
         if self.sgd:
-            return self.sgd.get_class_instance()
+            return SGDOptimizer(lr_scheduler=self.learning_rate_scheduler.get_class_instance())
         if self.adam:
-            return self.adam.get_class_instance()
+            return AdamOptimizer(
+                lr_scheduler=self.learning_rate_scheduler.get_class_instance(),
+                beta1=self.adam.beta1,
+                beta2=self.adam.beta2,
+                epsilon=self.adam.epsilon,
+            )
 
         msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
         raise ValueError(msg)
