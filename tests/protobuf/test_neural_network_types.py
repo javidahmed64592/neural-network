@@ -5,11 +5,17 @@ import numpy as np
 import pytest
 
 from neural_network.math.activation_functions import LinearActivation, ReluActivation, SigmoidActivation, TanhActivation
+from neural_network.math.learning_rate_scheduler import (
+    ExponentialDecayScheduler,
+    LearningRateScheduler,
+    StepDecayScheduler,
+)
 from neural_network.math.matrix import Matrix
 from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
+    LearningRateMethod,
     MatrixData,
     NeuralNetworkData,
     OptimizerData,
@@ -18,6 +24,7 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
 from neural_network.protobuf.neural_network_types import (
     ActivationFunctionEnum,
     AdamOptimizerDataType,
+    LearningRateMethodEnum,
     MatrixDataType,
     NeuralNetworkDataType,
     OptimizerDataType,
@@ -218,6 +225,54 @@ class TestAdamOptimizerDataType:
         assert optimizer.beta1 == adam_optimizer_data_type.beta1
         assert optimizer.beta2 == adam_optimizer_data_type.beta2
         assert optimizer.epsilon == adam_optimizer_data_type.epsilon
+
+
+class TestLearningRateMethodEnum:
+    """Test cases for LearningRateMethodEnum conversions."""
+
+    @pytest.mark.parametrize(
+        ("method", "expected_class"),
+        [
+            (LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
+            (LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
+        ],
+    )
+    def test_get_class(self, method: LearningRateMethodEnum, expected_class: type[LearningRateScheduler]) -> None:
+        """Test getting the learning rate method class from enum."""
+        assert method.get_class() == expected_class
+
+    @pytest.mark.parametrize(
+        ("method_class", "expected_enum"),
+        [
+            (StepDecayScheduler, LearningRateMethodEnum.STEP_DECAY),
+            (ExponentialDecayScheduler, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_class(self, method_class: type[LearningRateScheduler], expected_enum: LearningRateMethodEnum) -> None:
+        """Test getting the enum from learning rate method class."""
+        assert LearningRateMethodEnum.from_class(method_class) == expected_enum
+
+    @pytest.mark.parametrize(
+        ("protobuf_value", "expected_enum"),
+        [
+            (LearningRateMethod.STEP_DECAY, LearningRateMethodEnum.STEP_DECAY),
+            (LearningRateMethod.EXPONENTIAL_DECAY, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_protobuf(self, protobuf_value: LearningRateMethod, expected_enum: LearningRateMethodEnum) -> None:
+        """Test getting the enum from protobuf value."""
+        assert LearningRateMethodEnum.from_protobuf(protobuf_value) == expected_enum
+
+    @pytest.mark.parametrize(
+        ("enum_value", "expected_protobuf"),
+        [
+            (LearningRateMethodEnum.STEP_DECAY, LearningRateMethod.STEP_DECAY),
+            (LearningRateMethodEnum.EXPONENTIAL_DECAY, LearningRateMethod.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_to_protobuf(self, enum_value: LearningRateMethodEnum, expected_protobuf: LearningRateMethod) -> None:
+        """Test converting enum to protobuf value."""
+        assert LearningRateMethodEnum.to_protobuf(enum_value) == expected_protobuf
 
 
 class TestOptimizerDataType:

@@ -14,11 +14,17 @@ from neural_network.math.activation_functions import (
     SigmoidActivation,
     TanhActivation,
 )
+from neural_network.math.learning_rate_scheduler import (
+    ExponentialDecayScheduler,
+    LearningRateScheduler,
+    StepDecayScheduler,
+)
 from neural_network.math.matrix import Matrix
 from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
 from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
+    LearningRateMethod,
     MatrixData,
     NeuralNetworkData,
     OptimizerData,
@@ -299,6 +305,67 @@ class AdamOptimizerDataType:
             beta2=self.beta2,
             epsilon=self.epsilon,
         )
+
+
+class LearningRateMethodEnum(IntEnum):
+    """Enum for supported learning rate methods."""
+
+    STEP_DECAY = 0
+    EXPONENTIAL_DECAY = 1
+
+    @property
+    def map(self) -> dict[LearningRateMethodEnum, type[LearningRateScheduler]]:
+        """Return a mapping from enum to learning rate scheduler class.
+
+        :return dict[LearningRateMethodEnum, type[LearningRateScheduler]]:
+            Mapping from enum to learning rate scheduler class.
+        """
+        return {
+            LearningRateMethodEnum.STEP_DECAY: StepDecayScheduler,
+            LearningRateMethodEnum.EXPONENTIAL_DECAY: ExponentialDecayScheduler,
+        }
+
+    def get_class(self) -> type[LearningRateScheduler]:
+        """Return the corresponding learning rate scheduler class.
+
+        :return type[LearningRateScheduler]:
+            The learning rate scheduler class.
+        """
+        return self.map[self]
+
+    @classmethod
+    def from_class(cls, learning_rate_scheduler: type[LearningRateScheduler]) -> LearningRateMethodEnum:
+        """Return the enum value for a given learning rate scheduler class.
+
+        :param type[LearningRateScheduler] learning_rate_scheduler:
+            The learning rate scheduler class.
+        :return LearningRateMethodEnum:
+            The corresponding enum value.
+        """
+        reverse_map = {v: k for k, v in cls.STEP_DECAY.map.items()}
+        return reverse_map[learning_rate_scheduler]
+
+    @classmethod
+    def from_protobuf(cls, proto_enum_value: LearningRateMethod) -> LearningRateMethodEnum:
+        """Return the enum value from a Protobuf LearningRateMethodEnum value.
+
+        :param LearningRateMethod proto_enum_value:
+            The Protobuf enum value.
+        :return LearningRateMethodEnum:
+            The corresponding enum value.
+        """
+        return cls(proto_enum_value)
+
+    @staticmethod
+    def to_protobuf(enum_value: LearningRateMethodEnum) -> LearningRateMethod:
+        """Return the Protobuf LearningRateMethod from an enum value.
+
+        :param LearningRateMethodEnum enum_value:
+            The enum value.
+        :return LearningRateMethod:
+            The Protobuf enum value.
+        """
+        return LearningRateMethod.Value(enum_value.name)  # type: ignore[no-any-return]
 
 
 @dataclass
