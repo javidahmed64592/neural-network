@@ -16,6 +16,7 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
     LearningRateMethod,
+    LearningRateSchedulerData,
     MatrixData,
     NeuralNetworkData,
     OptimizerData,
@@ -25,6 +26,7 @@ from neural_network.protobuf.neural_network_types import (
     ActivationFunctionEnum,
     AdamOptimizerDataType,
     LearningRateMethodEnum,
+    LearningRateSchedulerDataType,
     MatrixDataType,
     NeuralNetworkDataType,
     OptimizerDataType,
@@ -273,6 +275,128 @@ class TestLearningRateMethodEnum:
     def test_to_protobuf(self, enum_value: LearningRateMethodEnum, expected_protobuf: LearningRateMethod) -> None:
         """Test converting enum to protobuf value."""
         assert LearningRateMethodEnum.to_protobuf(enum_value) == expected_protobuf
+
+
+class TestLearningRateSchedulerDataType:
+    """Test cases for LearningRateSchedulerDataType conversions."""
+
+    @pytest.fixture
+    def lr_scheduler_data(self) -> LearningRateSchedulerData:
+        """Fixture for a LearningRateSchedulerData protobuf message."""
+        return LearningRateSchedulerData(
+            initial_lr=0.01,
+            decay_rate=5,
+            decay_steps=100,
+            method=LearningRateMethod.STEP_DECAY,
+        )
+
+    @pytest.mark.parametrize(
+        ("initial_lr", "decay_rate", "decay_steps", "method"),
+        [
+            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_protobuf(
+        self, initial_lr: float, decay_rate: int, decay_steps: int, method: LearningRateMethodEnum
+    ) -> None:
+        """Test creating LearningRateSchedulerDataType from protobuf message."""
+        lr_data = LearningRateSchedulerData(
+            initial_lr=initial_lr,
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=LearningRateMethodEnum.to_protobuf(method),
+        )
+        lr_data_type = LearningRateSchedulerDataType.from_protobuf(lr_data)
+
+        assert lr_data_type.initial_lr == pytest.approx(initial_lr)
+        assert lr_data_type.decay_rate == decay_rate
+        assert lr_data_type.decay_steps == decay_steps
+        assert lr_data_type.method == method
+
+    @pytest.mark.parametrize(
+        ("initial_lr", "decay_rate", "decay_steps", "method"),
+        [
+            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_to_protobuf(
+        self, initial_lr: float, decay_rate: int, decay_steps: float, method: LearningRateMethodEnum
+    ) -> None:
+        """Test converting LearningRateSchedulerDataType to protobuf message."""
+        lr_data_type = LearningRateSchedulerDataType(
+            initial_lr=initial_lr,
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=method,
+        )
+
+        protobuf_data = LearningRateSchedulerDataType.to_protobuf(lr_data_type)
+
+        assert protobuf_data.initial_lr == pytest.approx(lr_data_type.initial_lr)
+        assert protobuf_data.decay_rate == lr_data_type.decay_rate
+        assert protobuf_data.decay_steps == lr_data_type.decay_steps
+        assert protobuf_data.method == LearningRateMethodEnum.to_protobuf(lr_data_type.method)
+
+    @pytest.mark.parametrize(
+        ("scheduler_class", "initial_lr", "decay_rate", "decay_steps", "expected_method"),
+        [
+            (StepDecayScheduler, 0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY),
+            (ExponentialDecayScheduler, 0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY),
+        ],
+    )
+    def test_from_class_instance(
+        self,
+        scheduler_class: type[LearningRateScheduler],
+        initial_lr: float,
+        decay_rate: int,
+        decay_steps: float,
+        expected_method: LearningRateMethodEnum,
+    ) -> None:
+        """Test creating LearningRateSchedulerDataType from class instance."""
+        scheduler = scheduler_class(
+            initial_lr=initial_lr,
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+        )
+
+        lr_data = LearningRateSchedulerDataType.from_class_instance(scheduler)
+
+        assert lr_data.initial_lr == initial_lr
+        assert lr_data.decay_rate == decay_rate
+        assert lr_data.decay_steps == decay_steps
+        assert lr_data.method == expected_method
+
+    @pytest.mark.parametrize(
+        ("initial_lr", "decay_rate", "decay_steps", "method", "expected_class"),
+        [
+            (0.01, 5, 100, LearningRateMethodEnum.STEP_DECAY, StepDecayScheduler),
+            (0.01, 2, 50, LearningRateMethodEnum.EXPONENTIAL_DECAY, ExponentialDecayScheduler),
+        ],
+    )
+    def test_get_class_instance(
+        self,
+        initial_lr: float,
+        decay_rate: int,
+        decay_steps: float,
+        method: LearningRateMethodEnum,
+        expected_class: type[LearningRateScheduler],
+    ) -> None:
+        """Test getting the learning rate scheduler class instance."""
+        lr_data = LearningRateSchedulerDataType(
+            initial_lr=initial_lr,
+            decay_rate=decay_rate,
+            decay_steps=decay_steps,
+            method=method,
+        )
+
+        scheduler = lr_data.get_class_instance()
+
+        assert isinstance(scheduler, expected_class)
+        assert scheduler.initial_lr == initial_lr
+        assert scheduler.decay_rate == decay_rate
+        assert scheduler.decay_steps == decay_steps
 
 
 class TestOptimizerDataType:

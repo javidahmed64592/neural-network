@@ -25,6 +25,7 @@ from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
     ActivationFunctionData,
     AdamOptimizerData,
     LearningRateMethod,
+    LearningRateSchedulerData,
     MatrixData,
     NeuralNetworkData,
     OptimizerData,
@@ -366,6 +367,76 @@ class LearningRateMethodEnum(IntEnum):
             The Protobuf enum value.
         """
         return LearningRateMethod.Value(enum_value.name)  # type: ignore[no-any-return]
+
+
+@dataclass
+class LearningRateSchedulerDataType:
+    """Data class to hold learning rate scheduler data."""
+
+    initial_lr: float
+    decay_rate: int
+    decay_steps: float
+    method: LearningRateMethodEnum
+
+    @classmethod
+    def from_protobuf(cls, lr_data: LearningRateSchedulerData) -> LearningRateSchedulerDataType:
+        """Create a LearningRateSchedulerDataType instance from Protobuf.
+
+        :param LearningRateSchedulerData lr_data:
+            The Protobuf LearningRateSchedulerData message.
+        :return LearningRateSchedulerDataType:
+            The corresponding LearningRateSchedulerDataType instance.
+        """
+        return cls(
+            initial_lr=lr_data.initial_lr,
+            decay_rate=lr_data.decay_rate,
+            decay_steps=lr_data.decay_steps,
+            method=LearningRateMethodEnum.from_protobuf(lr_data.method),
+        )
+
+    @staticmethod
+    def to_protobuf(lr_data: LearningRateSchedulerDataType) -> LearningRateSchedulerData:
+        """Convert LearningRateSchedulerDataType to Protobuf.
+
+        :param LearningRateSchedulerDataType lr_data:
+            The LearningRateSchedulerDataType instance.
+        :return LearningRateSchedulerData:
+            The corresponding Protobuf LearningRateSchedulerData message.
+        """
+        return LearningRateSchedulerData(
+            initial_lr=lr_data.initial_lr,
+            decay_rate=lr_data.decay_rate,
+            decay_steps=lr_data.decay_steps,
+            method=lr_data.method,
+        )
+
+    @classmethod
+    def from_class_instance(cls, lr_scheduler: LearningRateScheduler) -> LearningRateSchedulerDataType:
+        """Create a LearningRateSchedulerDataType instance from a LearningRateScheduler class instance.
+
+        :param LearningRateScheduler lr_scheduler:
+            The LearningRateScheduler class instance.
+        :return LearningRateSchedulerDataType:
+            The corresponding LearningRateSchedulerDataType instance.
+        """
+        return cls(
+            initial_lr=lr_scheduler.initial_lr,
+            decay_rate=lr_scheduler.decay_rate,
+            decay_steps=lr_scheduler.decay_steps,
+            method=LearningRateMethodEnum.from_class(lr_scheduler.__class__),
+        )
+
+    def get_class_instance(self) -> LearningRateScheduler:
+        """Return an instance of the LearningRateScheduler with the stored parameters.
+
+        :return LearningRateScheduler:
+            An instance of LearningRateScheduler with the specified parameters.
+        """
+        return self.method.get_class()(
+            initial_lr=self.initial_lr,
+            decay_rate=self.decay_rate,
+            decay_steps=self.decay_steps,
+        )
 
 
 @dataclass
