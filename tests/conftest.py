@@ -5,6 +5,7 @@ import pytest
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
+from neural_network.math.optimizer import AdamOptimizer
 from neural_network.neural_network import NeuralNetwork
 
 
@@ -15,15 +16,21 @@ def mock_activation() -> type[LinearActivation]:
 
 
 @pytest.fixture
+def mock_optimizer() -> AdamOptimizer:
+    """Fixture for a mock optimizer class."""
+    return AdamOptimizer(learning_rate=0.1)
+
+
+@pytest.fixture
 def mock_weights_range() -> tuple[float, float]:
     """Fixture for a mock weights range."""
-    return (-1.0, 1.0)
+    return (-0.1, 0.1)
 
 
 @pytest.fixture
 def mock_bias_range() -> tuple[float, float]:
     """Fixture for a mock bias range."""
-    return (-1.0, 1.0)
+    return (-0.1, 0.1)
 
 
 @pytest.fixture
@@ -153,4 +160,4 @@ def mock_training_outputs() -> list[list[float]]:
 @pytest.fixture
 def mock_fitnesses() -> list[float]:
     """Fixture for mock fitness values."""
-    return [0.8, 0.6, 0.9]
+    return [0.8, 0.7, 0.9]

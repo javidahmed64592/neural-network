@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13NeuralNetwork.proto\x12\rNeuralNetwork\"6\n\nMatrixData\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x02\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\"\xa6\x03\n\x11NeuralNetworkData\x12\x12\n\nnum_inputs\x18\x01 \x01(\x05\x12\x1a\n\x12hidden_layer_sizes\x18\x02 \x03(\x05\x12\x13\n\x0bnum_outputs\x18\x03 \x01(\x05\x12?\n\x10input_activation\x18\x04 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionData\x12\x45\n\x11hidden_activation\x18\x05 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionDataH\x00\x88\x01\x01\x12@\n\x11output_activation\x18\x06 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionData\x12*\n\x07weights\x18\x07 \x03(\x0b\x32\x19.NeuralNetwork.MatrixData\x12)\n\x06\x62iases\x18\x08 \x03(\x0b\x32\x19.NeuralNetwork.MatrixData\x12\x15\n\rlearning_rate\x18\t \x01(\x02\x42\x14\n\x12_hidden_activation*E\n\x16\x41\x63tivationFunctionData\x12\n\n\x06LINEAR\x10\x00\x12\x08\n\x04RELU\x10\x01\x12\x0b\n\x07SIGMOID\x10\x02\x12\x08\n\x04TANH\x10\x03\x42\x02H\x03\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13NeuralNetwork.proto\x12\rNeuralNetwork\"6\n\nMatrixData\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x02\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\")\n\x10SGDOptimizerData\x12\x15\n\rlearning_rate\x18\x01 \x01(\x02\"Y\n\x11\x41\x64\x61mOptimizerData\x12\x15\n\rlearning_rate\x18\x01 \x01(\x02\x12\r\n\x05\x62\x65ta1\x18\x02 \x01(\x02\x12\r\n\x05\x62\x65ta2\x18\x03 \x01(\x02\x12\x0f\n\x07\x65psilon\x18\x04 \x01(\x02\"~\n\rOptimizerData\x12.\n\x03sgd\x18\x01 \x01(\x0b\x32\x1f.NeuralNetwork.SGDOptimizerDataH\x00\x12\x30\n\x04\x61\x64\x61m\x18\x02 \x01(\x0b\x32 .NeuralNetwork.AdamOptimizerDataH\x00\x42\x0b\n\talgorithm\"\xd3\x03\n\x11NeuralNetworkData\x12\x12\n\nnum_inputs\x18\x01 \x01(\x05\x12\x1a\n\x12hidden_layer_sizes\x18\x02 \x03(\x05\x12\x13\n\x0bnum_outputs\x18\x03 \x01(\x05\x12?\n\x10input_activation\x18\x04 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionData\x12\x45\n\x11hidden_activation\x18\x05 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionDataH\x00\x88\x01\x01\x12@\n\x11output_activation\x18\x06 \x01(\x0e\x32%.NeuralNetwork.ActivationFunctionData\x12*\n\x07weights\x18\x07 \x03(\x0b\x32\x19.NeuralNetwork.MatrixData\x12)\n\x06\x62iases\x18\x08 \x03(\x0b\x32\x19.NeuralNetwork.MatrixData\x12\x34\n\toptimizer\x18\t \x01(\x0b\x32\x1c.NeuralNetwork.OptimizerDataH\x01\x88\x01\x01\x42\x14\n\x12_hidden_activationB\x0c\n\n_optimizer*E\n\x16\x41\x63tivationFunctionData\x12\n\n\x06LINEAR\x10\x00\x12\x08\n\x04RELU\x10\x01\x12\x0b\n\x07SIGMOID\x10\x02\x12\x08\n\x04TANH\x10\x03\x42\x02H\x03\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,10 +32,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'NeuralNetwork_pb2', _global
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'H\003'
-  _globals['_ACTIVATIONFUNCTIONDATA']._serialized_start=519
-  _globals['_ACTIVATIONFUNCTIONDATA']._serialized_end=588
+  _globals['_ACTIVATIONFUNCTIONDATA']._serialized_start=826
+  _globals['_ACTIVATIONFUNCTIONDATA']._serialized_end=895
   _globals['_MATRIXDATA']._serialized_start=38
   _globals['_MATRIXDATA']._serialized_end=92
-  _globals['_NEURALNETWORKDATA']._serialized_start=95
-  _globals['_NEURALNETWORKDATA']._serialized_end=517
+  _globals['_SGDOPTIMIZERDATA']._serialized_start=94
+  _globals['_SGDOPTIMIZERDATA']._serialized_end=135
+  _globals['_ADAMOPTIMIZERDATA']._serialized_start=137
+  _globals['_ADAMOPTIMIZERDATA']._serialized_end=226
+  _globals['_OPTIMIZERDATA']._serialized_start=228
+  _globals['_OPTIMIZERDATA']._serialized_end=354
+  _globals['_NEURALNETWORKDATA']._serialized_start=357
+  _globals['_NEURALNETWORKDATA']._serialized_end=824
 # @@protoc_insertion_point(module_scope)

@@ -28,8 +28,34 @@ class MatrixData(_message.Message):
     cols: int
     def __init__(self, data: _Optional[_Iterable[float]] = ..., rows: _Optional[int] = ..., cols: _Optional[int] = ...) -> None: ...
 
+class SGDOptimizerData(_message.Message):
+    __slots__ = ("learning_rate",)
+    LEARNING_RATE_FIELD_NUMBER: _ClassVar[int]
+    learning_rate: float
+    def __init__(self, learning_rate: _Optional[float] = ...) -> None: ...
+
+class AdamOptimizerData(_message.Message):
+    __slots__ = ("learning_rate", "beta1", "beta2", "epsilon")
+    LEARNING_RATE_FIELD_NUMBER: _ClassVar[int]
+    BETA1_FIELD_NUMBER: _ClassVar[int]
+    BETA2_FIELD_NUMBER: _ClassVar[int]
+    EPSILON_FIELD_NUMBER: _ClassVar[int]
+    learning_rate: float
+    beta1: float
+    beta2: float
+    epsilon: float
+    def __init__(self, learning_rate: _Optional[float] = ..., beta1: _Optional[float] = ..., beta2: _Optional[float] = ..., epsilon: _Optional[float] = ...) -> None: ...
+
+class OptimizerData(_message.Message):
+    __slots__ = ("sgd", "adam")
+    SGD_FIELD_NUMBER: _ClassVar[int]
+    ADAM_FIELD_NUMBER: _ClassVar[int]
+    sgd: SGDOptimizerData
+    adam: AdamOptimizerData
+    def __init__(self, sgd: _Optional[_Union[SGDOptimizerData, _Mapping]] = ..., adam: _Optional[_Union[AdamOptimizerData, _Mapping]] = ...) -> None: ...
+
 class NeuralNetworkData(_message.Message):
-    __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "learning_rate")
+    __slots__ = ("num_inputs", "hidden_layer_sizes", "num_outputs", "input_activation", "hidden_activation", "output_activation", "weights", "biases", "optimizer")
     NUM_INPUTS_FIELD_NUMBER: _ClassVar[int]
     HIDDEN_LAYER_SIZES_FIELD_NUMBER: _ClassVar[int]
     NUM_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
@@ -38,7 +64,7 @@ class NeuralNetworkData(_message.Message):
     OUTPUT_ACTIVATION_FIELD_NUMBER: _ClassVar[int]
     WEIGHTS_FIELD_NUMBER: _ClassVar[int]
     BIASES_FIELD_NUMBER: _ClassVar[int]
-    LEARNING_RATE_FIELD_NUMBER: _ClassVar[int]
+    OPTIMIZER_FIELD_NUMBER: _ClassVar[int]
     num_inputs: int
     hidden_layer_sizes: _containers.RepeatedScalarFieldContainer[int]
     num_outputs: int
@@ -47,5 +73,5 @@ class NeuralNetworkData(_message.Message):
     output_activation: ActivationFunctionData
     weights: _containers.RepeatedCompositeFieldContainer[MatrixData]
     biases: _containers.RepeatedCompositeFieldContainer[MatrixData]
-    learning_rate: float
-    def __init__(self, num_inputs: _Optional[int] = ..., hidden_layer_sizes: _Optional[_Iterable[int]] = ..., num_outputs: _Optional[int] = ..., input_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., hidden_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., output_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., weights: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., biases: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., learning_rate: _Optional[float] = ...) -> None: ...
+    optimizer: OptimizerData
+    def __init__(self, num_inputs: _Optional[int] = ..., hidden_layer_sizes: _Optional[_Iterable[int]] = ..., num_outputs: _Optional[int] = ..., input_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., hidden_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., output_activation: _Optional[_Union[ActivationFunctionData, str]] = ..., weights: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., biases: _Optional[_Iterable[_Union[MatrixData, _Mapping]]] = ..., optimizer: _Optional[_Union[OptimizerData, _Mapping]] = ...) -> None: ...

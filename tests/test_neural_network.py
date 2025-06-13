@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network/neural_network.py module."""
+"""Unit tests for the neural_network.neural_network module."""
 
 from pathlib import Path
 from unittest.mock import mock_open, patch
@@ -6,7 +6,11 @@ from unittest.mock import mock_open, patch
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
 from neural_network.math.activation_functions import ActivationFunction
 from neural_network.neural_network import NeuralNetwork
-from neural_network.protobuf.neural_network_types import ActivationFunctionEnum, NeuralNetworkDataType
+from neural_network.protobuf.neural_network_types import (
+    ActivationFunctionEnum,
+    NeuralNetworkDataType,
+    OptimizerDataType,
+)
 
 
 def make_hidden_layer(
@@ -33,7 +37,7 @@ class TestNeuralNetwork:
         assert nn_data.output_activation == ActivationFunctionEnum.from_class(mock_nn._output_layer._activation)
         assert len(nn_data.weights) == len(mock_nn.weights)
         assert len(nn_data.biases) == len(mock_nn.bias)
-        assert nn_data.learning_rate == mock_nn._lr
+        assert nn_data.optimizer == OptimizerDataType.from_class_instance(mock_nn._input_layer._optimizer)
 
     def test_from_protobuf(self, mock_nn: NeuralNetwork) -> None:
         """Test creating a neural network from protobuf format."""
@@ -47,7 +51,7 @@ class TestNeuralNetwork:
         assert new_nn._output_layer._activation == mock_nn._output_layer._activation
         assert len(new_nn.weights) == len(mock_nn.weights)
         assert len(new_nn.bias) == len(mock_nn.bias)
-        assert new_nn._lr == mock_nn._lr
+        assert isinstance(new_nn._optimizer, mock_nn._optimizer.__class__)
 
     def test_load_from_file(self, mock_nn: NeuralNetwork) -> None:
         """Test loading a neural network from a file."""
@@ -64,7 +68,7 @@ class TestNeuralNetwork:
             assert loaded_nn._output_layer._activation == mock_nn._output_layer._activation
             assert len(loaded_nn.weights) == len(mock_nn.weights)
             assert len(loaded_nn.bias) == len(mock_nn.bias)
-            assert loaded_nn._lr == mock_nn._lr
+            assert isinstance(loaded_nn._optimizer, mock_nn._optimizer.__class__)
 
     def test_save_to_file(self, mock_nn: NeuralNetwork) -> None:
         """Test saving a neural network to a file."""

@@ -15,6 +15,24 @@ message MatrixData {
     int32 cols = 3;
 }
 
+message SGDOptimizerData {
+    float learning_rate = 1;
+}
+
+message AdamOptimizerData {
+    float learning_rate = 1;
+    float beta1 = 2;
+    float beta2 = 3;
+    float epsilon = 4;
+}
+
+message OptimizerData {
+    oneof algorithm {
+        SGDOptimizerData sgd = 1;
+        AdamOptimizerData adam = 2;
+    }
+}
+
 message NeuralNetworkData {
     int32 num_inputs = 1;
     repeated int32 hidden_layer_sizes = 2;
@@ -24,5 +42,5 @@ message NeuralNetworkData {
     ActivationFunctionData output_activation = 6;
     repeated MatrixData weights = 7;
     repeated MatrixData biases = 8;
-    float learning_rate = 9;
+    optional OptimizerData optimizer = 9;
 }

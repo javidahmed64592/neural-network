@@ -9,7 +9,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from neural_network.math.activation_functions import ActivationFunction
-from neural_network.protobuf.neural_network_types import MatrixDataType
 
 rng = np.random.default_rng()
 
@@ -75,6 +74,16 @@ class Matrix:
         """
         return Matrix.from_array(self.vals @ other.vals)
 
+    def __truediv__(self, other: Matrix) -> Matrix:
+        """Element-wise division of two matrices.
+
+        :param Matrix other:
+            Matrix to divide by.
+        :return Matrix:
+            Resulting matrix.
+        """
+        return Matrix.from_array(self.vals / other.vals)
+
     @property
     def as_list(self) -> list[float]:
         """Return matrix as a flat list.
@@ -86,13 +95,31 @@ class Matrix:
         return cast(list[float], matrix_list)
 
     @property
-    def shape(self) -> tuple:
+    def shape(self) -> tuple[int, ...]:
         """Return shape of the matrix.
 
         :return tuple:
             Shape of the matrix.
         """
         return self.vals.shape
+
+    @property
+    def rows(self) -> int:
+        """Return number of rows in the matrix.
+
+        :return int:
+            Number of rows.
+        """
+        return int(self.shape[0])
+
+    @property
+    def cols(self) -> int:
+        """Return number of columns in the matrix.
+
+        :return int:
+            Number of columns.
+        """
+        return int(self.shape[1])
 
     @classmethod
     def from_array(cls, matrix_array: NDArray | list[list[float]] | list[float]) -> Matrix:
@@ -109,46 +136,32 @@ class Matrix:
         return cls(matrix_array)
 
     @classmethod
-    def from_protobuf(cls, matrix_data: MatrixDataType) -> Matrix:
-        """Create a Matrix from Protobuf data.
+    def zeros(cls, rows: int, cols: int) -> Matrix:
+        """Create a Matrix filled with zeros.
 
-        :param MatrixDataType matrix_data:
-            Protobuf data containing matrix values.
+        :param int rows:
+            Number of rows in matrix.
+        :param int cols:
+            Number of columns in matrix.
         :return Matrix:
-            Matrix with assigned values.
+            Matrix filled with zeros.
         """
-        matrix_array = np.array(matrix_data.data, dtype=np.float64).reshape((matrix_data.rows, matrix_data.cols))
-        return cls.from_array(matrix_array)
+        return cls.from_array(np.zeros((rows, cols)))
 
-    @staticmethod
-    def to_protobuf(matrix: Matrix) -> MatrixDataType:
-        """Convert Matrix to Protobuf data.
+    @classmethod
+    def filled(cls, rows: int, cols: int, value: float) -> Matrix:
+        """Create a Matrix filled with a specific value.
 
-        :param Matrix matrix:
-            Matrix to convert.
-        :return MatrixDataType:
-            Protobuf data containing matrix values.
+        :param int rows:
+            Number of rows in matrix.
+        :param int cols:
+            Number of columns in matrix.
+        :param float value:
+            Value to fill the matrix with.
+        :return Matrix:
+            Matrix filled with the specified value.
         """
-        return MatrixDataType(
-            data=matrix.vals.flatten().tolist(),
-            rows=matrix.shape[0],
-            cols=matrix.shape[1],
-        )
-
-    @staticmethod
-    def _uniform(low: float, high: float, size: tuple[int, int] | int | None = None) -> NDArray:
-        """Create an array of random values in specified range.
-
-        :param float low:
-            Lower boundary for random number.
-        :param float high:
-            Upper boundary for random number.
-        :param tuple[int, int]|int|None size:
-            Shape of the array to create.
-        :return NDArray:
-            Array with random values.
-        """
-        return rng.uniform(low=low, high=high, size=size)
+        return cls.from_array(np.full((rows, cols), value))
 
     @classmethod
     def random_matrix(cls, rows: int, cols: int, low: float, high: float) -> Matrix:
@@ -165,7 +178,7 @@ class Matrix:
         :return Matrix:
             Matrix with random values.
         """
-        return cls.from_array(cls._uniform(low=low, high=high, size=(rows, cols)))
+        return cls.from_array(rng.uniform(low=low, high=high, size=(rows, cols)))
 
     @classmethod
     def random_column(cls, rows: int, low: float, high: float) -> Matrix:
@@ -225,6 +238,6 @@ class Matrix:
             New Matrix with mixed values.
         """
         vectorized_crossover = np.vectorize(crossover_func)
-        crossover_rolls = Matrix._uniform(low=0, high=1, size=matrix.shape)
+        crossover_rolls = rng.uniform(low=0, high=1, size=matrix.shape)
         new_matrix = vectorized_crossover(matrix.vals, other_matrix.vals, crossover_rolls)
         return Matrix.from_array(new_matrix)

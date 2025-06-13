@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
+
+import numpy as np
 
 from neural_network.math.activation_functions import (
     ActivationFunction,
@@ -12,7 +14,16 @@ from neural_network.math.activation_functions import (
     SigmoidActivation,
     TanhActivation,
 )
-from neural_network.protobuf.compiled.NeuralNetwork_pb2 import ActivationFunctionData, MatrixData, NeuralNetworkData
+from neural_network.math.matrix import Matrix
+from neural_network.math.optimizer import AdamOptimizer, Optimizer, SGDOptimizer
+from neural_network.protobuf.compiled.NeuralNetwork_pb2 import (
+    ActivationFunctionData,
+    AdamOptimizerData,
+    MatrixData,
+    NeuralNetworkData,
+    OptimizerData,
+    SGDOptimizerData,
+)
 
 
 class ActivationFunctionEnum(IntEnum):
@@ -143,6 +154,254 @@ class MatrixDataType:
         matrix = MatrixDataType.to_protobuf(matrix_data)
         return matrix.SerializeToString()  # type: ignore[no-any-return]
 
+    @classmethod
+    def from_matrix(cls, matrix: Matrix) -> MatrixDataType:
+        """Create a MatrixDataType instance from a Matrix.
+
+        :param Matrix matrix:
+            The Matrix instance.
+        :return MatrixDataType:
+            The corresponding MatrixDataType instance.
+        """
+        return cls(
+            data=matrix.vals.flatten().tolist(),
+            rows=matrix.rows,
+            cols=matrix.cols,
+        )
+
+    @staticmethod
+    def to_matrix(matrix_data: MatrixDataType) -> Matrix:
+        """Convert MatrixDataType to a Matrix.
+
+        :param MatrixDataType matrix_data:
+            The MatrixDataType instance.
+        :return Matrix:
+            The corresponding Matrix instance.
+        """
+        matrix_array = np.array(matrix_data.data, dtype=np.float64).reshape((matrix_data.rows, matrix_data.cols))
+        return Matrix.from_array(matrix_array)
+
+
+@dataclass
+class SGDOptimizerDataType:
+    """Data class to hold SGD optimizer data."""
+
+    learning_rate: float
+
+    @classmethod
+    def from_protobuf(cls, sgd_data: SGDOptimizerData) -> SGDOptimizerDataType:
+        """Create a SGDOptimizerDataType instance from Protobuf.
+
+        :param SGDOptimizerData sgd_data:
+            The Protobuf SGDOptimizerData message.
+        :return SGDOptimizerDataType:
+            The corresponding SGDOptimizerDataType instance.
+        """
+        return cls(learning_rate=sgd_data.learning_rate)
+
+    @staticmethod
+    def to_protobuf(sgd_data: SGDOptimizerDataType) -> SGDOptimizerData:
+        """Convert SGDOptimizerDataType to Protobuf.
+
+        :param SGDOptimizerDataType sgd_data:
+            The SGDOptimizerDataType instance.
+        :return SGDOptimizerData:
+            The corresponding Protobuf SGDOptimizerData message.
+        """
+        return SGDOptimizerData(learning_rate=sgd_data.learning_rate)
+
+    @classmethod
+    def from_class_instance(cls, optimizer: SGDOptimizer) -> SGDOptimizerDataType:
+        """Create a SGDOptimizerDataType instance from an SGDOptimizer class instance.
+
+        :param SGDOptimizer optimizer:
+            The SGDOptimizer class instance.
+        :return SGDOptimizerDataType:
+            The corresponding SGDOptimizerDataType instance.
+        """
+        return cls(learning_rate=optimizer.learning_rate)
+
+    def get_class_instance(self) -> SGDOptimizer:
+        """Return an instance of the SGDOptimizer with the stored learning rate.
+
+        :return SGDOptimizer:
+            An instance of SGDOptimizer with the specified learning rate.
+        """
+        return SGDOptimizer(learning_rate=self.learning_rate)
+
+
+@dataclass
+class AdamOptimizerDataType:
+    """Data class to hold Adam optimizer data."""
+
+    learning_rate: float
+    beta1: float = 0.9
+    beta2: float = 0.999
+    epsilon: float = 1e-8
+
+    @classmethod
+    def from_protobuf(cls, adam_data: AdamOptimizerData) -> AdamOptimizerDataType:
+        """Create a AdamOptimizerDataType instance from Protobuf.
+
+        :param AdamOptimizerData adam_data:
+            The Protobuf AdamOptimizerData message.
+        :return AdamOptimizerDataType:
+            The corresponding AdamOptimizerDataType instance.
+        """
+        return cls(
+            learning_rate=adam_data.learning_rate,
+            beta1=adam_data.beta1,
+            beta2=adam_data.beta2,
+            epsilon=adam_data.epsilon,
+        )
+
+    @staticmethod
+    def to_protobuf(adam_data: AdamOptimizerDataType) -> AdamOptimizerData:
+        """Convert AdamOptimizerDataType to Protobuf.
+
+        :param AdamOptimizerDataType adam_data:
+            The AdamOptimizerDataType instance.
+        :return AdamOptimizerData:
+            The corresponding Protobuf AdamOptimizerData message.
+        """
+        return AdamOptimizerData(
+            learning_rate=adam_data.learning_rate,
+            beta1=adam_data.beta1,
+            beta2=adam_data.beta2,
+            epsilon=adam_data.epsilon,
+        )
+
+    @classmethod
+    def from_class_instance(cls, optimizer: AdamOptimizer) -> AdamOptimizerDataType:
+        """Create an AdamOptimizerDataType instance from an AdamOptimizer class instance.
+
+        :param AdamOptimizer optimizer:
+            The AdamOptimizer class instance.
+        :return AdamOptimizerDataType:
+            The corresponding AdamOptimizerDataType instance.
+        """
+        return cls(
+            learning_rate=optimizer.learning_rate,
+            beta1=optimizer.beta1,
+            beta2=optimizer.beta2,
+            epsilon=optimizer.epsilon,
+        )
+
+    def get_class_instance(self) -> AdamOptimizer:
+        """Return an instance of the AdamOptimizer with the stored parameters.
+
+        :return AdamOptimizer:
+            An instance of AdamOptimizer with the specified parameters.
+        """
+        return AdamOptimizer(
+            learning_rate=self.learning_rate,
+            beta1=self.beta1,
+            beta2=self.beta2,
+            epsilon=self.epsilon,
+        )
+
+
+@dataclass
+class OptimizerDataType:
+    """Data class to hold optimizer data."""
+
+    sgd: SGDOptimizerDataType | None = None
+    adam: AdamOptimizerDataType | None = None
+
+    @classmethod
+    def from_protobuf(cls, optimizer_data: OptimizerData) -> OptimizerDataType:
+        """Create a OptimizerDataType instance from Protobuf.
+
+        :param OptimizerData optimizer_data:
+            The Protobuf OptimizerData message.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        which_oneof = optimizer_data.WhichOneof("algorithm")
+        match which_oneof:
+            case "sgd":
+                return cls(sgd=SGDOptimizerDataType.from_protobuf(optimizer_data.sgd), adam=None)
+            case "adam":
+                return cls(sgd=None, adam=AdamOptimizerDataType.from_protobuf(optimizer_data.adam))
+            case _:
+                msg = "OptimizerData must contain either SGD or Adam optimizer data."
+                raise ValueError(msg)
+
+    @staticmethod
+    def to_protobuf(optimizer_data: OptimizerDataType) -> OptimizerData:
+        """Convert OptimizerDataType to Protobuf.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return OptimizerData:
+            The corresponding Protobuf OptimizerData message.
+        """
+        if optimizer_data.sgd:
+            return OptimizerData(sgd=SGDOptimizerDataType.to_protobuf(optimizer_data.sgd), adam=None)
+        if optimizer_data.adam:
+            return OptimizerData(sgd=None, adam=AdamOptimizerDataType.to_protobuf(optimizer_data.adam))
+
+        msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
+        raise ValueError(msg)
+
+    @classmethod
+    def from_bytes(cls, optimizer_data: bytes) -> OptimizerDataType:
+        """Create a OptimizerDataType instance from Protobuf bytes.
+
+        :param bytes optimizer_data:
+            The Protobuf-serialized OptimizerData bytes.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        optimizer = OptimizerData()
+        optimizer.ParseFromString(optimizer_data)
+        return cls.from_protobuf(optimizer)
+
+    @staticmethod
+    def to_bytes(optimizer_data: OptimizerDataType) -> bytes:
+        """Convert OptimizerDataType to Protobuf bytes.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return bytes:
+            The Protobuf-serialized OptimizerData bytes.
+        """
+        optimizer = OptimizerDataType.to_protobuf(optimizer_data)
+        return optimizer.SerializeToString()  # type: ignore[no-any-return]
+
+    @classmethod
+    def from_class_instance(cls, optimizer: Optimizer) -> OptimizerDataType:
+        """Create an OptimizerDataType instance from an optimizer class instance.
+
+        :param Optimizer optimizer:
+            The optimizer class instance.
+        :return OptimizerDataType:
+            The corresponding OptimizerDataType instance.
+        """
+        if isinstance(optimizer, SGDOptimizer):
+            return cls(sgd=SGDOptimizerDataType.from_class_instance(optimizer))
+        if isinstance(optimizer, AdamOptimizer):
+            return cls(adam=AdamOptimizerDataType.from_class_instance(optimizer))
+
+        msg = "Optimizer must be an instance of SGDOptimizer or AdamOptimizer."
+        raise ValueError(msg)
+
+    def get_class_instance(self) -> SGDOptimizer | AdamOptimizer:
+        """Return an instance of the optimizer based on the stored data.
+
+        :param OptimizerDataType optimizer_data:
+            The OptimizerDataType instance.
+        :return SGDOptimizer | AdamOptimizer:
+            An instance of the specified optimizer.
+        """
+        if self.sgd:
+            return self.sgd.get_class_instance()
+        if self.adam:
+            return self.adam.get_class_instance()
+
+        msg = "OptimizerDataType must contain either SGD or Adam optimizer data."
+        raise ValueError(msg)
+
 
 @dataclass
 class NeuralNetworkDataType:
@@ -156,7 +415,7 @@ class NeuralNetworkDataType:
     output_activation: ActivationFunctionEnum
     weights: list[MatrixDataType]
     biases: list[MatrixDataType]
-    learning_rate: float
+    optimizer: OptimizerDataType = field(default_factory=OptimizerDataType)
 
     @classmethod
     def from_protobuf(cls, nn_data: NeuralNetworkData) -> NeuralNetworkDataType:
@@ -174,9 +433,9 @@ class NeuralNetworkDataType:
             input_activation=ActivationFunctionEnum.from_protobuf(nn_data.input_activation),
             hidden_activation=ActivationFunctionEnum.from_protobuf(nn_data.hidden_activation),
             output_activation=ActivationFunctionEnum.from_protobuf(nn_data.output_activation),
-            weights=nn_data.weights,
-            biases=nn_data.biases,
-            learning_rate=nn_data.learning_rate,
+            weights=[MatrixDataType.from_protobuf(weight) for weight in nn_data.weights],
+            biases=[MatrixDataType.from_protobuf(bias) for bias in nn_data.biases],
+            optimizer=OptimizerDataType.from_protobuf(nn_data.optimizer),
         )
 
     @staticmethod
@@ -197,7 +456,7 @@ class NeuralNetworkDataType:
             output_activation=ActivationFunctionEnum.to_protobuf(config_data.output_activation),
             weights=[MatrixDataType.to_protobuf(weight) for weight in config_data.weights],
             biases=[MatrixDataType.to_protobuf(bias) for bias in config_data.biases],
-            learning_rate=config_data.learning_rate,
+            optimizer=OptimizerDataType.to_protobuf(config_data.optimizer),
         )
 
     @classmethod

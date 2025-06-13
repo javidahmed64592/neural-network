@@ -1,4 +1,4 @@
-"""Unit tests for the neural_network.math.activation_functions.py module."""
+"""Unit tests for the neural_network.math.activation_functions module."""
 
 import numpy as np
 

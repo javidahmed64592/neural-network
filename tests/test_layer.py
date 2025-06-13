@@ -1,10 +1,11 @@
-"""Unit tests for the neural_network/layer.py module."""
+"""Unit tests for the neural_network.layer module."""
 
 import numpy as np
 
 from neural_network.layer import HiddenLayer, InputLayer, OutputLayer
-from neural_network.math.activation_functions import ActivationFunction
+from neural_network.math.activation_functions import LinearActivation
 from neural_network.math.matrix import Matrix
+from neural_network.math.optimizer import AdamOptimizer, SGDOptimizer
 
 
 class TestLayer:
@@ -39,12 +40,22 @@ class TestLayer:
         assert actual_weights_shape == expected_weights_shape
         assert actual_bias_shape == expected_bias_shape
 
-    def test_given_layers_when_setting_previous_layer_then_check_previous_layer_is_set(self) -> None:
+    def test_given_layers_when_setting_previous_layer_then_check_previous_layer_is_set(
+        self, mock_activation: type[LinearActivation]
+    ) -> None:
         """Test setting the previous layer for a hidden layer."""
-        input_layer = InputLayer(3, ActivationFunction)
-        hidden_layer = HiddenLayer(4, ActivationFunction, (0.0, 1.0), (0.0, 1.0))
+        input_layer = InputLayer(3, mock_activation)
+        hidden_layer = HiddenLayer(4, mock_activation, (0.0, 1.0), (0.0, 1.0))
         hidden_layer.set_prev_layer(input_layer)
         assert hidden_layer._prev_layer == input_layer
+
+    def test_given_layer_when_setting_optimizer_then_check_optimizer_is_set(
+        self, mock_hidden_layer_1: HiddenLayer, mock_optimizer: AdamOptimizer
+    ) -> None:
+        """Test setting the optimizer for a layer."""
+        assert isinstance(mock_hidden_layer_1._optimizer, SGDOptimizer)
+        mock_hidden_layer_1.set_optimizer(mock_optimizer)
+        assert mock_hidden_layer_1._optimizer == mock_optimizer
 
     def test_given_inputs_when_performing_feedforward_then_check_output_has_correct_shape(
         self, mock_hidden_layer_1: HiddenLayer, mock_len_hidden: list[int], mock_input_matrix: Matrix
@@ -66,8 +77,7 @@ class TestLayer:
         mock_hidden_layer_1.feedforward(mock_input_matrix)
 
         errors = Matrix.random_matrix(mock_len_hidden[0], 1, -1, 1)
-        learning_rate = 0.1
-        mock_hidden_layer_1.backpropagate_error(errors, learning_rate)
+        mock_hidden_layer_1.backpropagate_error(errors)
 
         assert not np.array_equal(mock_hidden_layer_1.weights.vals, original_weights)
         assert not np.array_equal(mock_hidden_layer_1.bias.vals, original_bias)
