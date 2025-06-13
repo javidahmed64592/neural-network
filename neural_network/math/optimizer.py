@@ -21,7 +21,7 @@ class Optimizer(ABC):
         :param LearningRateScheduler | None lr_scheduler:
             The learning rate scheduler for parameter updates.
         """
-        self._lr = lr
+        self.lr = lr
         self.lr_scheduler = lr_scheduler or StepDecayScheduler()
         self._t = 1
 
@@ -32,7 +32,7 @@ class Optimizer(ABC):
         :return float:
             The current learning rate.
         """
-        return self.lr_scheduler.step(self._lr, self._t)
+        return self.lr_scheduler.step(self.lr, self._t)
 
     @abstractmethod
     def update_weights(self, weights: Matrix, gradients: Matrix) -> Matrix:

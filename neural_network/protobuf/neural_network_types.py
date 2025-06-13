@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import IntEnum
 
 import numpy as np
@@ -226,7 +226,7 @@ class SGDOptimizerDataType:
         :return SGDOptimizerDataType:
             The corresponding SGDOptimizerDataType instance.
         """
-        return cls(learning_rate=optimizer._lr)
+        return cls(learning_rate=optimizer.lr)
 
 
 @dataclass
@@ -280,7 +280,7 @@ class AdamOptimizerDataType:
             The corresponding AdamOptimizerDataType instance.
         """
         return cls(
-            learning_rate=optimizer._lr,
+            learning_rate=optimizer.lr,
             beta1=optimizer.beta1,
             beta2=optimizer.beta2,
             epsilon=optimizer.epsilon,

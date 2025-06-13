@@ -428,14 +428,14 @@ class TestOptimizerDataType:
         assert sgd_optimizer_data_type.sgd == SGDOptimizerDataType.from_protobuf(sgd_optimizer_data.sgd)
         sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance._lr == sgd_optimizer_data.sgd.learning_rate
+        assert sgd_instance.lr == sgd_optimizer_data.sgd.learning_rate
 
         adam_optimizer_data_type = OptimizerDataType.from_protobuf(adam_optimizer_data)
         assert adam_optimizer_data_type.sgd is None
         assert adam_optimizer_data_type.adam == AdamOptimizerDataType.from_protobuf(adam_optimizer_data.adam)
         adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance._lr == adam_optimizer_data.adam.learning_rate  # Check _lr directly
+        assert adam_instance.lr == adam_optimizer_data.adam.learning_rate  # Check _lr directly
         assert adam_instance.beta1 == adam_optimizer_data.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data.adam.epsilon
@@ -496,11 +496,11 @@ class TestOptimizerDataType:
         """Test getting the optimizer class instance."""
         sgd_instance = sgd_optimizer_data_type.get_class_instance()
         assert isinstance(sgd_instance, SGDOptimizer)
-        assert sgd_instance._lr == sgd_optimizer_data_type.sgd.learning_rate
+        assert sgd_instance.lr == sgd_optimizer_data_type.sgd.learning_rate
 
         adam_instance = adam_optimizer_data_type.get_class_instance()
         assert isinstance(adam_instance, AdamOptimizer)
-        assert adam_instance._lr == adam_optimizer_data_type.adam.learning_rate
+        assert adam_instance.lr == adam_optimizer_data_type.adam.learning_rate
         assert adam_instance.beta1 == adam_optimizer_data_type.adam.beta1
         assert adam_instance.beta2 == adam_optimizer_data_type.adam.beta2
         assert adam_instance.epsilon == adam_optimizer_data_type.adam.epsilon
