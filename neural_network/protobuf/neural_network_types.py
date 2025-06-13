@@ -352,8 +352,8 @@ class LearningRateMethodEnum(IntEnum):
 class LearningRateSchedulerDataType:
     """Data class to hold learning rate scheduler data."""
 
-    decay_rate: int
-    decay_steps: float
+    decay_rate: float
+    decay_steps: int
     method: LearningRateMethodEnum
 
     @classmethod

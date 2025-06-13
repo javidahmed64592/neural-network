@@ -33,7 +33,7 @@ enum LearningRateMethod {
 
 message LearningRateSchedulerData {
     float decay_rate = 1;
-    float decay_steps = 2;
+    int32 decay_steps = 2;
     LearningRateMethod method = 3;
 }
 

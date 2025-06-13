@@ -344,8 +344,8 @@ class TestLearningRateSchedulerDataType:
     def test_from_class_instance(
         self,
         scheduler_class: type[LearningRateScheduler],
-        decay_rate: int,
-        decay_steps: float,
+        decay_rate: float,
+        decay_steps: int,
         expected_method: LearningRateMethodEnum,
     ) -> None:
         """Test creating LearningRateSchedulerDataType from class instance."""
@@ -369,8 +369,8 @@ class TestLearningRateSchedulerDataType:
     )
     def test_get_class_instance(
         self,
-        decay_rate: int,
-        decay_steps: float,
+        decay_rate: float,
+        decay_steps: int,
         method: LearningRateMethodEnum,
         expected_class: type[LearningRateScheduler],
     ) -> None:
@@ -397,7 +397,7 @@ class TestOptimizerDataType:
         return OptimizerData(
             sgd=SGDOptimizerData(learning_rate=0.1),
             learning_rate_scheduler=LearningRateSchedulerData(
-                decay_rate=0.5, decay_steps=10.0, method=LearningRateMethod.STEP_DECAY
+                decay_rate=0.5, decay_steps=10, method=LearningRateMethod.STEP_DECAY
             ),
         )
 
@@ -407,7 +407,7 @@ class TestOptimizerDataType:
         return OptimizerData(
             adam=AdamOptimizerData(learning_rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8),
             learning_rate_scheduler=LearningRateSchedulerData(
-                decay_rate=0.5, decay_steps=10.0, method=LearningRateMethod.STEP_DECAY
+                decay_rate=0.5, decay_steps=10, method=LearningRateMethod.STEP_DECAY
             ),
         )
 
