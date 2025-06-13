@@ -6,19 +6,33 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from neural_network.math.learning_rate_scheduler import LearningRateScheduler, StepDecayScheduler
 from neural_network.math.matrix import Matrix
 
 
 class Optimizer(ABC):
     """Abstract base class for optimization algorithms."""
 
-    def __init__(self, learning_rate: float = 0.001) -> None:
-        """Initialize the optimizer with a learning rate.
+    def __init__(self, lr: float, lr_scheduler: LearningRateScheduler | None = None) -> None:
+        """Initialize the optimizer with a learning rate scheduler.
 
-        :param float learning_rate:
-            The learning rate for parameter updates.
+        :param float lr:
+            Initial learning rate for the optimizer.
+        :param LearningRateScheduler | None lr_scheduler:
+            The learning rate scheduler for parameter updates.
         """
-        self.learning_rate = learning_rate
+        self._lr = lr
+        self.lr_scheduler = lr_scheduler or StepDecayScheduler()
+        self._t = 1
+
+    @property
+    def learning_rate(self) -> float:
+        """Get the current learning rate from the scheduler.
+
+        :return float:
+            The current learning rate.
+        """
+        return self.lr_scheduler.step(self._lr, self._t)
 
     @abstractmethod
     def update_weights(self, weights: Matrix, gradients: Matrix) -> Matrix:
@@ -44,25 +58,27 @@ class Optimizer(ABC):
             Updated bias.
         """
 
-    @abstractmethod
     def step(self) -> None:
-        """Increment the optimizer's internal state (e.g., time step for Adam)."""
+        """Increment the time step."""
+        self._t += 1
 
-    @abstractmethod
     def reset(self) -> None:
-        """Reset optimizer state (e.g., momentum terms)."""
+        """Reset optimizer state."""
+        self._t = 1
 
 
 class SGDOptimizer(Optimizer):
     """Stochastic Gradient Descent optimizer."""
 
-    def __init__(self, learning_rate: float = 0.01) -> None:
+    def __init__(self, lr: float = 0.1, lr_scheduler: LearningRateScheduler | None = None) -> None:
         """Initialize SGD optimizer.
 
-        :param float learning_rate:
-            The learning rate for parameter updates.
+        :param float lr:
+            Initial learning rate for the optimizer.
+        :param LearningRateScheduler | None lr_scheduler:
+            The learning rate scheduler for parameter updates.
         """
-        super().__init__(learning_rate)
+        super().__init__(lr, lr_scheduler)
 
     def update_weights(self, weights: Matrix, gradients: Matrix) -> Matrix:
         """Update weights using SGD.
@@ -88,12 +104,6 @@ class SGDOptimizer(Optimizer):
         """
         return bias + gradients * self.learning_rate
 
-    def step(self) -> None:
-        """Increment the optimizer's internal state (no state in SGD)."""
-
-    def reset(self) -> None:
-        """Reset optimizer state (no state in SGD)."""
-
 
 class AdamOptimizer(Optimizer):
     """Adam (Adaptive Moment Estimation) optimizer.
@@ -105,15 +115,18 @@ class AdamOptimizer(Optimizer):
 
     def __init__(
         self,
-        learning_rate: float = 0.001,
+        lr: float = 0.001,
+        lr_scheduler: LearningRateScheduler | None = None,
         beta1: float = 0.9,
         beta2: float = 0.999,
         epsilon: float = 1e-8,
     ) -> None:
         """Initialize Adam optimizer.
 
-        :param float learning_rate:
-            The step size for parameter updates.
+        :param float lr:
+            Initial learning rate for the optimizer.
+        :param LearningRateScheduler | None lr_scheduler:
+            The learning rate scheduler for parameter updates.
         :param float beta1:
             Exponential decay rate for first moment estimates (momentum).
         :param float beta2:
@@ -121,7 +134,7 @@ class AdamOptimizer(Optimizer):
         :param float epsilon:
             Small constant to prevent division by zero.
         """
-        super().__init__(learning_rate)
+        super().__init__(lr, lr_scheduler)
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
@@ -131,7 +144,6 @@ class AdamOptimizer(Optimizer):
         self._weight_v: Matrix | None = None  # Second moment estimate for weights
         self._bias_m: Matrix | None = None  # First moment estimate for bias
         self._bias_v: Matrix | None = None  # Second moment estimate for bias
-        self._t: int = 1  # Time step
 
     def update_weights(self, weights: Matrix, gradients: Matrix) -> Matrix:
         """Update weights using Adam optimization.
@@ -203,14 +215,10 @@ class AdamOptimizer(Optimizer):
 
         return bias + update
 
-    def step(self) -> None:
-        """Increment the time step for bias correction."""
-        self._t += 1
-
     def reset(self) -> None:
         """Reset optimizer state."""
+        super().reset()
         self._weight_m = None
         self._weight_v = None
         self._bias_m = None
         self._bias_v = None
-        self._t = 0

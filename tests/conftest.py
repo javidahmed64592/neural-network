@@ -18,7 +18,7 @@ def mock_activation() -> type[LinearActivation]:
 @pytest.fixture
 def mock_optimizer() -> AdamOptimizer:
     """Fixture for a mock optimizer class."""
-    return AdamOptimizer(learning_rate=0.1)
+    return AdamOptimizer()
 
 
 @pytest.fixture
