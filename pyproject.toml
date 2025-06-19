@@ -10,7 +10,7 @@ version = "1.15.5"
 description = "An artificial neural network library in Python."
 readme = "README.md"
 requires-python = ">=3.12"
-license-files = ["LICENSE"]
+license = {"file"="LICENSE"}
 authors = [
     { name = "Javid Ahmed", email = "javidahmed@icloud.com" }
 ]
@@ -122,6 +122,8 @@ select = [
     "YTT",
 ]
 ignore = [
+    "ANN101",
+    "ANN102",
     "D203",
     "D213",
     "PLR0913",
