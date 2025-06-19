@@ -29,7 +29,7 @@ jobs:
           python-version-file: ".python-version"
       - name: Install dependencies
         run: |
-          uv sync --dev
+          uv sync --extra dev
       - name: Check with mypy
         run: |
           uv run -m mypy .
@@ -48,7 +48,7 @@ jobs:
           python-version-file: ".python-version"
       - name: Install dependencies
         run: |
-          uv sync --dev
+          uv sync --extra dev
       - name: Test with pytest
         run: |
           uv run -m pytest --cov-report html
@@ -72,12 +72,12 @@ jobs:
           python-version-file: ".python-version"
       - name: Install dependencies
         run: |
-          uv sync --dev
+          uv sync --extra dev
       - name: Check version consistency
         run: |
           echo "Checking if versions in __init__.py and pyproject.toml match..."
-          INIT_VERSION=$(uv python -c "import neural_network; print(neural_network.__version__)")
-          TOML_VERSION=$(uv python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          INIT_VERSION=$(uv run python -c "import neural_network; print(neural_network.__version__)")
+          TOML_VERSION=$(uv run python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
           echo "Version in __init__.py: $INIT_VERSION"
           echo "Version in pyproject.toml: $TOML_VERSION"
           if [ "$INIT_VERSION" != "$TOML_VERSION" ]; then
