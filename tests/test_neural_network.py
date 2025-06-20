@@ -114,10 +114,10 @@ class TestNeuralNetwork:
         assert actual_len == mock_len_outputs
 
     def test_given_inputs_and_fitnesses_when_training_then_check_error_has_correct_shape(
-        self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int
+        self, mock_nn: NeuralNetwork, mock_inputs: list[float], mock_len_outputs: int, mock_outputs: list[float]
     ) -> None:
         """Test training with fitness produces error of correct shape."""
-        output_errors = mock_nn.train_with_fitness(mock_inputs, 1, 0.8)
+        output_errors = mock_nn.train_with_fitness(mock_inputs, mock_outputs, 1, 0.8)
         actual_len = len(output_errors)
         assert actual_len == mock_len_outputs
 
@@ -144,13 +144,14 @@ class TestNeuralNetwork:
         self,
         mock_nn: NeuralNetwork,
         mock_training_inputs: list[list[float]],
+        mock_training_outputs: list[list[float]],
         mock_fitnesses: list[float],
         mock_len_outputs: int,
     ) -> None:
         """Test fitness-based training updates weights and maintains output shape."""
         initial_weights = [layer.weights.vals.copy() for layer in mock_nn.layers[1:]]
 
-        mock_nn.run_fitness_training(mock_training_inputs, mock_fitnesses, epochs=2, alpha=0.2)
+        mock_nn.run_fitness_training(mock_training_inputs, mock_training_outputs, mock_fitnesses, epochs=2, alpha=0.2)
 
         final_weights = [layer.weights.vals for layer in mock_nn.layers[1:]]
         for initial, final in zip(initial_weights, final_weights, strict=True):
