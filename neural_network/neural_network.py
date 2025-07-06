@@ -6,6 +6,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
+import numpy as np
+
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
@@ -16,6 +18,8 @@ from neural_network.protobuf.neural_network_types import (
     NeuralNetworkDataType,
     OptimizerDataType,
 )
+
+rng = np.random.default_rng()
 
 
 class NeuralNetwork:
@@ -329,9 +333,12 @@ class NeuralNetwork:
         :param int epochs:
             Number of training epochs (default 1).
         """
+        num_data_points = len(inputs)
+        indices = np.linspace(0, num_data_points - 1, num_data_points, dtype=int)
         for _ in range(epochs):
-            for input_data, expected_output in zip(inputs, expected_outputs, strict=False):
-                self.train(input_data, expected_output)
+            rng.shuffle(indices)
+            for i in indices:
+                self.train(inputs[i], expected_outputs[i])
 
     def run_fitness_training(
         self,
@@ -355,9 +362,11 @@ class NeuralNetwork:
             Smoothing factor for fitness values (default 0.1).
         """
         prev_fitness = 0.0
-
+        num_data_points = len(inputs)
+        indices = np.linspace(0, num_data_points - 1, num_data_points, dtype=int)
         for _ in range(epochs):
-            for i in range(len(inputs)):
+            rng.shuffle(indices)
+            for i in indices:
                 fitness = fitnesses[i]
                 smoothed_fitness = prev_fitness * (1 - alpha) + fitness * alpha
 
