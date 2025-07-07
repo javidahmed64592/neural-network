@@ -6,6 +6,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
+import numpy as np
+
 from neural_network.layer import HiddenLayer, InputLayer, Layer, OutputLayer
 from neural_network.math.matrix import Matrix
 from neural_network.math.nn_math import calculate_error_from_expected, calculate_next_errors
@@ -16,6 +18,8 @@ from neural_network.protobuf.neural_network_types import (
     NeuralNetworkDataType,
     OptimizerDataType,
 )
+
+rng = np.random.default_rng()
 
 
 class NeuralNetwork:
@@ -266,11 +270,15 @@ class NeuralNetwork:
 
         return output_errors.as_list
 
-    def train_with_fitness(self, inputs: list[float], fitness: float, prev_fitness: float) -> list[float]:
-        """Train the neural network using fitness values.
+    def train_with_fitness(
+        self, inputs: list[float], outputs: list[float], fitness: float, prev_fitness: float
+    ) -> list[float]:
+        """Train the neural network using fitness values and output sensitivity.
 
         :param list[float] inputs:
             List of input values.
+        :param list[float] outputs:
+            List of output values.
         :param float fitness:
             Fitness value for the current generation.
         :param float prev_fitness:
@@ -283,9 +291,23 @@ class NeuralNetwork:
         for layer in self.layers:
             vals = layer.feedforward(vals)
 
-        fitness_error = fitness - prev_fitness
-        errors = vals * fitness_error
+        actual_outputs = Matrix.from_array(outputs)
 
+        # Calculate reinforcement signal based on fitness improvement
+        fitness_delta = fitness - prev_fitness
+
+        # Scale the reinforcement signal - strengthen positive reinforcement
+        # and weaken negative reinforcement to encourage exploration
+        if fitness_delta > 0:
+            reinforcement_signal = 1.0 * fitness_delta
+        else:
+            reinforcement_signal = 0.1 * fitness_delta
+
+        # Create target outputs that nudge the network in direction of higher fitness
+        target_outputs = actual_outputs * (1 + reinforcement_signal)
+        errors = target_outputs - actual_outputs
+
+        # Backpropagate the errors
         self._output_layer.backpropagate_error(errors)
         output_errors = Matrix.transpose(errors)
 
@@ -311,13 +333,17 @@ class NeuralNetwork:
         :param int epochs:
             Number of training epochs (default 1).
         """
+        num_data_points = len(inputs)
+        indices = np.linspace(0, num_data_points - 1, num_data_points, dtype=int)
         for _ in range(epochs):
-            for input_data, expected_output in zip(inputs, expected_outputs, strict=False):
-                self.train(input_data, expected_output)
+            rng.shuffle(indices)
+            for i in indices:
+                self.train(inputs[i], expected_outputs[i])
 
     def run_fitness_training(
         self,
         inputs: list[list[float]],
+        outputs: list[list[float]],
         fitnesses: list[float],
         epochs: int = 1,
         alpha: float = 0.1,
@@ -326,6 +352,8 @@ class NeuralNetwork:
 
         :param list[list[float]] inputs:
             List of input value lists.
+        :param list[list[float]] outputs:
+            List of output value lists.
         :param list[float] fitnesses:
             List of fitness values for each input.
         :param int epochs:
@@ -334,16 +362,18 @@ class NeuralNetwork:
             Smoothing factor for fitness values (default 0.1).
         """
         prev_fitness = 0.0
-
+        num_data_points = len(inputs)
+        indices = np.linspace(0, num_data_points - 1, num_data_points, dtype=int)
         for _ in range(epochs):
-            for i in range(len(inputs)):
+            rng.shuffle(indices)
+            for i in indices:
                 fitness = fitnesses[i]
                 smoothed_fitness = prev_fitness * (1 - alpha) + fitness * alpha
 
                 if fitness > prev_fitness:
                     smoothed_fitness += 0.05
 
-                self.train_with_fitness(inputs[i], smoothed_fitness, prev_fitness)
+                self.train_with_fitness(inputs[i], outputs[i], smoothed_fitness, prev_fitness)
                 prev_fitness = smoothed_fitness
 
     @staticmethod
