@@ -550,7 +550,7 @@ wheels = [
 
 [[package]]
 name = "neural-network"
-version = "1.15.5"
+version = "1.15.6"
 source = { editable = "." }
 dependencies = [
     { name = "grpcio-tools" },
