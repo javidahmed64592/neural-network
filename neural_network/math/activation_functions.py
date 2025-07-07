@@ -86,7 +86,7 @@ class ReluActivation(ActivationFunction):
         :return float:
             Derivative value (1 if x > 0 else 0).
         """
-        return [0, 1][x > 0]
+        return float(x > 0)
 
 
 class SigmoidActivation(ActivationFunction):
