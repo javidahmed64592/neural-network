@@ -10,13 +10,14 @@ version = "1.15.6"
 description = "An artificial neural network library in Python."
 readme = "README.md"
 requires-python = ">=3.12"
-license = {"file"="LICENSE"}
+license = { file = "LICENSE" }
 authors = [
     { name = "Javid Ahmed", email = "javidahmed@icloud.com" }
 ]
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "grpcio-tools",
@@ -30,7 +31,7 @@ dev = [
     "mypy",
     "pytest",
     "pytest-cov",
-    "tomli",
+    "validate-pyproject",
     "ipykernel",
     "matplotlib"
 ]
