@@ -7,31 +7,27 @@ name = "neural-network"
 version = "1.15.6"
 description = "An artificial neural network library in Python."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 license = { file = "LICENSE" }
 authors = [
     { name = "Javid Ahmed", email = "javidahmed@icloud.com" }
 ]
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    "grpcio-tools",
-    "numpy",
-    "pydantic"
+    "grpcio-tools>=1.76.0",
+    "numpy>=2.4.0",
+    "pydantic>=2.12.5",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
-    "mypy",
-    "pytest",
-    "pytest-cov",
-    "validate-pyproject",
-    "ipykernel",
-    "matplotlib"
+    "ipykernel>=7.1.0",
+    "matplotlib>=3.10.8",
+    "template-python[dev] @ git+https://github.com/javidahmed64592/template-python.git",
 ]
 
 [project.urls]
@@ -40,9 +36,15 @@ repository = "https://github.com/javidahmed64592/neural-network"
 [project.scripts]
 compile-protobuf = "neural_network.protobuf.compile_protobuf:main"
 
-[tool.setuptools.packages.find]
-include = ["neural_network*"]
-exclude = ["protobuf*"]
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build]
+include = [
+  "neural_network/**",
+  "LICENSE",
+  "README.md",
+]
 
 [tool.pytest.ini_options]
 addopts = [
@@ -52,8 +54,17 @@ addopts = [
     "term-missing",
 ]
 
+[tool.coverage.run]
+branch = true
+source = ["neural_network", "tests"]
+
+[tool.coverage.report]
+fail_under = 80
+skip_covered = false
+show_missing = true
+
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 120
 indent-width = 4
 
@@ -140,6 +151,9 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [tool.mypy]
 warn_unused_configs = true
 disallow_incomplete_defs = true
@@ -152,8 +166,6 @@ pretty = true
 
 [[tool.mypy.overrides]]
 module = [
-    "neural_network.*",
-    "numpy.*",
     "google.*"
 ]
 ignore_missing_imports = true
