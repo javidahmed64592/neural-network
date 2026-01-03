@@ -11,14 +11,14 @@ from neural_network.protobuf.compile_protobuf import OUT_DIR, PROJECT_ROOT, PROT
 
 
 @pytest.fixture
-def mock_logger() -> Generator[MagicMock, None, None]:
+def mock_logger() -> Generator[MagicMock]:
     """Fixture for patching the logger used in compile_protobuf module."""
     with patch("neural_network.protobuf.compile_protobuf.logger") as mock:
         yield mock
 
 
 @pytest.fixture(autouse=True)
-def mock_mkdir() -> Generator[MagicMock, None, None]:
+def mock_mkdir() -> Generator[MagicMock]:
     """Fixture for patching Path.mkdir used in compile_protobuf module."""
     with patch("neural_network.protobuf.compile_protobuf.Path.mkdir") as mock:
         mock.return_value = None
@@ -26,7 +26,7 @@ def mock_mkdir() -> Generator[MagicMock, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def mock_glob() -> Generator[MagicMock, None, None]:
+def mock_glob() -> Generator[MagicMock]:
     """Fixture for patching Path.glob used in compile_protobuf module."""
     with patch("neural_network.protobuf.compile_protobuf.Path.glob") as mock:
         mock.return_value = []
@@ -34,21 +34,21 @@ def mock_glob() -> Generator[MagicMock, None, None]:
 
 
 @pytest.fixture
-def mock_subprocess_run() -> Generator[MagicMock, None, None]:
+def mock_subprocess_run() -> Generator[MagicMock]:
     """Fixture for patching subprocess.run used in compile_protobuf module."""
     with patch("neural_network.protobuf.compile_protobuf.subprocess.run") as mock:
         yield mock
 
 
 @pytest.fixture
-def mock_compile_protobuf() -> Generator[MagicMock, None, None]:
+def mock_compile_protobuf() -> Generator[MagicMock]:
     """Fixture for patching compile_protobuf function itself."""
     with patch("neural_network.protobuf.compile_protobuf.compile_protobuf") as mock:
         yield mock
 
 
 @pytest.fixture
-def mock_sys_exit() -> Generator[MagicMock, None, None]:
+def mock_sys_exit() -> Generator[MagicMock]:
     """Fixture for patching sys.exit used in compile_protobuf module."""
     with patch("neural_network.protobuf.compile_protobuf.sys.exit") as mock:
         yield mock

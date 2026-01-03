@@ -1,53 +1,33 @@
-[![python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat&logo=python&logoColor=ffd343)](https://docs.python.org/3.12/)
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=ffd343)](https://docs.python.org/3.13/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![CI](https://img.shields.io/github/actions/workflow/status/javidahmed64592/neural-network/ci.yml?branch=main&style=flat-square&label=CI&logo=github)](https://github.com/javidahmed64592/neural-network/actions/workflows/ci.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/javidahmed64592/neural-network/build.yml?branch=main&style=flat-square&label=Build&logo=github)](https://github.com/javidahmed64592/neural-network/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <!-- omit from toc -->
 # Neural Network
 This is a neural network library in Python which can be used to feedforward arrays of inputs, generate outputs, and be trained with expected outputs.
 
-Install this package using `pip`:
+Install this package using `uv`:
 
-    pip install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+    uv pip install -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 
 To update the package:
 
-    pip update -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
+    uv pip install --upgrade -e git+https://github.com/javidahmed64592/neural-network#egg=neural_network
 
 _Note: It is recommended to install this into a virtual environment._
 
 <!-- omit from toc -->
 ## Table of Contents
-- [uv](#uv)
-- [Installing Dependencies](#installing-dependencies)
 - [Using the Neural Network](#using-the-neural-network)
   - [Creating a Neural Network](#creating-a-neural-network)
   - [Training a Neural Network](#training-a-neural-network)
   - [Saving and Loading Models](#saving-and-loading-models)
 - [Protobuf Classes](#protobuf-classes)
 - [Neuroevolution](#neuroevolution)
-- [Testing, Linting, and Type Checking](#testing-linting-and-type-checking)
 - [License](#license)
-
-## uv
-This repository is managed using the `uv` Python project manager: https://docs.astral.sh/uv/
-
-To install `uv`:
-
-```sh
-curl -LsSf https://astral.sh/uv/install.sh | sh                                    # Linux/Mac
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex" # Windows
-```
-
-## Installing Dependencies
-Install the required dependencies using `pip`:
-
-    uv sync
-
-To install with `dev` dependencies:
-
-    uv sync --extra dev
 
 ## Using the Neural Network
 For a complete example of how to create and train the neural network, see the example notebooks in the `examples` directory.
@@ -140,13 +120,6 @@ nn_3.weights, nn_3.bias = NeuralNetwork.crossover(
     bias_crossover_func=crossover_func
 )
 ```
-
-## Testing, Linting, and Type Checking
-
-- **Run tests:** `uv run pytest`
-- **Lint code:** `uv run ruff check .`
-- **Format code:** `uv run ruff format .`
-- **Type check:** `uv run mypy .`
 
 ## License
 
